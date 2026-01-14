@@ -24,7 +24,11 @@ export default class Agent extends EventEmitter {
     
     async run(query: string) {
         const spinner = this.logger.spinner('Agent is running...');
-
+        
+        this.memory.addMessage({
+            role: 'user',
+            content: query,
+        });
         const messages: message[] = [
             {
                 role: 'system',
