@@ -1,33 +1,30 @@
 import mongoose from 'mongoose';
 
-
 export const connectDB = async () => {
-
    if(!process.env.MONGODB_URI){
       throw new Error('MONGODB_URI is not set');
   }
 
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-    
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 30000, // 30秒超时
+      socketTimeoutMS: 45000,           // 45秒socket超时
+      connectTimeoutMS: 30000,          // 30秒连接超时
+    });
+
     // 监听连接事件
     mongoose.connection.on('error', (err) => {
       console.error('MongoDB connection error:', err);
     });
-    
-    mongoose.connection.on('disconnected', () => {
-      console.log('MongoDB disconnected');
-    });
 
     return conn;
-     
-    
-  } catch (error:any) {
-    console.error(`Error connecting to MongoDB: ${error.message}`);
-    process.exit(1);
+
+
+  } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`Error connecting to MongoDB: ${message}`);
+      process.exit(1);
   }
 
-  
-};
 
+};

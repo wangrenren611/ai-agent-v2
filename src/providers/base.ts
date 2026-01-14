@@ -8,7 +8,7 @@ export interface ProviderConfig {
   /** Additional options */
   [key: string]: unknown
 }
-export interface LLMptions {
+export interface LLMOptions {
   model?: string
   max_tokens?: number
   temperature?: number,
@@ -48,5 +48,5 @@ export abstract class LLMProvider{
    * @param prompt The input prompt for the model
    * @returns A promise that resolves to the model's response
    */
-  abstract generate(messages: message[], options?: LLMptions): Promise<LLMResponse|null>
+  abstract generate(messages: message[], options?: LLMOptions): Promise<LLMResponse|null>
 }

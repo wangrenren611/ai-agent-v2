@@ -1,8 +1,18 @@
+/**
+ * Message 数据库模型
+ */
 import mongoose from 'mongoose';
+
 const messageSchema = new mongoose.Schema({
+    sessionId: {
+        type: String,
+        required: true,
+        index: true,
+    },
     userId: {
-       type: String,
-       required: true,
+        type: String,
+        required: true,
+        index: true,
     },
     content: {
         type: String,
@@ -10,23 +20,24 @@ const messageSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'system', 'assistant','tool'],
+        enum: ['user', 'system', 'assistant', 'tool'],
         required: true,
+    },
+    type: {
+        type: String,
+        enum: ['text', 'tool', 'tool_call'],
+        default: 'text',
     },
     createdAt: {
         type: Date,
         default: Date.now,
+        index: true,
     },
-    updatedAt: {
-        type: Date,
-        default: Date.now,
-    },
-    type: {
-        type: String,
-        enum: ['text','tool','tool_call'],
-        default: 'text',
-    },
-})
+}, {
+    timestamps: true,
+});
+
+// 复合索引优化查询
+messageSchema.index({ sessionId: 1, createdAt: 1 });
 
 export const Message = mongoose.model('Message', messageSchema);
-

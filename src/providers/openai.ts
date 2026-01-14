@@ -6,7 +6,7 @@
  * OpenAI API provider implementation.
  */
 
-import { LLMProvider, LLMptions, LLMResponse, message, type ProviderConfig } from './base'
+import { LLMProvider, LLMOptions, LLMResponse, message, type ProviderConfig } from './base'
 
 /**
  * OpenAI provider configuration
@@ -22,26 +22,47 @@ export interface OpenAIConfig extends ProviderConfig {
   organization?: string
 }
 
+/**
+ * Chat Completion API response structure
+ */
+interface ChatCompletionResponse {
+  choices: Array<{
+    message: {
+      content: string;
+      type?: 'text' | 'tool' | 'tool_call';
+      tool_calls?: Array<{
+        id: string;
+        type: 'function';
+        function: {
+          name: string;
+          arguments: string;
+        };
+      }>;
+    };
+  }>;
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+}
 
 /**
  * OpenAI API provider
  *
- * Uses the OpenAI Chat Completions API for summarization.
+ * Uses the OpenAI Chat Completions API.
  */
 export class OpenAIProvider extends LLMProvider {
   baseURL: string
   model: string
-  promptTokens: number;
-  completionTokens: number;
+
   constructor(config: OpenAIConfig) {
     super(config)
     this.baseURL = config.baseURL || 'https://api.openai.com/v1'
     this.model = config.model || 'gpt-4o-mini'
-    this.promptTokens = 0;
-    this.completionTokens = 0;
   }
 
-  async generate(messages: message[], options?: LLMptions): Promise<LLMResponse|null> {
+  async generate(messages: message[], options?: LLMOptions): Promise<LLMResponse|null> {
     const { model, max_tokens, temperature } = options || {}
     try {
       const response = await fetch(`${this.baseURL}/chat/completions`, {
@@ -58,46 +79,29 @@ export class OpenAIProvider extends LLMProvider {
         }),
       })
 
-      const data: any = await response.json();
-//       {
-//   id: '46750164-6995-4d41-91e5-002f754e389f',
-//   object: 'chat.completion',
-//   created: 1768388546,
-//   model: 'deepseek-chat',
-//   choices: [
-//     {
-//       index: 0,
-//       message: [Object],
-//       logprobs: null,
-//       finish_reason: 'stop'
-//     }
-//   ],
-//   usage: {
-//     prompt_tokens: 11,
-//     completion_tokens: 29,
-//     total_tokens: 40,
-//     prompt_tokens_details: { cached_tokens: 0 },
-//     prompt_cache_hit_tokens: 0,
-//     prompt_cache_miss_tokens: 11
-//   },
-//   system_fingerprint: 'fp_eaab8d114b_prod0820_fp8_kvcache'
-// }
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json() as ChatCompletionResponse;
+
       return {
-        content: data.choices[0].message.content || '',
+        content: data.choices[0]?.message?.content || '',
         role: 'assistant',
-        type: data?.choices[0].message.type || 'text',
-        tool_calls: data?.choices[0].message.tool_calls || [],
+        type: data.choices[0]?.message?.type || 'text',
+        tool_calls: data.choices[0]?.message?.tool_calls || [],
         usage: {
-          prompt_tokens: data?.usage.prompt_tokens || 0,
-          completion_tokens: data?.usage.completion_tokens || 0,
-          total_tokens: data?.usage.total_tokens || 0,
+          prompt_tokens: data.usage?.prompt_tokens || 0,
+          completion_tokens: data.usage?.completion_tokens || 0,
+          total_tokens: data.usage?.total_tokens || 0,
         },
       };
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('OpenAI API error:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       return {
-        content: 'LLM API error: ' + error.message,
+        content: 'LLM API error: ' + errorMsg,
         role: 'assistant',
         type: 'text',
         tool_calls: [],
