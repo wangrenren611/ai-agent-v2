@@ -187,8 +187,7 @@ export class ToolRegistry {
                 function: {
                     name: tool.name,
                     description: tool.description,
-                    // strict 是 OpenAI 特有参数，DeepSeek 可能不支持
-                    // strict: true,
+                    strict: true,
                     parameters: jsonSchema,
                 },
             };

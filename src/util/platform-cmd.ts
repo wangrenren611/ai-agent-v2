@@ -5,6 +5,7 @@
  */
 
 import { execaCommandSync, execaCommand } from 'execa';
+import iconv from 'iconv-lite';
 
 /**
  * 平台类型
@@ -174,17 +175,18 @@ export function execCommand(command: string): { stdout: string; stderr: string; 
     try {
         const result = execaCommandSync(command, {
             shell: true,
-            encoding: 'utf8' as any
+            encoding: 'buffer' as any,
         });
         return {
-            stdout: String(result.stdout || ''),
-            stderr: String(result.stderr || ''),
+            stdout: decodeShellOutput(result.stdout),
+            stderr: decodeShellOutput(result.stderr),
             exitCode: result.exitCode ?? 0
         };
     } catch (error: any) {
+        const stderr = normalizeTimeoutText(decodeShellOutput(error.stderr) || String(error.message || ''));
         return {
-            stdout: String(error.stdout || ''),
-            stderr: String(error.stderr || error.message),
+            stdout: decodeShellOutput(error.stdout),
+            stderr,
             exitCode: error.exitCode || 1
         };
     }
@@ -200,7 +202,7 @@ export function execCommand(command: string): { stdout: string; stderr: string; 
  */
 export async function execCommandAsync(
     command: string,
-    options?: { timeout?: number }
+    options?: { timeout?: number; cwd?: string; env?: NodeJS.ProcessEnv }
 ): Promise<{
     stdout: string;
     stderr: string;
@@ -209,19 +211,38 @@ export async function execCommandAsync(
     try {
         const result = await execaCommand(command, {
             shell: true,
-            encoding: 'utf8' as any,
+            encoding: 'buffer' as any,
             timeout: options?.timeout,
+            cwd: options?.cwd,
+            env: options?.env,
         });
         return {
-            stdout: String(result.stdout || ''),
-            stderr: String(result.stderr || ''),
+            stdout: decodeShellOutput(result.stdout),
+            stderr: decodeShellOutput(result.stderr),
             exitCode: result.exitCode ?? 0
         };
     } catch (error: any) {
+        const stderr = normalizeTimeoutText(decodeShellOutput(error.stderr) || String(error.message || ''));
         return {
-            stdout: String(error.stdout || ''),
-            stderr: String(error.stderr || error.message),
+            stdout: decodeShellOutput(error.stdout),
+            stderr,
             exitCode: error.exitCode || 1
         };
     }
+}
+
+function decodeShellOutput(output: unknown): string {
+    if (output === undefined || output === null) return '';
+    if (typeof output === 'string') return output;
+    if (Buffer.isBuffer(output)) {
+        if (getPlatform() !== 'windows') return output.toString('utf8');
+        const utf8 = output.toString('utf8');
+        if (!utf8.includes('\uFFFD')) return utf8;
+        return iconv.decode(output, 'cp936');
+    }
+    return String(output);
+}
+
+function normalizeTimeoutText(text: string): string {
+    return text.replace(/timed out after (\d+) milliseconds/gi, 'timed out after $1ms');
 }

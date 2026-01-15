@@ -16,7 +16,10 @@ const messageSchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        required: true,
+        required: function (this: { type?: string }) {
+            return this.type !== 'tool_call';
+        },
+        default: '',
     },
     role: {
         type: String,

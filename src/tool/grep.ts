@@ -17,11 +17,11 @@ export  default class GrepTool extends BaseTool<typeof schema> {
   description = `Fast content search tool for finding code patterns.
 
 BEST PRACTICES:
-1. Start by exploring the codebase structure using 'dir' or 'ls' commands
-2. Read key files (like index.ts, main entry points) before searching
-3. Use specific search patterns: "class_name", "function_name", or "import.*module"
-4. Avoid broad searches like "http|request|fetch" - use specific terms instead
-5. Once you find relevant files, read them completely instead of searching for more patterns
+1. Use this tool FIRST to locate relevant files fast
+2. Use specific search patterns: "class_name", "function_name", or "import.*module"
+3. Prefer narrowing with filePattern like "*.ts" when possible
+4. Avoid broad patterns like "http|request|fetch" unless needed
+5. After you find the right file, read it fully instead of searching again
 
 WHEN TO USE:
 - Finding specific function/class definitions
@@ -30,8 +30,7 @@ WHEN TO USE:
 
 WHEN NOT TO USE:
 - After already reading a file (don't search for patterns you've already seen)
-- For open-ended exploration (use dir/ls to understand structure first)
-- When you need file listings (use Bash with 'dir' or 'ls')
+- For listing files/directories (use Bash only when necessary)
 
 Returns JSON with file paths, line numbers, and matched content.`;
   schema = schema;

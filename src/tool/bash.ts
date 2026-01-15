@@ -38,24 +38,10 @@ const schema = z.object({
  */
 export default class BashTool extends BaseTool<typeof schema> {
     name = 'bash';
+    private cwd = process.cwd();
 
     get description(): string {
-        const platform = getPlatform();
-        const baseDesc = 'Execute shell commands with persistent state (cd, env vars persist).';
-
-        const platformInfo = {
-            windows: 'Platform: Windows (cmd.exe). Use: dir, type, cd. AVOID Unix commands (head, tail, grep).',
-            mac: 'Platform: macOS (zsh). Use: ls, cat, find. Full Unix support.',
-            linux: 'Platform: Linux (bash). Use: ls, cat, find. Full Unix support.'
-        };
-
-        const examples = {
-            windows: `Examples: dir /a, type file.txt, dir /s /b src\\*.ts`,
-            mac: `Examples: ls -la, cat file.txt, find . -name "*.ts"`,
-            linux: `Examples: ls -la, cat file.txt, find . -name "*.ts"`
-        };
-
-        return `${baseDesc}\n\n${platformInfo[platform]}\n\n${examples[platform]}\n\nUse for: testing, building, git, file operations.`;
+        return 'Run bash commands';
     }
 
     schema = schema;
@@ -71,17 +57,18 @@ export default class BashTool extends BaseTool<typeof schema> {
      */
     async execute(args: z.infer<typeof this.schema>): Promise<string> {
         const { command } = args;
-
-        // 获取解析器并解析命令
-        const parser = await getBashParser();
-        const result = parser.parse(command);
-
-        // 显示解析结果
-        // this.displayParseResult(result);
-
-        // 语法无效时拒绝执行
-        if (!result.valid) {
-            return 'Command not executed due to syntax error';
+        const platform = getPlatform();
+        if (platform !== 'windows') {
+            const parser = await getBashParser();
+            const result = parser.parse(command);
+            if (!result.valid) {
+                return 'Command not executed due to syntax error';
+            }
+        } else {
+            const maybeDangerous = /(^|\s)(format|shutdown|reg\s+delete|rmdir\s+\/s|rd\s+\/s|del\s+\/f)(\s|$)/i;
+            if (maybeDangerous.test(command)) {
+                return 'Command not executed due to safety policy';
+            }
         }
 
         // 执行命令
@@ -104,18 +91,120 @@ export default class BashTool extends BaseTool<typeof schema> {
      * @returns Promise<string> - 执行结果
      */
     private async runCommand(command: string): Promise<string> {
-        // 使用封装好的跨平台执行函数，传递超时配置
-        const result = await execCommandAsync(command, {
+        const normalizedCommand = this.normalizeCommand(command);
+        const cdOutput = this.tryHandleCd(normalizedCommand);
+        if (cdOutput !== null) return cdOutput;
+
+        const result = await execCommandAsync(normalizedCommand, {
             timeout: this.timeout,
+            cwd: this.cwd,
         });
 
         if (result.exitCode === 0) {
-            return result.stdout || `Command exited successfully`;
+            return this.truncateOutput(result.stdout || `Command exited successfully`);
         } else {
             // 命令失败时返回 stderr
-            return result.stderr || `Command failed with exit code ${result.exitCode}`;
+            return this.truncateOutput(result.stderr || `Command failed with exit code ${result.exitCode}`);
         }
     }
 
+    private tryHandleCd(command: string): string | null {
+        const platform = getPlatform();
+        const cdMatch = command.match(/^\s*cd(?:\s+\/d)?\s+(.+?)\s*$/i);
+        if (!cdMatch) return null;
+
+        const rawTarget = cdMatch[1]?.trim();
+        if (!rawTarget) return null;
+
+        const target = rawTarget.replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1');
+        const resolved = platform === 'windows'
+            ? require('path').resolve(this.cwd, target.replace(/\//g, '\\'))
+            : require('path').resolve(this.cwd, target);
+
+        this.cwd = resolved;
+        return this.cwd;
+    }
+
+    private normalizeCommand(command: string): string {
+        if (getPlatform() !== 'windows') return command;
+
+        const timeoutMatch = command.match(/^\s*timeout\s+\/t\s+(\d+)\s*$/i);
+        if (timeoutMatch) {
+            const seconds = Number(timeoutMatch[1]);
+            const safeSeconds = Number.isFinite(seconds) ? Math.max(0, seconds) : 0;
+            return `powershell -NoProfile -Command "Start-Sleep -Seconds ${safeSeconds}"`;
+        }
+
+        const { tokens, quoteTypes } = this.tokenize(command);
+        const normalizedTokens = tokens.map((token, i) => {
+            const quote = quoteTypes[i];
+            const original = quote ? `${quote}${token}${quote}` : token;
+            if (!token.includes('/')) return original;
+            if (token.startsWith('/')) return original;
+            if (token.includes('://')) return original;
+
+            const looksLikeProjectPath =
+                token.startsWith('./') ||
+                token.startsWith('../') ||
+                token.startsWith('src/') ||
+                token.startsWith('test/') ||
+                token.startsWith('__tests__/') ||
+                /\.(ts|tsx|js|jsx|json|md|txt|log|env)$/i.test(token) ||
+                token.includes('/src/') ||
+                token.includes('/test/') ||
+                token.includes('/__tests__/');
+
+            if (!looksLikeProjectPath) return original;
+
+            const replaced = token.replace(/\//g, '\\');
+            return quote ? `${quote}${replaced}${quote}` : replaced;
+        });
+
+        return normalizedTokens.join(' ');
+    }
+
+    private tokenize(command: string): { tokens: string[]; quoteTypes: Array<'"' | "'" | null> } {
+        const tokens: string[] = [];
+        const quoteTypes: Array<'"' | "'" | null> = [];
+        let current = '';
+        let quote: '"' | "'" | null = null;
+
+        for (let i = 0; i < command.length; i++) {
+            const ch = command[i];
+            if ((ch === '"' || ch === "'") && quote === null) {
+                quote = ch as '"' | "'";
+                continue;
+            }
+            if (quote !== null && ch === quote) {
+                tokens.push(current);
+                quoteTypes.push(quote);
+                current = '';
+                quote = null;
+                continue;
+            }
+            if (quote === null && /\s/.test(ch)) {
+                if (current.length > 0) {
+                    tokens.push(current);
+                    quoteTypes.push(null);
+                    current = '';
+                }
+                continue;
+            }
+            current += ch;
+        }
+
+        if (current.length > 0) {
+            tokens.push(current);
+            quoteTypes.push(quote);
+        }
+
+        return { tokens, quoteTypes };
+    }
+
+    private truncateOutput(output: string): string {
+        const maxChars = 12000;
+        if (output.length <= maxChars) return output;
+        return `${output.slice(0, maxChars)}\n... (truncated, ${output.length - maxChars} more chars)`;
+    }
  
 }

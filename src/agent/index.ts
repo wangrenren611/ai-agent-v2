@@ -6,7 +6,7 @@ import EventEmitter from "events";
 import { LLMProvider, message, ToolSchema } from "../providers/base";
 import { ScopedLogger } from "../util/log";
 import { SessionManager } from "../application/SessionManager";
-import { SYSTEM_PROMPT, SYSTEM_PROMPT1 } from "../prompts/system";
+import { SYSTEM_PROMPT } from "../prompts/system";
 import { ToolRegistry } from "../tool";
 
 export interface AgentConfig {
