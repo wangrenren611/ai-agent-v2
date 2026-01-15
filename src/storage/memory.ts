@@ -29,7 +29,7 @@ export default class Memory {
            try {
                await Message.create({
                    userId: 'default',
-                   content: msg.content,
+                   content: msg.role==='tool'? "":msg.content,
                    role: msg.role,
                    type: msg.type || 'text',
                });

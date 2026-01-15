@@ -20,6 +20,13 @@
 
 import { BaseTool } from './base';
 import BashTool from './bash';
+import { ReadFileTool } from './file';
+import { WriteFileTool } from './file';
+import GrepTool from './grep';
+import { SurgicalEditTool } from './surgical';
+import { BatchReplaceTool } from './batch-replace';
+import { TodoReadTool } from './todo';
+import { TodoWriteTool } from './todo';
 
 // =============================================================================
 // Tool Registry
@@ -40,14 +47,28 @@ export class ToolRegistry {
     /**
      * 注册工具
      *
-     * @param tool - 工具实例
+     * 支持单个工具或工具数组
+     *
+     * @param tool - 工具实例或工具数组
      * @throws 如果工具名称已存在
+     *
+     * @example
+     * ```ts
+     * // 注册单个工具
+     * ToolRegistry.register(new BashTool());
+     *
+     * // 批量注册工具
+     * ToolRegistry.register([new BashTool(), new GrepTool()]);
+     * ```
      */
-    static register<T extends BaseTool<any>>(tool: T): void {
-        if (this.tools.has(tool.name)) {
-            throw new Error(`Tool "${tool.name}" is already registered`);
+    static register<T extends BaseTool<any>>(tool: T | T[]): void {
+        const tools = Array.isArray(tool) ? tool : [tool];
+        for (const t of tools) {
+            if (this.tools.has(t.name)) {
+                throw new Error(`Tool "${t.name}" is already registered`);
+            }
+            this.tools.set(t.name, t);
         }
-        this.tools.set(tool.name, tool);
     }
 
     /**
@@ -152,7 +173,7 @@ export class ToolRegistry {
         function: {
             name: string;
             description: string;
-            strict: boolean;
+            strict?: boolean;
             parameters: Record<string, unknown>;
         };
     }> {
@@ -166,7 +187,8 @@ export class ToolRegistry {
                 function: {
                     name: tool.name,
                     description: tool.description,
-                    strict: true,
+                    // strict 是 OpenAI 特有参数，DeepSeek 可能不支持
+                    // strict: true,
                     parameters: jsonSchema,
                 },
             };
@@ -230,7 +252,7 @@ export class ToolRegistry {
                 return { type: 'boolean' };
 
             case 'ZodArray':
-                const itemType = this.zodTypeToJsonSchema(def.type);
+                const itemType = this.zodTypeToJsonSchema(def.type?._def || def.type, key);
                 return {
                     type: 'array',
                     items: itemType,
@@ -241,10 +263,9 @@ export class ToolRegistry {
 
             case 'ZodOptional':
             case 'ZodNullable':
-                return this.zodTypeToJsonSchema(def.innerType);
-
             case 'ZodDefault':
-                return this.zodTypeToJsonSchema(def.innerType);
+                // innerType 是 Zod 对象，需要获取其 _def
+                return this.zodTypeToJsonSchema(def.innerType._def, key);
 
             case 'ZodEnum':
                 return {
@@ -266,7 +287,7 @@ export class ToolRegistry {
 
             case 'ZodEffects':
                 // 处理带描述的字段
-                const innerSchema = this.zodTypeToJsonSchema(def.innerType, key);
+                const innerSchema = this.zodTypeToJsonSchema(def.innerType._def, key);
                 if (def.description) {
                     return { ...innerSchema, description: def.description };
                 }
@@ -274,7 +295,11 @@ export class ToolRegistry {
 
             default:
                 // 未知类型，使用 any
-                console.warn(`Unknown Zod type: ${typeName} for field: ${key}`);
+                if (typeName !== undefined) {
+                    console.warn(`Unknown Zod type: ${typeName} for field: ${key}`);
+                } else {
+                    console.warn(`Undefined Zod type definition for field: ${key}, def:`, def);
+                }
                 return {};
         }
     }
@@ -290,7 +315,8 @@ export class ToolRegistry {
  * 在应用启动时调用此函数
  */
 export function registerDefaultTools(): void {
-    ToolRegistry.register(new BashTool());
+
+    ToolRegistry.register([new BashTool(),new GrepTool(), new ReadFileTool(), new WriteFileTool(), new SurgicalEditTool(), new BatchReplaceTool(), new TodoReadTool(), new TodoWriteTool()]);
 }
 
 // 自动注册默认工具
@@ -304,3 +330,4 @@ export { BaseTool } from './base';
 export { default as BashTool } from './bash';
 export { getBashParser } from './bash-parser';
 export type { CommandInfo, SecurityIssue, ParseResult } from './bash-parser';
+export { BatchReplaceTool } from './batch-replace';

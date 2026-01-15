@@ -9,6 +9,7 @@ import { connectDB } from './storage/mongoose';
 import { SessionManager } from './application/SessionManager';
 import { MessageRepository } from './infrastructure/MessageRepository';
 import { CLI } from './cli';
+import { registerDefaultTools } from './tool';
 
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}`, override: true });
@@ -39,7 +40,8 @@ async function initializeApp(config: AppConfig) {
         apiKey: config.deepseekApiKey,
         baseURL: config.deepseekBaseUrl,
     });
-
+    
+  
     // 5. 初始化 Agent
     const agent = new Agent({
         llmProvider,

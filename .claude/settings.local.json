@@ -14,7 +14,15 @@
       "Bash(pnpm approve-builds:*)",
       "Bash(pnpm rebuild:*)",
       "Bash(node -e:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm build:*)",
+      "Bash(dir:*)",
+      "Bash(chcp:*)",
+      "Bash(echo:*)",
+      "Bash(ls:*)",
+      "Bash(cd:*)",
+      "Bash(node:*)"
     ]
   },
   "enabledMcpjsonServers": [

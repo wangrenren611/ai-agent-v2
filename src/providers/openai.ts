@@ -6,7 +6,7 @@
  * OpenAI API provider implementation.
  */
 
-import { LLMProvider, LLMOptions, LLMResponse, message, type ProviderConfig } from './base'
+import { LLMProvider, LLMOptions, LLMResponse, message, ToolSchema, type ProviderConfig } from './base'
 
 /**
  * OpenAI provider configuration
@@ -63,24 +63,35 @@ export class OpenAIProvider extends LLMProvider {
   }
 
   async generate(messages: message[], options?: LLMOptions): Promise<LLMResponse|null> {
-    const { model, max_tokens, temperature } = options || {}
+    const { model, max_tokens, temperature, tools } = options || {}
     try {
+      const requestBody: Record<string, unknown> = {
+        model: model || this.model,
+        messages,
+        max_tokens: max_tokens || 2000,
+        temperature: temperature || 0.1,
+      };
+
+      // 添加 tools 参数（如果提供）
+      if (tools && tools.length > 0) {
+        requestBody.tools = tools;
+        // 调试：打印工具 schemas
+        // console.log('Tools sent to API:', JSON.stringify(tools, null, 2));
+      }
+
       const response = await fetch(`${this.baseURL}/chat/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.config.apiKey}`,
         },
-        body: JSON.stringify({
-          model: model || this.model,
-          messages,
-          max_tokens: max_tokens || 2000,
-          temperature: temperature || 0.7,
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+        const errorBody = await response.text();
+        console.error('API Error Response:', errorBody);
+        throw new Error(`API request failed: ${response.status} ${response.statusText}\n${errorBody}`);
       }
 
       const data = await response.json() as ChatCompletionResponse;

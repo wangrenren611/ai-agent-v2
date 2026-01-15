@@ -28,6 +28,16 @@ const messageSchema = new mongoose.Schema({
         enum: ['text', 'tool', 'tool_call'],
         default: 'text',
     },
+    /** Tool call ID (required for tool response messages) */
+    toolCallId: {
+        type: String,
+        required: false,
+    },
+    /** Tool calls (serialized as JSON string) */
+    toolCalls: {
+        type: String,
+        required: false,
+    },
     createdAt: {
         type: Date,
         default: Date.now,

@@ -21,9 +21,11 @@ export class MessageRepository {
             await Message.create({
                 sessionId,
                 userId,
-                content: msg.content,
+                content: msg.content || '',
                 role: msg.role,
                 type: msg.type || 'text',
+                toolCallId: msg.tool_call_id,
+                toolCalls: msg.tool_calls ? JSON.stringify(msg.tool_calls) : undefined,
             });
         } catch (error) {
             const errorMsg = error instanceof Error ? error.message : String(error);
@@ -40,9 +42,11 @@ export class MessageRepository {
             const docs = messages.map(msg => ({
                 sessionId,
                 userId,
-                content: msg.content,
+                content: msg.content || '',
                 role: msg.role,
                 type: msg.type || 'text',
+                toolCallId: msg.tool_call_id,
+                toolCalls: msg.tool_calls ? JSON.stringify(msg.tool_calls) : undefined,
             }));
             await Message.insertMany(docs);
         } catch (error) {
@@ -58,11 +62,24 @@ export class MessageRepository {
     async findBySession(sessionId: string): Promise<message[]> {
         try {
             const docs = await Message.find({ sessionId }).sort({ createdAt: 1 });
-            return docs.map(doc => ({
-                role: doc.role as any,
-                content: doc.content,
-                type: doc.type as any,
-            }));
+            return docs.map(doc => {
+                const msg: message = {
+                    role: doc.role as any,
+                    content: doc.content,
+                    type: doc.type as any,
+                };
+                if (doc.toolCallId) {
+                    msg.tool_call_id = doc.toolCallId;
+                }
+                if (doc.toolCalls) {
+                    try {
+                        msg.tool_calls = JSON.parse(doc.toolCalls);
+                    } catch {
+                        // Ignore invalid JSON
+                    }
+                }
+                return msg;
+            });
         } catch (error) {
             const errorMsg = error instanceof Error ? error.message : String(error);
             this.logger.error(`Failed to find messages: ${errorMsg}`);

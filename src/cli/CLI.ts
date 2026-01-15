@@ -96,21 +96,16 @@ export class CLI {
      * 处理对话输入（带加载动画）
      */
     private async handleChat(input: string): Promise<void> {
-        const spinner = this.logger.spinner('🤖 Thinking...');
-
         try {
             const response = await this.agent.run(this.sessionId, this.userId, input, { silent: true });
             if (response) {
-                spinner.succeed('✅ Done');
-                console.log(`\n🤖 Agent:\n${response.content}\n`);
+                this.logger.info(`\n🤖 Agent:\n${response.content}\n`);
             } else {
-                spinner.fail('❌ Agent failed to respond');
-                console.log();
+                this.logger.error('❌ Agent failed to respond');
             }
         } catch (error) {
-            spinner.fail('❌ Request failed');
             const errorMsg = error instanceof Error ? error.message : String(error);
-            console.log(`Error: ${errorMsg}\n`);
+            this.logger.error(`Error: ${errorMsg}\n`);
         }
     }
 
