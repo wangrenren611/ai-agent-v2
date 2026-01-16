@@ -8,13 +8,21 @@ export  class SurgicalEditTool extends BaseTool<any> {
 
   name = "precise_replace";
 
+  description = "Precise code replacement using line numbers and exact text matching. " +
+    "IMPORTANT: All text parameters (oldText, newText) should be provided as plain strings, " +
+    "NOT wrapped in markdown code blocks or backticks.";
 
-  description = "Precise code replacement. Use line number and exact text matches from search_code to make safe modifications.";
   schema = z.object({
-    filePath: z.string(),
-    line: z.number().describe("Line number (1-based)"),
-    oldText: z.string().describe("The exact text segment to replace on that line"),
-    newText: z.string().describe("The new text")
+    filePath: z.string().describe("The absolute or relative path to the file"),
+    line: z.number().describe("Line number (1-based, starting from 1)"),
+    oldText: z.string().describe(
+      "The exact text segment to replace on that line. " +
+      "Provide as plain text without markdown formatting."
+    ),
+    newText: z.string().describe(
+      "The new replacement text. " +
+      "Provide as plain text without markdown formatting."
+    )
   });
 
   async execute({ filePath, line, oldText, newText }: z.infer<typeof this.schema>): Promise<string> {

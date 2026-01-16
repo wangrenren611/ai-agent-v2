@@ -150,7 +150,7 @@ class Log {
    */
   static info(msg: unknown, scope?: string) {
     if (!enabled(this.level, 'info')) return;
-    console.log(`${prefix('info', scope)} ${chalk.white(stringify(msg))}`);
+    console.log(`${prefix('info', scope)} ${chalk.green(stringify(msg))}`);
   }
 
   /**

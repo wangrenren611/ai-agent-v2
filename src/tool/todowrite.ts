@@ -42,6 +42,7 @@ You MUST use this tool IMMEDIATELY when:
 5. **Include testing** - Always add test/verification steps
 6. **Include documentation** - Add doc updates if needed
 
+
 ## 🔄 Real-Time Updates (CRITICAL)
 
 You MUST update the todo list after EACH subtask:

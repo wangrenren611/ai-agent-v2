@@ -1,59 +1,55 @@
-
 》分析当前项目
 ✔ Thinking-1 end
-✔ Tool todo_write({"todos": [{"id": "1", "content": "探索项目结构和主要文件", "status": "in_progress", "priority": "high"}, {"id": "2", "content": "分析主要代码架构和入口点", "status": "pending", "priority": "high"}, {"id": "3", "content": "识别核心组件和依赖关系", "status": "pending", "priority": "medium"}, {"id": "4", "content": "检查配置文件和技术栈", "status": "pending", "priority": "medium"}, {"id": "5", "content": "总结项目架构和关键发现", "status": "pending", "priority": "low"}]}) execution end
-[2026-01-15T17:22:26.063Z] [INFO] [Agent] Tool todo_write result:
-
+[2026-01-16T01:03:51.860Z] [INFO] [Agent] Tool tips: 我来分析这个项目的结构和代码。首先创建一个任务列表来系统性地分析项目。
+✔ Tool todo_write({"todos": [{"id": "1", "content": "分析项目结构和配置文件", "status": "in_progress", "priority": "high"}, {"id": "2", "content": "识别主要代码架构和入口点", "status": "pending", "priority": "high"}, {"id": "3", "content": "分析核心组件和依赖关系", "status": "pending", "priority": "medium"}, {"id": "4", "content": "总结项目架构和关键发现", "status": "pending", "priority": "medium"}]}) execution end
+[2026-01-16T01:03:51.863Z] [INFO] [Agent] Tool todo_write result: 
+ 
         todos: [
   {
-    "content": "探索项目结构和主要文件",
+    "content": "分析项目结构和配置文件",
     "status": "in_progress",
     "priority": "high",
     "id": "1"
   },
   {
-    "content": "分析主要代码架构和入口点",
+    "content": "识别主要代码架构和入口点",
     "status": "pending",
     "priority": "high",
     "id": "2"
   },
   {
-    "content": "识别核心组件和依赖关系",
+    "content": "分析核心组件和依赖关系",
     "status": "pending",
     "priority": "medium",
     "id": "3"
   },
   {
-    "content": "检查配置文件和技术栈",
+    "content": "总结项目架构和关键发现",
     "status": "pending",
     "priority": "medium",
     "id": "4"
-  },
-  {
-    "content": "总结项目架构和关键发现",
-    "status": "pending",
-    "pr...
+  }
+]
+     ...
 ✔ Thinking-2 end
-✔ Tool bash({"command": "dir /a"}) execution end
-[2026-01-15T17:22:28.787Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2 ��Ŀ¼
-
-2026/01/16  01:11    <DIR>          .
-2026/01/14  21:06    <DIR>          ..
-2026/01/15  23:04    <DIR>          .claude
-2026/01/14  22:18             1,054 .env.development
-2026/01/16  01:11    <DIR>          .git
-2026/01/15  23:51                62 .gitignore
-2026/01/16  00:37               205 .npmrc
-2026/01/14  21:06    <DIR>          bin
-2026/01/15  23:51             5,029 CLAUDE.md
-2026/01/15  21:50    <...
+[2026-01-16T01:03:55.400Z] [INFO] [Agent] Tool tips: 现在开始分析项目结构和配置文件。首先查看根目录下的关键文件。
+✔ Tool bash({"command": "ls -la"}) execution end
+[2026-01-16T01:03:55.430Z] [INFO] [Agent] Tool bash result: 
+ total 416
+drwxr-xr-x   22 wrr  staff    704  1月 16 09:02 .
+drwxrwxrwx@ 109 wrr  staff   3488  1月 16 08:54 ..
+drwxr-xr-x    3 wrr  staff     96  1月 16 09:00 .claude
+-rw-rw-rw-@   1 wrr  staff    693  1月 16 09:02 .env.development
+drwxr-xr-x   15 wrr  staff    480  1月 16 09:03 .git
+-rw-r--r--    1 wrr  staff     57  1月 16 08:54 .gitignore
+-rw-r--r--    1 wrr  staff    205  1月 16 08:54 .npmrc
+drwxr-xr-x    3 wrr  staff     96  1月 16 08:54 bin
+-rw-r--r--    1 wrr  staff   4933  1月 16 08:54 CLAUDE.md
+...
 ✔ Thinking-3 end
+[2026-01-16T01:04:01.822Z] [INFO] [Agent] Tool tips: 查看package.json了解项目依赖和脚本。
 ✔ Tool read_file({"filePath": "package.json"}) execution end
-[2026-01-15T17:22:31.824Z] [INFO] [Agent] Tool read_file result:
+[2026-01-16T01:04:01.826Z] [INFO] [Agent] Tool read_file result: 
  --- FILE: package.json ---
 Range: 1 - 49
 
@@ -76,8 +72,9 @@ Range: 1 - 49
 17 |     "build": "cross-env NODE_ENV=production  tsc",
 18 |     "dev": "cross-env NODE_ENV=development  tsx src/inde...
 ✔ Thinking-4 end
+[2026-01-16T01:04:05.465Z] [INFO] [Agent] Tool tips: 查看tsconfig.json了解TypeScript配置。
 ✔ Tool read_file({"filePath": "tsconfig.json"}) execution end
-[2026-01-15T17:22:34.498Z] [INFO] [Agent] Tool read_file result:
+[2026-01-16T01:04:05.467Z] [INFO] [Agent] Tool read_file result: 
  --- FILE: tsconfig.json ---
 Range: 1 - 25
 
@@ -95,28 +92,103 @@ Range: 1 - 25
 12 |     "declaration": true,
 13 |     "outDir": "./dist",
 14 |     "rootDir": "./src",
-15 |     "t...
+15 |     "target": "ESNex...
 ✔ Thinking-5 end
-✔ Tool bash({"command": "dir /a src"}) execution end
-[2026-01-15T17:22:37.256Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
+[2026-01-16T01:04:08.744Z] [INFO] [Agent] Tool tips: 查看.env.example了解环境变量配置。
+✔ Tool read_file({"filePath": "env.example"}) execution end
+[2026-01-16T01:04:08.746Z] [INFO] [Agent] Tool read_file result: 
+ --- FILE: env.example ---
+Range: 1 - 5
 
- D:\work\ai-agent-v2\src ��Ŀ¼
-
-2026/01/15  20:53    <DIR>          .
-2026/01/16  01:11    <DIR>          ..
-2026/01/15  22:17    <DIR>          agent
-2026/01/14  23:31    <DIR>          application
-2026/01/15  00:25    <DIR>          cli
-2026/01/14  23:05    <DIR>          domain
-2026/01/14  21:06    <DIR>          examples
-2026/01/15  21:33             3,959 index.ts
-2026/01/16  00:54    <DIR>          infrastructure
-2026/01/16  01:21 ...
+1 | DEEPSEEK_API_KEY=
+2 | DEEPSEEK_BASE_URL=
+3 | TAVILY_API_KEY=
+4 | modelscope
+5 | MODELSCOPE_KPI_KEY=...
 ✔ Thinking-6 end
+[2026-01-16T01:04:12.564Z] [INFO] [Agent] Tool tips: 现在查看src目录结构。
+✔ Tool bash({"command": "find src -type f -name \"*.ts\" -o -name \"*.js\" | head -20"}) execution end
+[2026-01-16T01:04:12.586Z] [INFO] [Agent] Tool bash result: 
+ src/util/log.ts
+src/util/platform-cmd.ts
+src/providers/base.ts
+src/providers/openai.ts
+src/agent/index.ts
+src/cli/CLI.ts
+src/cli/utils/smart-input.ts
+src/cli/utils/input.ts
+src/cli/utils/reader.ts
+src/cli/utils/format.ts
+src/cli/utils/index.ts
+src/cli/commands/history.ts
+src/cli/commands/help.ts
+src/cli/commands/exit.ts
+src/cli/commands/types.ts
+src/cli/commands/session.ts
+src/cli/commands/index.ts
+src/cli/commands/clear.ts
+src/cli/index.ts
+src/storage/mongoose.ts...
+✔ Thinking-7 end
+[2026-01-16T01:04:16.021Z] [INFO] [Agent] Tool tips: 查看更多文件。
+✔ Tool bash({"command": "find src -type f -name \"*.ts\" -o -name \"*.js\" | tail -20"}) execution end
+[2026-01-16T01:04:16.040Z] [INFO] [Agent] Tool bash result: 
+ src/storage/memory.ts
+src/examples/log-demo.ts
+src/prompts/system.ts
+src/index.ts
+src/application/SessionManager.ts
+src/infrastructure/MessageRepository.ts
+src/domain/MessageQueue.ts
+src/domain/session.ts
+src/tool/base.ts
+src/tool/todo.ts
+src/tool/surgical.ts
+src/tool/index.test.ts
+src/tool/bash-parser.ts
+src/tool/file.ts
+src/tool/todowrite.ts
+src/tool/grep.ts
+src/tool/bash.ts
+src/tool/batch-replace.ts
+src/tool/index.ts
+src/tool/bash.test.ts...
+✔ Thinking-8 end
+[2026-01-16T01:04:22.112Z] [INFO] [Agent] Tool tips: 现在更新任务状态并开始分析主要代码架构。
+✔ Tool todo_write({"todos": [{"id":"1","content":"分析项目结构和配置文件","status":"completed","priority":"high"},{"id":"2","content":"识别主要代码架构和入口点","status":"in_progress","priority":"high"},{"id":"3","content":"分析核心组件和依赖关系","status":"pending","priority":"medium"},{"id":"4","content":"总结项目架构和关键发现","status":"pending","priority":"medium"}]}) execution end
+[2026-01-16T01:04:22.114Z] [INFO] [Agent] Tool todo_write result: 
+ 
+        todos: [
+  {
+    "content": "分析项目结构和配置文件",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "识别主要代码架构和入口点",
+    "status": "in_progress",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "分析核心组件和依赖关系",
+    "status": "pending",
+    "priority": "medium",
+    "id": "3"
+  },
+  {
+    "content": "总结项目架构和关键发现",
+    "status": "pending",
+    "priority": "medium",
+    "id": "4"
+  }
+]
+     ...
+✔ Thinking-9 end
+[2026-01-16T01:04:25.192Z] [INFO] [Agent] Tool tips: 查看主入口文件src/index.ts。
 ✔ Tool read_file({"filePath": "src/index.ts"}) execution end
-[2026-01-15T17:22:40.073Z] [INFO] [Agent] Tool read_file result:
+[2026-01-16T01:04:25.194Z] [INFO] [Agent] Tool read_file result: 
  --- FILE: src/index.ts ---
 Range: 1 - 149
 
@@ -131,67 +203,26 @@ Range: 1 - 149
 9 | import { SessionManager } from './application/SessionManager';
 10 | import { MessageRepository } from './infrastructure/MessageRepository';
 11 | import { CLI } from './cli';
-12 | import { registerDefaultTools } f...
-✔ Thinking-7 end
-✔ Tool todo_write({"todos": [{"id":"1","content":"探索项目结构和主要文件","status":"completed","priority":"high"},{"id":"2","content":"分析主要代码架构和入口点","status":"in_progress","priority":"high"},{"id":"3","content":"识别核心组件和依赖关系","status":"pending","priority":"medium"},{"id":"4","content":"检查配置文件和技术栈","status":"pending","priority":"medium"},{"id":"5","content":"总结项目架构和关键发现","status":"pending","priority":"low"}]}) execution end
-[2026-01-15T17:22:46.211Z] [INFO] [Agent] Tool todo_write result:
-
-        todos: [
-  {
-    "content": "探索项目结构和主要文件",
-    "status": "completed",
-    "priority": "high",
-    "id": "1"
-  },
-  {
-    "content": "分析主要代码架构和入口点",
-    "status": "in_progress",
-    "priority": "high",
-    "id": "2"
-  },
-  {
-    "content": "识别核心组件和依赖关系",
-    "status": "pending",
-    "priority": "medium",
-    "id": "3"
-  },
-  {
-    "content": "检查配置文件和技术栈",
-    "status": "pending",
-    "priority": "medium",
-    "id": "4"
-  },
-  {
-    "content": "总结项目架构和关键发现",
-    "status": "pending",
-    "...
-✔ Thinking-8 end
+12 | import { registerDefaultTools } from './tool...
+✔ Thinking-10 end
+[2026-01-16T01:04:29.142Z] [INFO] [Agent] Tool tips: 查看Agent核心类。
 ✔ Tool search_code({"pattern": "class Agent", "filePattern": "*.ts"}) execution end
-[2026-01-15T17:22:49.836Z] [INFO] [Agent] Tool search_code result:
- [
-  {
-    "file": ".\\src\\prompts\\system.ts",
-    "line": 83,
-    "content": "- **ALWAYS start with search_code** using EXACT patterns: \"class Agent\", \"SessionManager\", \"function connectDB\"",
-    "submatches": [
-      {
-        "match": {
-          "text": "class Agent"
-        },
-        "start": 59,
-        "end": 70
-      }
-    ]
-  },
-  {
-    "file": ".\\src\\prompts\\system.ts",
-    "line": 91,
-    "content": "- GOOD: search_code(\"class Agent\") + search_code(\"SessionManager\") + s...
-✔ Thinking-9 end
+[2026-01-16T01:04:29.147Z] [INFO] [Agent] Tool search_code result: 
+ Ripgrep Error: spawn rg ENOENT
+Hint: 请安装 ripgrep (rg) 或在依赖中添加 vscode-ripgrep。macOS 可使用: brew install ripgrep...
+✔ Thinking-11 end
+[2026-01-16T01:04:32.388Z] [INFO] [Agent] Tool tips: 使用bash搜索。
+✔ Tool bash({"command": "grep -r \"class Agent\" src --include=\"*.ts\""}) execution end
+[2026-01-16T01:04:32.406Z] [INFO] [Agent] Tool bash result: 
+ src/agent/index.ts:export default class Agent extends EventEmitter {
+src/prompts/system.ts:- **ALWAYS start with search_code** using EXACT patterns: "class Agent", "SessionManager", "function connectDB"
+src/prompts/system.ts:- GOOD: search_code("class Agent") + search_code("SessionManager") + search_code("ProviderConfig") → read ONLY those files...
+✔ Thinking-12 end
+[2026-01-16T01:04:35.724Z] [INFO] [Agent] Tool tips: 读取Agent类定义。
 ✔ Tool read_file({"filePath": "src/agent/index.ts"}) execution end
-[2026-01-15T17:22:53.623Z] [INFO] [Agent] Tool read_file result:
+[2026-01-16T01:04:35.727Z] [INFO] [Agent] Tool read_file result: 
  --- FILE: src/agent/index.ts ---
-Range: 1 - 221
+Range: 1 - 223
 
 1 | /**
 2 |  * Agent - AI 代理
@@ -203,31 +234,13 @@ Range: 1 - 221
 8 | import { SessionManager } from "../application/SessionManager";
 9 | import { SYSTEM_PROMPT } from "../prompts/system";
 10 | import { ToolRegistry } from "../tool";
-11 |
+11 | 
 12 | export interface AgentConfig {
-13 |   ...
-✔ Thinking-10 end
-✔ Tool search_code({"pattern": "class SessionManager", "filePattern": "*.ts"}) execution end
-[2026-01-15T17:22:57.846Z] [INFO] [Agent] Tool search_code result:
- [
-  {
-    "file": ".\\src\\application\\SessionManager.ts",
-    "line": 11,
-    "content": "export class SessionManager {",
-    "submatches": [
-      {
-        "match": {
-          "text": "class SessionManager"
-        },
-        "start": 7,
-        "end": 27
-      }
-    ]
-  }
-]...
-✔ Thinking-11 end
+13 |     llmProvide...
+✔ Thinking-13 end
+[2026-01-16T01:04:39.471Z] [INFO] [Agent] Tool tips: 查看SessionManager。
 ✔ Tool read_file({"filePath": "src/application/SessionManager.ts"}) execution end
-[2026-01-15T17:23:00.722Z] [INFO] [Agent] Tool read_file result:
+[2026-01-16T01:04:39.474Z] [INFO] [Agent] Tool read_file result: 
  --- FILE: src/application/SessionManager.ts ---
 Range: 1 - 136
 
@@ -240,881 +253,102 @@ Range: 1 - 136
 7 | import { message } from "../providers/base";
 8 | import { MessageRepository } from "../infrastructure/MessageRepository";
 9 | import { ScopedLogger } from "../util/log";
-10 |
+10 | 
 11 | export class SessionManager {
-12 |     private log...
-✔ Thinking-12 end
-✔ Tool search_code({"pattern": "class.*Provider", "filePattern": "*.ts"}) execution end
-[2026-01-15T17:23:04.638Z] [INFO] [Agent] Tool search_code result:
- [
-  {
-    "file": ".\\src\\providers\\openai.ts",
-    "line": 55,
-    "content": "export class OpenAIProvider extends LLMProvider {",
-    "submatches": [
-      {
-        "match": {
-          "text": "class OpenAIProvider extends LLMProvider"
-        },
-        "start": 7,
-        "end": 47
-      }
-    ]
-  },
-  {
-    "file": ".\\src\\providers\\base.ts",
-    "line": 63,
-    "content": "export abstract class LLMProvider{",
-    "submatches": [
-      {
-        "match": {
-          "text": "class LLM...
-✔ Thinking-13 end
-✔ Tool read_file({"filePath": "src/providers/base.ts"}) execution end
-[2026-01-15T17:23:07.555Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/providers/base.ts ---
-Range: 1 - 75
-
-1 | export interface ProviderConfig {
-2 |   /** API key or credentials */
-3 |   apiKey?: string
-4 |   /** Base URL for API */
-5 |   baseURL?: string
-6 |   /** Model name */
-7 |   model?: string
-8 |   /** Additional options */
-9 |   [key: string]: unknown
-10 | }
-11 | export interface ToolSchema {
-12 |   type: 'function';
-13 |   function: {
-14 |     name: string;
-15 |     description: string;
-16 |     strict?: boolean;
-17 |     par...
+12 |     private logger: Scoped...
 ✔ Thinking-14 end
-✔ Tool read_file({"filePath": "src/providers/openai.ts"}) execution end
-[2026-01-15T17:23:10.877Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/providers/openai.ts ---
-Range: 1 - 130
+[2026-01-16T01:04:43.343Z] [INFO] [Agent] Tool tips: 查看工具注册表。
+✔ Tool read_file({"filePath": "src/tool/index.ts"}) execution end
+[2026-01-16T01:04:43.345Z] [INFO] [Agent] Tool read_file result: 
+ --- FILE: src/tool/index.ts ---
+Range: 1 - 333
 
 1 | /**
-2 |  * ============================================================================
-3 |  * @ai-context/compressor - OpenAI Provider
-4 |  * ============================================================================
+2 |  * Tool Registry
+3 |  *
+4 |  * 工具注册中心，负责管理所有可用的工具
 5 |  *
-6 |  * OpenAI API provider implementation.
-7 |  */
-8 |
-9 | import { LLMProvider, LLMOptions, LLMResponse, message, ToolSchema, type ProviderConfig } from './base'
-10 |
-11 | /**
-12 |  * OpenAI provider c...
+6 |  * @example
+7 |  * ```ts
+8 |  * import { ToolRegistry } from './index';
+9 |  *
+10 |  * // 获取所有工具
+11 |  * const tools = ToolRegistry.getAll();
+12 |  *
+13 |  * // 根据名称获取工具
+14 |  * const bashTool = ToolRegistry.get('bash');
+15 |  *
+16 |  * // 执行工具
+17 |  * const result = await bashTool.execute({ command: 'ls' });
+18 |  * ```
+19 |  */
+20 | 
+21 | import { BaseTool } from './base';
+2...
 ✔ Thinking-15 end
-✔ Tool todo_write({"todos": [{"id":"1","content":"探索项目结构和主要文件","status":"completed","priority":"high"},{"id":"2","content":"分析主要代码架构和入口点","status":"completed","priority":"high"},{"id":"3","content":"识别核心组件和依赖关系","status":"in_progress","priority":"medium"},{"id":"4","content":"检查配置文件和技术栈","status":"pending","priority":"medium"},{"id":"5","content":"总结项目架构和关键发现","status":"pending","priority":"low"}]}) execution end
-[2026-01-15T17:23:16.631Z] [INFO] [Agent] Tool todo_write result:
-
+[2026-01-16T01:04:50.084Z] [INFO] [Agent] Tool tips: 现在更新任务状态并分析核心组件。
+✔ Tool todo_write({"todos": [{"id":"1","content":"分析项目结构和配置文件","status":"completed","priority":"high"},{"id":"2","content":"识别主要代码架构和入口点","status":"completed","priority":"high"},{"id":"3","content":"分析核心组件和依赖关系","status":"in_progress","priority":"medium"},{"id":"4","content":"总结项目架构和关键发现","status":"pending","priority":"medium"}]}) execution end
+[2026-01-16T01:04:50.088Z] [INFO] [Agent] Tool todo_write result: 
+ 
         todos: [
   {
-    "content": "探索项目结构和主要文件",
+    "content": "分析项目结构和配置文件",
     "status": "completed",
     "priority": "high",
     "id": "1"
   },
   {
-    "content": "分析主要代码架构和入口点",
+    "content": "识别主要代码架构和入口点",
     "status": "completed",
     "priority": "high",
     "id": "2"
   },
   {
-    "content": "识别核心组件和依赖关系",
+    "content": "分析核心组件和依赖关系",
     "status": "in_progress",
     "priority": "medium",
     "id": "3"
   },
   {
-    "content": "检查配置文件和技术栈",
+    "content": "总结项目架构和关键发现",
     "status": "pending",
     "priority": "medium",
     "id": "4"
-  },
-  {
-    "content": "总结项目架构和关键发现",
-    "status": "pending",
-   ...
+  }
+]
+     ...
 ✔ Thinking-16 end
-✔ Tool bash({"command": "dir /a src/tool"}) execution end
-[2026-01-15T17:23:19.012Z] [INFO] [Agent] Tool bash result:
- ������ʽ����ȷ - "ool"��...
+[2026-01-16T01:04:53.400Z] [INFO] [Agent] Tool tips: 查看领域层和基础设施层。
+✔ Tool read_file({"filePath": "src/domain/session.ts"}) execution end
+[2026-01-16T01:04:53.404Z] [INFO] [Agent] Tool read_file result: 
+ --- FILE: src/domain/session.ts ---
+Range: 1 - 31
+
+1 | /**
+2 |  * Session 领域模型
+3 |  * 表示一个用户会话
+4 |  */
+5 | export interface Session {
+6 |     id: string;
+7 |     userId: string;
+8 |     createdAt: Date;
+9 |     updatedAt: Date;
+10 | }
+11 | 
+12 | /**
+13 |  * 创建新会话
+14 |  */
+15 | export function createSession(userId: string): Session {
+16 |     const now = new Date();
+17 |     return {
+18 |         id: generateSessionId(),
+19 |         userId,
+20 |         createdAt: now,
+21 |         updatedAt: no...
 ✔ Thinking-17 end
-[2026-01-15T17:23:22.061Z] [ERROR] [MessageRepository] Failed to save message: Message validation failed: content: Path `content` is required.
-[2026-01-15T17:23:22.061Z] [ERROR] [SessionManager] Failed to persist message for session session_1768497728669
-✔ Tool bash({"command": "dir /a src\\tool"}) execution end
-[2026-01-15T17:23:22.084Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\tool ��Ŀ¼
-
-2026/01/16  01:02    <DIR>          .
-2026/01/15  20:53    <DIR>          ..
-2026/01/15  20:53               222 base.ts
-2026/01/15  20:53            14,903 bash-parser.ts
-2026/01/15  20:53             6,361 bash.test.ts
-2026/01/16  00:35             3,566 bash.ts
-2026/01/16  00:56             2,761 batch-replace.ts
-2026/01/16  00:47             2,315 file.ts
-2026/01/16  00:41             3,849 grep.ts...
-✔ Thinking-18 end
-✔ Tool read_file({"filePath": "src/tool/index.ts"}) execution end
-[2026-01-15T17:23:24.939Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/tool/index.ts ---
-Range: 1 - 334
-
-1 | /**
-2 |  * Tool Registry
-3 |  *
-4 |  * 工具注册中心，负责管理所有可用的工具
-5 |  *
-6 |  * @example
-7 |  * ```ts
-8 |  * import { ToolRegistry } from './index';
-9 |  *
-10 |  * // 获取所有工具
-11 |  * const tools = ToolRegistry.getAll();
-12 |  *
-13 |  * // 根据名称获取工具
-14 |  * const bashTool = ToolRegistry.get('bash');
-15 |  *
-16 |  * // 执行工具
-17 |  * const result = await bashTool.execute({ command: 'ls' });
-18 |  * ```
-19 |  */
-20 |
-21 | import { BaseToo...
-✔ Thinking-19 end
-✔ Tool bash({"command": "dir /a src\\domain"}) execution end
-[2026-01-15T17:23:27.968Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\domain ��Ŀ¼
-
-2026/01/14  23:05    <DIR>          .
-2026/01/15  20:53    <DIR>          ..
-2026/01/14  23:05               843 MessageQueue.ts
-2026/01/14  23:05               581 session.ts
-               2 ���ļ�          1,424 �ֽ�
-               2 ��Ŀ¼ 546,101,293,056 �����ֽ�...
-✔ Thinking-20 end
-✔ Tool read_file({"filePath": "src/domain/session.ts"}) execution end
-[2026-01-15T17:23:30.884Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/domain/session.ts ---
-Range: 1 - 31
-
-1 | /**
-2 |  * Session 领域模型
-3 |  * 表示一个用户会话
-4 |  */
-5 | export interface Session {
-6 |     id: string;
-7 |     userId: string;
-8 |     createdAt: Date;
-9 |     updatedAt: Date;
-10 | }
-11 |
-12 | /**
-13 |  * 创建新会话
-14 |  */
-15 | export function createSession(userId: string): Session {
-16 |     const now = new Date();
-17 |     return {
-18 |         id: generateSessionId(),
-19 |         userId,
-20 |         createdAt: now,
-21 |  ...
-✔ Thinking-21 end
-✔ Tool bash({"command": "dir /a src\\infrastructure"}) execution end
-[2026-01-15T17:23:33.650Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\infrastructure ��Ŀ¼
-
-2026/01/16  00:54    <DIR>          .
-2026/01/15  20:53    <DIR>          ..
-2026/01/16  00:54             3,462 MessageRepository.ts
-               1 ���ļ�          3,462 �ֽ�
-               2 ��Ŀ¼ 546,101,293,056 �����ֽ�...
-✔ Thinking-22 end
-✔ Tool bash({"command": "dir /a src\\storage"}) execution end
-[2026-01-15T17:23:36.684Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\storage ��Ŀ¼
-
-2026/01/14  22:59    <DIR>          .
-2026/01/15  20:53    <DIR>          ..
-2026/01/15  23:32             1,321 memory.ts
-2026/01/15  21:54    <DIR>          models
-2026/01/14  22:58               811 mongoose.ts
-               2 ���ļ�          2,132 �ֽ�
-               3 ��Ŀ¼ 546,101,293,056 �����ֽ�...
-✔ Thinking-23 end
-✔ Tool todo_write({"todos": [{"id":"1","content":"探索项目结构和主要文件","status":"completed","priority":"high"},{"id":"2","content":"分析主要代码架构和入口点","status":"completed","priority":"high"},{"id":"3","content":"识别核心组件和依赖关系","status":"completed","priority":"medium"},{"id":"4","content":"检查配置文件和技术栈","status":"in_progress","priority":"medium"},{"id":"5","content":"总结项目架构和关键发现","status":"pending","priority":"low"}]}) execution end
-[2026-01-15T17:23:42.646Z] [INFO] [Agent] Tool todo_write result:
-
-        todos: [
-  {
-    "content": "探索项目结构和主要文件",
-    "status": "completed",
-    "priority": "high",
-    "id": "1"
-  },
-  {
-    "content": "分析主要代码架构和入口点",
-    "status": "completed",
-    "priority": "high",
-    "id": "2"
-  },
-  {
-    "content": "识别核心组件和依赖关系",
-    "status": "completed",
-    "priority": "medium",
-    "id": "3"
-  },
-  {
-    "content": "检查配置文件和技术栈",
-    "status": "in_progress",
-    "priority": "medium",
-    "id": "4"
-  },
-  {
-    "content": "总结项目架构和关键发现",
-    "status": "pending",
- ...
-✔ Thinking-24 end
-✔ Tool read_file({"filePath": ".env.development"}) execution end
-[2026-01-15T17:23:45.585Z] [INFO] [Agent] Tool read_file result:
- --- FILE: .env.development ---
-Range: 1 - 15
-
-1 | DEEPSEEK_API_KEY=sk-1eda0bba4eab46de95c1f3378621cdca
-2 | DEEPSEEK_BASE_URL=https://api.deepseek.com
-3 | TAVILY_API_KEY=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
-4 | KIMI_API_KEY=sk-LQrNwzgpNZsusgCN4NPeF2wQFmzsjYWJcH0mDKMe0fnxPMvY
-5 | KIMI_BASE_URL=https://api.moonshot.cn/v1
-6 | MODELSCOPE_KPI_KEY=ms-ed164af8-bbdb-403c-9bd3-50db2f7150f8
-7 | MODELSCOPE_BASE_URL=https://api-inference.modelscope.cn/v1/
-8 |
-9 | GLM_API_KEY=610bd1d093804268a5b...
-✔ Thinking-25 end
-✔ Tool bash({"command": "dir /a src\\cli"}) execution end
-[2026-01-15T17:23:48.836Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\cli ��Ŀ¼
-
-2026/01/15  00:25    <DIR>          .
-2026/01/15  20:53    <DIR>          ..
-2026/01/15  22:25             4,250 CLI.ts
-2026/01/15  00:51    <DIR>          commands
-2026/01/14  23:44               102 index.ts
-2026/01/15  01:03    <DIR>          utils
-               2 ���ļ�          4,352 �ֽ�
-               4 ��Ŀ¼ 546,101,293,056 �����ֽ�...
-✔ Thinking-26 end
-✔ Tool bash({"command": "dir /a src\\prompts"}) execution end
-[2026-01-15T17:23:51.966Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\prompts ��Ŀ¼
-
-2026/01/16  01:21    <DIR>          .
-2026/01/15  20:53    <DIR>          ..
-2026/01/16  01:21             9,802 system.ts
-               1 ���ļ�          9,802 �ֽ�
-               2 ��Ŀ¼ 546,101,293,056 �����ֽ�...
-✔ Thinking-27 end
-✔ Tool read_file({"filePath": "src/prompts/system.ts", "startLine": 1, "endLine": 50}) execution end
-[2026-01-15T17:23:55.530Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/prompts/system.ts ---
-Range: 1 - 50
-
-1 | export const SYSTEM_PROMPT = `
-2 | You are Super Code, an advanced AI programming agent powered by the ReAct framework. You are an expert software engineering assistant.
-3 |
-4 | # Tone and Style
-5 |
-6 | Be concise, direct, and to the point. Minimize output tokens while maintaining accuracy.
-7 |
-8 | **Verbosity examples**:
-9 | - User: "2 + 2" → Assistant: "4"
-10 | - User: "list files" → Assistant: [runs ls] or just the list
-11 | ...
-✔ Thinking-28 end
-✔ Tool todo_write({"todos": [{"id":"1","content":"探索项目结构和主要文件","status":"completed","priority":"high"},{"id":"2","content":"分析主要代码架构和入口点","status":"completed","priority":"high"},{"id":"3","content":"识别核心组件和依赖关系","status":"completed","priority":"medium"},{"id":"4","content":"检查配置文件和技术栈","status":"completed","priority":"medium"},{"id":"5","content":"总结项目架构和关键发现","status":"in_progress","priority":"low"}]}) execution end
-[2026-01-15T17:24:01.065Z] [INFO] [Agent] Tool todo_write result:
-
-        todos: [
-  {
-    "content": "探索项目结构和主要文件",
-    "status": "completed",
-    "priority": "high",
-    "id": "1"
-  },
-  {
-    "content": "分析主要代码架构和入口点",
-    "status": "completed",
-    "priority": "high",
-    "id": "2"
-  },
-  {
-    "content": "识别核心组件和依赖关系",
-    "status": "completed",
-    "priority": "medium",
-    "id": "3"
-  },
-  {
-    "content": "检查配置文件和技术栈",
-    "status": "completed",
-    "priority": "medium",
-    "id": "4"
-  },
-  {
-    "content": "总结项目架构和关键发现",
-    "status": "in_progress",...
-✔ Thinking-29 end
-✔ Tool todo_write({"todos": [{"id":"1","content":"探索项目结构和主要文件","status":"completed","priority":"high"},{"id":"2","content":"分析主要代码架构和入口点","status":"completed","priority":"high"},{"id":"3","content":"识别核心组件和依赖关系","status":"completed","priority":"medium"},{"id":"4","content":"检查配置文件和技术栈","status":"completed","priority":"medium"},{"id":"5","content":"总结项目架构和关键发现","status":"completed","priority":"low"}]}) execution end
-[2026-01-15T17:24:24.784Z] [INFO] [Agent] Tool todo_write result:
-
-        todos: [
-  {
-    "content": "探索项目结构和主要文件",
-    "status": "completed",
-    "priority": "high",
-    "id": "1"
-  },
-  {
-    "content": "分析主要代码架构和入口点",
-    "status": "completed",
-    "priority": "high",
-    "id": "2"
-  },
-  {
-    "content": "识别核心组件和依赖关系",
-    "status": "completed",
-    "priority": "medium",
-    "id": "3"
-  },
-  {
-    "content": "检查配置文件和技术栈",
-    "status": "completed",
-    "priority": "medium",
-    "id": "4"
-  },
-  {
-    "content": "总结项目架构和关键发现",
-    "status": "completed",
- ...
-✔ Thinking-30 end
-[2026-01-15T17:24:31.474Z] [INFO] [CLI]
-🤖 Agent:
-**项目分析完成**
-
-这是一个设计良好的AI Agent框架，具有以下特点：
-
-**架构优势**
-- **清晰的分层**: 领域层、应用层、基础设施层分离
-- **可扩展设计**: 易于添加新工具和LLM提供商
-- **完善的工具系统**: 支持多种开发工具，参数验证
-- **会话管理**: 支持持久化和内存缓存
-
-**技术特点**
-- TypeScript类型安全
-- MongoDB持久化存储
-- 多LLM提供商支持
-- 交互式CLI界面
-- 完善的错误处理和日志
-
-**潜在改进点**
-1. 缺少单元测试覆盖率
-2. 工具系统依赖Zod，但转换逻辑较复杂
-3. 配置文件包含敏感API密钥（应使用环境变量）
-
-整体来看，这是一个功能完整、架构清晰的AI Agent框架，适合作为代码助手或开发工具的基础平台。
-
-》
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> ^C
-PS D:\work\ai-agent-v2> pnpm dev
-
-> ai-agent-v2@1.0.0 dev D:\work\ai-agent-v2
-> cross-env NODE_ENV=development  tsx src/index.ts
-
-[dotenv@17.2.3] injecting env (13) from .env.development -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
-
-╔════════════════════════════════════════════════╗
-║       AI Agent - Interactive Mode              ║
-╚════════════════════════════════════════════════╝
-Session: ...98183739
-Type /help for available commands
-
-》分析当前项目
-✔ Thinking-1 end
-✔ Tool todo_write({"todos": [{"id": "1", "content": "探索项目结构和主要文件", "status": "in_progress", "priority": "high"}, {"id": "2", "content": "分析项目类型和技术栈", "status": "pending", "priority": "high"}, {"id": "3", "content": "识别主要组件和架构", "status": "pending", "priority": "medium"}, {"id": "4", "content": "检查配置和依赖", "status": "pending", "priority": "medium"}, {"id": "5", "content": "总结项目架构和功能", "status": "pending", "priority": "low"}]}) execution end
-[2026-01-15T17:29:51.678Z] [INFO] [Agent] Tool todo_write result:
-
-        todos: [
-  {
-    "content": "探索项目结构和主要文件",
-    "status": "in_progress",
-    "priority": "high",
-    "id": "1"
-  },
-  {
-    "content": "分析项目类型和技术栈",
-    "status": "pending",
-    "priority": "high",
-    "id": "2"
-  },
-  {
-    "content": "识别主要组件和架构",
-    "status": "pending",
-    "priority": "medium",
-    "id": "3"
-  },
-  {
-    "content": "检查配置和依赖",
-    "status": "pending",
-    "priority": "medium",
-    "id": "4"
-  },
-  {
-    "content": "总结项目架构和功能",
-    "status": "pending",
-    "priority": ...
-✔ Thinking-2 end
-✔ Tool bash({"command": "dir /a"}) execution end
-[2026-01-15T17:29:55.199Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2 ��Ŀ¼
-
-2026/01/16  01:11    <DIR>          .
-2026/01/14  21:06    <DIR>          ..
-2026/01/15  23:04    <DIR>          .claude
-2026/01/14  22:18             1,054 .env.development
-2026/01/16  01:11    <DIR>          .git
-2026/01/15  23:51                62 .gitignore
-2026/01/16  00:37               205 .npmrc
-2026/01/14  21:06    <DIR>          bin
-2026/01/15  23:51             5,029 CLAUDE.md
-2026/01/15  21:50    <...
-✔ Thinking-3 end
-✔ Tool read_file({"filePath": "package.json"}) execution end
-[2026-01-15T17:30:00.054Z] [INFO] [Agent] Tool read_file result:
- --- FILE: package.json ---
-Range: 1 - 49
-
-1 | {
-2 |   "name": "ai-agent-v2",
-3 |   "version": "1.0.0",
-4 |   "description": "",
-5 |   "license": "ISC",
-6 |   "author": "",
-7 |   "type": "commonjs",
-8 |   "main": "index.js",
-9 |   "bin": {
-10 |     "@qps": "bin/index.js"
-11 |   },
-12 |   "files": [
-13 |     "dist"
-14 |   ],
-15 |   "scripts": {
-16 |     "typecheck": "tsc --noEmit",
-17 |     "build": "cross-env NODE_ENV=production  tsc",
-18 |     "dev": "cross-env NODE_ENV=development  tsx src/inde...
-✔ Tool read_file({"filePath": "tsconfig.json"}) execution end
-[2026-01-15T17:30:00.098Z] [INFO] [Agent] Tool read_file result:
- --- FILE: tsconfig.json ---
-Range: 1 - 25
-
-1 | {
-2 |   "exclude": ["dist", "__tests__", "node_modules"],
-3 |   "compilerOptions": {
-4 |     "lib": ["ESNext"],
-5 |     "module": "CommonJS",
-6 |     "types": ["node"],
-7 |     "resolveJsonModule": true,
-8 |     "allowSyntheticDefaultImports": true,
-9 |     "strict": true,
-10 |     "strictNullChecks": true,
-11 |     "skipLibCheck": true,
-12 |     "declaration": true,
-13 |     "outDir": "./dist",
-14 |     "rootDir": "./src",
-15 |     "t...
-✔ Tool read_file({"filePath": "vitest.config.ts"}) execution end
-[2026-01-15T17:30:00.144Z] [INFO] [Agent] Tool read_file result:
- --- FILE: vitest.config.ts ---
-Range: 1 - 8
-
-1 | import { defineConfig } from 'vitest/config';
-2 |
-3 | export default defineConfig({
-4 |   test: {
-5 |     globals: true,
-6 |   },
-7 | });
-8 | ...
-✔ Thinking-4 end
-✔ Tool todo_write({"todos": [{"id":"1","content":"探索项目结构和主要文件","status":"completed","priority":"high"},{"id":"2","content":"分析项目类型和技术栈","status":"in_progress","priority":"high"},{"id":"3","content":"识别主要组件和架构","status":"pending","priority":"medium"},{"id":"4","content":"检查配置和依赖","status":"pending","priority":"medium"},{"id":"5","content":"总结项目架构和功能","status":"pending","priority":"low"}]}) execution end
-[2026-01-15T17:30:05.638Z] [INFO] [Agent] Tool todo_write result:
-
-        todos: [
-  {
-    "content": "探索项目结构和主要文件",
-    "status": "completed",
-    "priority": "high",
-    "id": "1"
-  },
-  {
-    "content": "分析项目类型和技术栈",
-    "status": "in_progress",
-    "priority": "high",
-    "id": "2"
-  },
-  {
-    "content": "识别主要组件和架构",
-    "status": "pending",
-    "priority": "medium",
-    "id": "3"
-  },
-  {
-    "content": "检查配置和依赖",
-    "status": "pending",
-    "priority": "medium",
-    "id": "4"
-  },
-  {
-    "content": "总结项目架构和功能",
-    "status": "pending",
-    "priority"...
-✔ Thinking-5 end
-✔ Tool bash({"command": "dir /a src"}) execution end
-[2026-01-15T17:30:09.022Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src ��Ŀ¼
-
-2026/01/15  20:53    <DIR>          .
-2026/01/16  01:11    <DIR>          ..
-2026/01/15  22:17    <DIR>          agent
-2026/01/14  23:31    <DIR>          application
-2026/01/15  00:25    <DIR>          cli
-2026/01/14  23:05    <DIR>          domain
-2026/01/14  21:06    <DIR>          examples
-2026/01/15  21:33             3,959 index.ts
-2026/01/16  00:54    <DIR>          infrastructure
-2026/01/16  01:21 ...
-✔ Thinking-6 end
-✔ Tool read_file({"filePath": "src/index.ts"}) execution end
-[2026-01-15T17:30:11.969Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/index.ts ---
-Range: 1 - 149
-
-1 | /**
-2 |  * 主入口文件
-3 |  * 初始化并启动 AI Agent 应用
-4 |  */
-5 | import dotenv from 'dotenv';
-6 | import { OpenAIProvider } from './providers/openai';
-7 | import Agent from './agent';
-8 | import { connectDB } from './storage/mongoose';
-9 | import { SessionManager } from './application/SessionManager';
-10 | import { MessageRepository } from './infrastructure/MessageRepository';
-11 | import { CLI } from './cli';
-12 | import { registerDefaultTools } f...
-✔ Thinking-7 end
-✔ Tool todo_write({"todos": [{"id":"1","content":"探索项目结构和主要文件","status":"completed","priority":"high"},{"id":"2","content":"分析项目类型和技术栈","status":"completed","priority":"high"},{"id":"3","content":"识别主要组件和架构","status":"in_progress","priority":"medium"},{"id":"4","content":"检查配置和依赖","status":"pending","priority":"medium"},{"id":"5","content":"总结项目架构和功能","status":"pending","priority":"low"}]}) execution end
-[2026-01-15T17:30:17.722Z] [INFO] [Agent] Tool todo_write result:
-
-        todos: [
-  {
-    "content": "探索项目结构和主要文件",
-    "status": "completed",
-    "priority": "high",
-    "id": "1"
-  },
-  {
-    "content": "分析项目类型和技术栈",
-    "status": "completed",
-    "priority": "high",
-    "id": "2"
-  },
-  {
-    "content": "识别主要组件和架构",
-    "status": "in_progress",
-    "priority": "medium",
-    "id": "3"
-  },
-  {
-    "content": "检查配置和依赖",
-    "status": "pending",
-    "priority": "medium",
-    "id": "4"
-  },
-  {
-    "content": "总结项目架构和功能",
-    "status": "pending",
-    "priorit...
-✔ Thinking-8 end
-✔ Tool search_code({"pattern": "class Agent", "filePattern": "*.ts"}) execution end
-[2026-01-15T17:30:23.867Z] [INFO] [Agent] Tool search_code result:
- [
-  {
-    "file": ".\\src\\prompts\\system.ts",
-    "line": 83,
-    "content": "- **ALWAYS start with search_code** using EXACT patterns: \"class Agent\", \"SessionManager\", \"function connectDB\"",
-    "submatches": [
-      {
-        "match": {
-          "text": "class Agent"
-        },
-        "start": 59,
-        "end": 70
-      }
-    ]
-  },
-  {
-    "file": ".\\src\\prompts\\system.ts",
-    "line": 91,
-    "content": "- GOOD: search_code(\"class Agent\") + search_code(\"SessionManager\") + s...
-✔ Tool search_code({"pattern": "class SessionManager", "filePattern": "*.ts"}) execution end
-[2026-01-15T17:30:24.101Z] [INFO] [Agent] Tool search_code result:
- [
-  {
-    "file": ".\\src\\application\\SessionManager.ts",
-    "line": 11,
-    "content": "export class SessionManager {",
-    "submatches": [
-      {
-        "match": {
-          "text": "class SessionManager"
-        },
-        "start": 7,
-        "end": 27
-      }
-    ]
-  }
-]...
-✔ Tool search_code({"pattern": "interface Message", "filePattern": "*.ts"}) execution end
-[2026-01-15T17:30:24.355Z] [INFO] [Agent] Tool search_code result:
- No matches found....
-✔ Thinking-9 end
-✔ Tool read_file({"filePath": "src/agent/index.ts"}) execution end
-[2026-01-15T17:30:28.180Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/agent/index.ts ---
-Range: 1 - 221
-
-1 | /**
-2 |  * Agent - AI 代理
-3 |  * 负责编排 LLM 调用和会话管理
-4 |  */
-5 | import EventEmitter from "events";
-6 | import { LLMProvider, message, ToolSchema } from "../providers/base";
-7 | import { ScopedLogger } from "../util/log";
-8 | import { SessionManager } from "../application/SessionManager";
-9 | import { SYSTEM_PROMPT } from "../prompts/system";
-10 | import { ToolRegistry } from "../tool";
-11 |
-12 | export interface AgentConfig {
-13 |   ...
-✔ Tool read_file({"filePath": "src/application/SessionManager.ts"}) execution end
-[2026-01-15T17:30:28.226Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/application/SessionManager.ts ---
-Range: 1 - 136
-
-1 | /**
-2 |  * SessionManager - 会话管理器
-3 |  * 负责管理用户会话和消息队列
-4 |  */
-5 | import { MessageQueue } from "../domain/MessageQueue";
-6 | import { Session, createSession } from "../domain/session";
-7 | import { message } from "../providers/base";
-8 | import { MessageRepository } from "../infrastructure/MessageRepository";
-9 | import { ScopedLogger } from "../util/log";
-10 |
-11 | export class SessionManager {
-12 |     private log...
-✔ Thinking-10 end
-✔ Tool search_code({"pattern": "class ToolRegistry", "filePattern": "*.ts"}) execution end
-[2026-01-15T17:30:34.290Z] [INFO] [Agent] Tool search_code result:
- [
-  {
-    "file": ".\\src\\tool\\index.ts",
-    "line": 40,
-    "content": "export class ToolRegistry {",
-    "submatches": [
-      {
-        "match": {
-          "text": "class ToolRegistry"
-        },
-        "start": 7,
-        "end": 25
-      }
-    ]
-  }
-]...
-✔ Tool search_code({"pattern": "interface MessageQueue", "filePattern": "*.ts"}) execution end
-[2026-01-15T17:30:34.522Z] [INFO] [Agent] Tool search_code result:
- No matches found....
-✔ Tool read_file({"filePath": "src/tool/index.ts"}) execution end
-[2026-01-15T17:30:34.569Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/tool/index.ts ---
-Range: 1 - 334
-
-1 | /**
-2 |  * Tool Registry
-3 |  *
-4 |  * 工具注册中心，负责管理所有可用的工具
-5 |  *
-6 |  * @example
-7 |  * ```ts
-8 |  * import { ToolRegistry } from './index';
-9 |  *
-10 |  * // 获取所有工具
-11 |  * const tools = ToolRegistry.getAll();
-12 |  *
-13 |  * // 根据名称获取工具
-14 |  * const bashTool = ToolRegistry.get('bash');
-15 |  *
-16 |  * // 执行工具
-17 |  * const result = await bashTool.execute({ command: 'ls' });
-18 |  * ```
-19 |  */
-20 |
-21 | import { BaseToo...
-✔ Thinking-11 end
-✔ Tool bash({"command": "dir /a src/domain"}) execution end
-[2026-01-15T17:30:39.073Z] [INFO] [Agent] Tool bash result:
- ������ʽ����ȷ - "domain"��...
-✔ Tool bash({"command": "dir /a src/infrastructure"}) execution end
-[2026-01-15T17:30:39.138Z] [INFO] [Agent] Tool bash result:
- ��Ч���� - "infrastructure"��...
-✔ Thinking-12 end
-✔ Tool bash({"command": "dir /a src\\domain"}) execution end
-[2026-01-15T17:30:43.146Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\domain ��Ŀ¼
-
-2026/01/14  23:05    <DIR>          .
-2026/01/15  20:53    <DIR>          ..
-2026/01/14  23:05               843 MessageQueue.ts
-2026/01/14  23:05               581 session.ts
-               2 ���ļ�          1,424 �ֽ�
-               2 ��Ŀ¼ 546,101,293,056 �����ֽ�...
-✔ Tool bash({"command": "dir /a src\\infrastructure"}) execution end
-[2026-01-15T17:30:43.215Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\infrastructure ��Ŀ¼
-
-2026/01/16  00:54    <DIR>          .
-2026/01/15  20:53    <DIR>          ..
-2026/01/16  00:54             3,462 MessageRepository.ts
-               1 ���ļ�          3,462 �ֽ�
-               2 ��Ŀ¼ 546,101,293,056 �����ֽ�...
-✔ Thinking-13 end
-✔ Tool read_file({"filePath": "src/domain/MessageQueue.ts"}) execution end
-[2026-01-15T17:30:46.768Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/domain/MessageQueue.ts ---
-Range: 1 - 45
-
-1 | /**
-2 |  * MessageQueue - 消息队列
-3 |  * 负责管理内存中的消息队列
-4 |  */
-5 | import { message } from "../providers/base";
-6 |
-7 | export class MessageQueue {
-8 |     private messages: message[] = [];
-9 |
-10 |     /**
-11 |      * 添加消息到队列
-12 |      */
-13 |     add(msg: message): void {
-14 |         this.messages.push(msg);
-15 |     }
-16 |
-17 |     /**
-18 |      * 获取所有消息（返回副本，防止外部修改）
-19 |      */
-20 |     getAll(): message[] {
-21 ...
-✔ Tool read_file({"filePath": "src/domain/session.ts"}) execution end
-[2026-01-15T17:30:46.825Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/domain/session.ts ---
-Range: 1 - 31
-
-1 | /**
-2 |  * Session 领域模型
-3 |  * 表示一个用户会话
-4 |  */
-5 | export interface Session {
-6 |     id: string;
-7 |     userId: string;
-8 |     createdAt: Date;
-9 |     updatedAt: Date;
-10 | }
-11 |
-12 | /**
-13 |  * 创建新会话
-14 |  */
-15 | export function createSession(userId: string): Session {
-16 |     const now = new Date();
-17 |     return {
-18 |         id: generateSessionId(),
-19 |         userId,
-20 |         createdAt: now,
-21 |  ...
-✔ Thinking-14 end
+[2026-01-16T01:04:57.510Z] [INFO] [Agent] Tool tips: 查看MessageRepository。
 ✔ Tool read_file({"filePath": "src/infrastructure/MessageRepository.ts"}) execution end
-[2026-01-15T17:30:49.925Z] [INFO] [Agent] Tool read_file result:
+[2026-01-16T01:04:57.513Z] [INFO] [Agent] Tool read_file result: 
  --- FILE: src/infrastructure/MessageRepository.ts ---
 Range: 1 - 103
 
@@ -1125,237 +359,34 @@ Range: 1 - 103
 5 | import { message } from "../providers/base";
 6 | import { Message } from "../storage/models/message";
 7 | import { ScopedLogger } from "../util/log";
-8 |
+8 | 
 9 | export class MessageRepository {
 10 |     private logger: ScopedLogger;
-11 |
+11 | 
 12 |     constructor() {
 13 |         this.logger = new ScopedLogger('MessageRepository');
 14 |     }
-15 |...
-✔ Thinking-15 end
-✔ Tool todo_write({"todos": [{"id":"1","content":"探索项目结构和主要文件","status":"completed","priority":"high"},{"id":"2","content":"分析项目类型和技术栈","status":"completed","priority":"high"},{"id":"3","content":"识别主要组件和架构","status":"completed","priority":"medium"},{"id":"4","content":"检查配置和依赖","status":"in_progress","priority":"medium"},{"id":"5","content":"总结项目架构和功能","status":"pending","priority":"low"}]}) execution end
-[2026-01-15T17:30:56.045Z] [INFO] [Agent] Tool todo_write result:
-
-        todos: [
-  {
-    "content": "探索项目结构和主要文件",
-    "status": "completed",
-    "priority": "high",
-    "id": "1"
-  },
-  {
-    "content": "分析项目类型和技术栈",
-    "status": "completed",
-    "priority": "high",
-    "id": "2"
-  },
-  {
-    "content": "识别主要组件和架构",
-    "status": "completed",
-    "priority": "medium",
-    "id": "3"
-  },
-  {
-    "content": "检查配置和依赖",
-    "status": "in_progress",
-    "priority": "medium",
-    "id": "4"
-  },
-  {
-    "content": "总结项目架构和功能",
-    "status": "pending",
-    "prior...
-✔ Thinking-16 end
-✔ Tool read_file({"filePath": ".env.development"}) execution end
-[2026-01-15T17:31:01.426Z] [INFO] [Agent] Tool read_file result:
- --- FILE: .env.development ---
-Range: 1 - 15
-
-1 | DEEPSEEK_API_KEY=sk-1eda0bba4eab46de95c1f3378621cdca
-2 | DEEPSEEK_BASE_URL=https://api.deepseek.com
-3 | TAVILY_API_KEY=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
-4 | KIMI_API_KEY=sk-LQrNwzgpNZsusgCN4NPeF2wQFmzsjYWJcH0mDKMe0fnxPMvY
-5 | KIMI_BASE_URL=https://api.moonshot.cn/v1
-6 | MODELSCOPE_KPI_KEY=ms-ed164af8-bbdb-403c-9bd3-50db2f7150f8
-7 | MODELSCOPE_BASE_URL=https://api-inference.modelscope.cn/v1/
-8 |
-9 | GLM_API_KEY=610bd1d093804268a5b...
-✔ Tool read_file({"filePath": "env.example"}) execution end
-[2026-01-15T17:31:01.473Z] [INFO] [Agent] Tool read_file result:
- --- FILE: env.example ---
-Range: 1 - 5
-
-1 | DEEPSEEK_API_KEY=
-2 | DEEPSEEK_BASE_URL=
-3 | TAVILY_API_KEY=
-4 | modelscope
-5 | MODELSCOPE_KPI_KEY=...
-✔ Tool bash({"command": "dir /a src\\storage"}) execution end
-[2026-01-15T17:31:01.539Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\storage ��Ŀ¼
-
-2026/01/14  22:59    <DIR>          .
-2026/01/15  20:53    <DIR>          ..
-2026/01/15  23:32             1,321 memory.ts
-2026/01/15  21:54    <DIR>          models
-2026/01/14  22:58               811 mongoose.ts
-               2 ���ļ�          2,132 �ֽ�
-               3 ��Ŀ¼ 546,101,293,056 �����ֽ�...
-✔ Thinking-17 end
-✔ Tool read_file({"filePath": "src/storage/mongoose.ts"}) execution end
-[2026-01-15T17:31:05.954Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/storage/mongoose.ts ---
-Range: 1 - 31
-
-1 | import mongoose from 'mongoose';
-2 |
-3 | export const connectDB = async () => {
-4 |    if(!process.env.MONGODB_URI){
-5 |       throw new Error('MONGODB_URI is not set');
-6 |   }
-7 |
-8 |   try {
-9 |     const conn = await mongoose.connect(process.env.MONGODB_URI, {
-10 |       serverSelectionTimeoutMS: 30000, // 30秒超时
-11 |       socketTimeoutMS: 45000,           // 45秒socket超时
-12 |       connectTimeoutMS: 30000,          // 30秒连...
-✔ Tool bash({"command": "dir /a src\\storage\\models"}) execution end
-[2026-01-15T17:31:06.024Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\storage\models ��Ŀ¼
-
-2026/01/15  21:54    <DIR>          .
-2026/01/14  22:59    <DIR>          ..
-2026/01/15  21:54             1,170 message.ts
-2026/01/14  23:08               438 session.ts
-               2 ���ļ�          1,608 �ֽ�
-               2 ��Ŀ¼ 546,101,293,056 �����ֽ�...
+15 | 
+16 |     /**...
 ✔ Thinking-18 end
-✔ Tool read_file({"filePath": "src/storage/models/message.ts"}) execution end
-[2026-01-15T17:31:10.576Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/storage/models/message.ts ---
-Range: 1 - 54
+[2026-01-16T01:05:01.292Z] [INFO] [Agent] Tool tips: 查看CLI组件。
+✔ Tool read_file({"filePath": "src/cli/index.ts"}) execution end
+[2026-01-16T01:05:01.294Z] [INFO] [Agent] Tool read_file result: 
+ --- FILE: src/cli/index.ts ---
+Range: 1 - 6
 
 1 | /**
-2 |  * Message 数据库模型
+2 |  * CLI 模块导出
 3 |  */
-4 | import mongoose from 'mongoose';
-5 |
-6 | const messageSchema = new mongoose.Schema({
-7 |     sessionId: {
-8 |         type: String,
-9 |         required: true,
-10 |         index: true,
-11 |     },
-12 |     userId: {
-13 |         type: String,
-14 |         required: true,
-15 |         index: true,
-16 |     },
-17 |     content: {
-18 |         type: String,
-19 |         required: ...
-✔ Tool read_file({"filePath": "src/storage/models/session.ts"}) execution end
-[2026-01-15T17:31:10.620Z] [INFO] [Agent] Tool read_file result:
- --- FILE: src/storage/models/session.ts ---
-Range: 1 - 23
-
-1 | /**
-2 |  * Session 数据库模型
-3 |  */
-4 | import mongoose from 'mongoose';
-5 |
-6 | const sessionSchema = new mongoose.Schema({
-7 |     sessionId: {
-8 |         type: String,
-9 |         required: true,
-10 |         unique: true,
-11 |         index: true,
-12 |     },
-13 |     userId: {
-14 |         type: String,
-15 |         required: true,
-16 |         index: true,
-17 |     },
-18 | }, {
-19 |     timestamps: true,
-20 | ...
+4 | export { CLI } from './CLI';
+5 | export type { CLIConfig } from './CLI';
+6 | ...
 ✔ Thinking-19 end
-✔ Tool bash({"command": "dir /a src\\cli"}) execution end
-[2026-01-15T17:31:14.395Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\cli ��Ŀ¼
-
-2026/01/15  00:25    <DIR>          .
-2026/01/15  20:53    <DIR>          ..
-2026/01/15  22:25             4,250 CLI.ts
-2026/01/15  00:51    <DIR>          commands
-2026/01/14  23:44               102 index.ts
-2026/01/15  01:03    <DIR>          utils
-               2 ���ļ�          4,352 �ֽ�
-               4 ��Ŀ¼ 546,101,293,056 �����ֽ�...
-✔ Tool bash({"command": "dir /a src\\tool"}) execution end
-[2026-01-15T17:31:14.458Z] [INFO] [Agent] Tool bash result:
-  ������ D �еľ��� ����
- �������к��� AD99-157E
-
- D:\work\ai-agent-v2\src\tool ��Ŀ¼
-
-2026/01/16  01:02    <DIR>          .
-2026/01/15  20:53    <DIR>          ..
-2026/01/15  20:53               222 base.ts
-2026/01/15  20:53            14,903 bash-parser.ts
-2026/01/15  20:53             6,361 bash.test.ts
-2026/01/16  00:35             3,566 bash.ts
-2026/01/16  00:56             2,761 batch-replace.ts
-2026/01/16  00:47             2,315 file.ts
-2026/01/16  00:41             3,849 grep.ts...
-✔ Thinking-20 end
-✔ Tool todo_write({"todos": [{"id":"1","content":"探索项目结构和主要文件","status":"completed","priority":"high"},{"id":"2","content":"分析项目类型和技术栈","status":"completed","priority":"high"},{"id":"3","content":"识别主要组件和架构","status":"completed","priority":"medium"},{"id":"4","content":"检查配置和依赖","status":"completed","priority":"medium"},{"id":"5","content":"总结项目架构和功能","status":"in_progress","priority":"low"}]}) execution end
-[2026-01-15T17:31:20.048Z] [INFO] [Agent] Tool todo_write result:
-
-        todos: [
-  {
-    "content": "探索项目结构和主要文件",
-    "status": "completed",
-    "priority": "high",
-    "id": "1"
-  },
-  {
-    "content": "分析项目类型和技术栈",
-    "status": "completed",
-    "priority": "high",
-    "id": "2"
-  },
-  {
-    "content": "识别主要组件和架构",
-    "status": "completed",
-    "priority": "medium",
-    "id": "3"
-  },
-  {
-    "content": "检查配置和依赖",
-    "status": "completed",
-    "priority": "medium",
-    "id": "4"
-  },
-  {
-    "content": "总结项目架构和功能",
-    "status": "in_progress",
-    "pri...
-✔ Thinking-21 end
-✔ Tool read_file({"filePath": "src/cli/CLI.ts", "startLine": 1, "endLine": 100}) execution end
-[2026-01-15T17:31:24.513Z] [INFO] [Agent] Tool read_file result:
+[2026-01-16T01:05:04.472Z] [INFO] [Agent] Tool tips: 查看CLI类。
+✔ Tool read_file({"filePath": "src/cli/CLI.ts"}) execution end
+[2026-01-16T01:05:04.476Z] [INFO] [Agent] Tool read_file result: 
  --- FILE: src/cli/CLI.ts ---
-Range: 1 - 100
+Range: 1 - 139
 
 1 | /**
 2 |  * CLI - 交互式命令行界面
@@ -1367,87 +398,132 @@ Range: 1 - 100
 8 | import { formatSessionId, InputHistory } from './utils';
 9 | import { readWithHistory } from './utils/reader';
 10 | import type { CommandContext } from './commands/types';
-11 |
+11 | 
 12 | export interface CLIConfig {
 13 |     agent: Agent;
-14 |   ...
-✔ Thinking-22 end
-✔ Tool todo_write({"todos": [{"id":"1","content":"探索项目结构和主要文件","status":"completed","priority":"high"},{"id":"2","content":"分析项目类型和技术栈","status":"completed","priority":"high"},{"id":"3","content":"识别主要组件和架构","status":"completed","priority":"medium"},{"id":"4","content":"检查配置和依赖","status":"completed","priority":"medium"},{"id":"5","content":"总结项目架构和功能","status":"completed","priority":"low"}]}) execution end
-[2026-01-15T17:31:30.543Z] [INFO] [Agent] Tool todo_write result:
+14 |     sessionId: ...
+✔ Thinking-20 end
+[2026-01-16T01:05:08.789Z] [INFO] [Agent] Tool tips: 查看系统提示。
+✔ Tool read_file({"filePath": "src/prompts/system.ts", "startLine": 1, "endLine": 50}) execution end
+[2026-01-16T01:05:08.791Z] [INFO] [Agent] Tool read_file result: 
+ --- FILE: src/prompts/system.ts ---
+Range: 1 - 50
 
+1 | export const SYSTEM_PROMPT = `
+2 | You are Super Code, an advanced AI programming agent powered by the ReAct framework. You are an expert software engineering assistant.
+3 | 
+4 | # Tone and Style
+5 | 
+6 | Be concise, direct, and to the point. Minimize output tokens while maintaining accuracy.
+7 | 
+8 | **Verbosity examples**:
+9 | - User: "2 + 2" → Assistant: "4"
+10 | - User: "list files" → Assistant: [runs ls] or just the list
+11 | - User: "w...
+✔ Thinking-21 end
+[2026-01-16T01:05:15.706Z] [INFO] [Agent] Tool tips: 现在更新任务状态并总结项目架构。
+✔ Tool todo_write({"todos": [{"id":"1","content":"分析项目结构和配置文件","status":"completed","priority":"high"},{"id":"2","content":"识别主要代码架构和入口点","status":"completed","priority":"high"},{"id":"3","content":"分析核心组件和依赖关系","status":"completed","priority":"medium"},{"id":"4","content":"总结项目架构和关键发现","status":"in_progress","priority":"medium"}]}) execution end
+[2026-01-16T01:05:15.710Z] [INFO] [Agent] Tool todo_write result: 
+ 
         todos: [
   {
-    "content": "探索项目结构和主要文件",
+    "content": "分析项目结构和配置文件",
     "status": "completed",
     "priority": "high",
     "id": "1"
   },
   {
-    "content": "分析项目类型和技术栈",
+    "content": "识别主要代码架构和入口点",
     "status": "completed",
     "priority": "high",
     "id": "2"
   },
   {
-    "content": "识别主要组件和架构",
+    "content": "分析核心组件和依赖关系",
     "status": "completed",
     "priority": "medium",
     "id": "3"
   },
   {
-    "content": "检查配置和依赖",
+    "content": "总结项目架构和关键发现",
+    "status": "in_progress",
+    "priority": "medium",
+    "id": "4"
+  }
+]
+     ...
+✔ Thinking-22 end
+[2026-01-16T01:05:21.576Z] [INFO] [Agent] Tool tips: 
+✔ Tool todo_write({"todos": [{"id":"1","content":"分析项目结构和配置文件","status":"completed","priority":"high"},{"id":"2","content":"识别主要代码架构和入口点","status":"completed","priority":"high"},{"id":"3","content":"分析核心组件和依赖关系","status":"completed","priority":"medium"},{"id":"4","content":"总结项目架构和关键发现","status":"completed","priority":"medium"}]}) execution end
+[2026-01-16T01:05:21.579Z] [INFO] [Agent] Tool todo_write result: 
+ 
+        todos: [
+  {
+    "content": "分析项目结构和配置文件",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "识别主要代码架构和入口点",
+    "status": "completed",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "分析核心组件和依赖关系",
+    "status": "completed",
+    "priority": "medium",
+    "id": "3"
+  },
+  {
+    "content": "总结项目架构和关键发现",
     "status": "completed",
     "priority": "medium",
     "id": "4"
-  },
-  {
-    "content": "总结项目架构和功能",
-    "status": "completed",
-    "prior...
+  }
+]
+     ...
 ✔ Thinking-23 end
-[2026-01-15T17:31:43.992Z] [INFO] [CLI]
+[2026-01-16T01:05:38.251Z] [INFO] [CLI] 
 🤖 Agent:
 ## 项目分析总结
 
 **项目概述**
-这是一个基于TypeScript的AI Agent框架，采用分层架构设计，支持多LLM提供商和工具调用功能。
+这是一个基于TypeScript的AI Agent框架，采用分层架构设计，支持DeepSeek API集成，具备交互式CLI和工具调用能力。
+
+**架构分层**
+- **入口层**: `src/index.ts` - 应用启动入口，支持CLI和Demo模式
+- **应用层**: `SessionManager` - 会话管理和消息编排
+- **领域层**: `Session`, `MessageQueue` - 核心业务模型
+- **基础设施层**: `MessageRepository` - 数据持久化（MongoDB）
+- **工具层**: `ToolRegistry` - 可扩展的工具系统
+
+**核心组件**
+- **Agent**: 主协调器，集成LLM调用和工具执行循环
+- **LLM Provider**: 支持OpenAI兼容API（DeepSeek）
+- **Session Manager**: 会话状态管理和消息队列
+- **Tool Registry**: 工具注册中心，支持8个内置工具
+- **CLI**: 交互式命令行界面，支持历史记录和命令
 
 **技术栈**
-- **语言**: TypeScript (ESNext)
-- **运行时**: Node.js (CommonJS)
-- **数据库**: MongoDB (Mongoose ODM)
-- **测试**: Vitest
-- **构建**: TypeScript编译器
-- **依赖管理**: pnpm
+- **语言**: TypeScript (CommonJS)
+- **运行时**: Node.js
+- **数据库**: MongoDB (mongoose)
+- **LLM**: DeepSeek API (OpenAI兼容)
+- **工具**: Zod验证、Ora加载动画、Prompts交互库
 
-**核心架构**
-- **领域层**: `MessageQueue`, `Session` - 业务核心模型
-- **应用层**: `SessionManager` - 会话管理逻辑
-- **基础设施层**: `MessageRepository` - 数据持久化
-- **Agent层**: `Agent` - LLM编排和工具调用
-- **工具层**: `ToolRegistry` - 工具注册和执行
-- **界面层**: `CLI` - 命令行交互界面
-
-**主要组件**
-1. **Agent**: 核心AI代理，支持工具调用循环和会话管理
-2. **SessionManager**: 会话生命周期管理，支持内存缓存和数据库持久化
-3. **ToolRegistry**: 工具注册中心，支持bash、文件操作、搜索等工具
-4. **LLM Providers**: 支持DeepSeek、Kimi、ModelScope等多提供商
-5. **CLI**: 交互式命令行界面，支持历史记录和命令系统
-
-**数据模型**
-- **Message**: 消息存储，支持用户、助手、系统、工具角色
-- **Session**: 会话管理，支持多用户和多会话
+**关键特性**
+1. **ReAct框架**: 支持工具调用循环，最大100次迭代
+2. **持久化存储**: 消息自动保存到MongoDB
+3. **分层架构**: 清晰的领域驱动设计
+4. **可扩展工具**: 支持bash、文件操作、搜索、编辑等工具
+5. **交互式CLI**: 支持历史记录、命令系统和会话管理
 
 **运行模式**
 - `npm run dev:cli` - 交互式CLI模式
 - `npm run dev:demo` - 演示模式
-- `npm test` - 运行测试
+- 支持环境变量配置API密钥
 
-**项目特点**
-- 清晰的DDD分层架构
-- 支持多LLM提供商切换
-- 完整的工具调用系统
-- 会话持久化到MongoDB
-- 交互式CLI界面
-- 类型安全的TypeScript实现
+**项目状态**
+代码结构清晰，架构设计良好，具备完整的AI Agent核心功能，适合作为编程助手框架使用。

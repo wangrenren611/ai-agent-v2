@@ -41,17 +41,24 @@ Most files are small enough to read entirely. Avoid premature optimization.`;
 }
 
 const writeFileSchema = z.object({
-    filePath: z.string(),
-    content: z.string()
+    filePath: z.string().describe("The absolute or relative path to the file"),
+    content: z.string().describe(
+        "The complete file content as a plain string. " +
+        "IMPORTANT: Provide the raw content directly, NOT wrapped in markdown code blocks or backticks. " +
+        "All newlines, quotes, and special characters will be properly handled automatically."
+    ),
 })
 
 export class WriteFileTool extends BaseTool<typeof writeFileSchema> {
 
   name = "write_file";
 
+  description =
+    "Write the entire file content. " +
+    "IMPORTANT: For the content parameter, provide the raw file content directly as a plain string. " +
+    "Do NOT wrap it in markdown code blocks (```), backticks, or any other formatting. " +
+    "Just pass the actual file content as-is.";
 
-
-  description = "Write the entire file content. Use surgical_edit for large files.";
   schema = writeFileSchema;
 
   async execute({ filePath, content }: any) {

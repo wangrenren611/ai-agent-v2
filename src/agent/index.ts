@@ -5,6 +5,7 @@
 import EventEmitter from "events";
 import { LLMProvider, message, ToolSchema } from "../providers/base";
 import { ScopedLogger } from "../util/log";
+import { formatToolResult } from "../util/log-format";
 import { SessionManager } from "../application/SessionManager";
 import { SYSTEM_PROMPT } from "../prompts/system";
 import { ToolRegistry } from "../tool";
@@ -113,46 +114,66 @@ export default class Agent extends EventEmitter {
                         type: 'tool_call',
                         tool_calls: llmResponse.tool_calls,
                     });
-                    
-                    // 执行每个工具调用
-                    for (const toolCall of llmResponse.tool_calls) {
+
+                    this.logger.info(`Tool tips: ${llmResponse.content}`);
+
+                    // 并行执行所有工具调用
+                    const toolPromises = llmResponse.tool_calls.map(async (toolCall) => {
                         const { id, function: fn } = toolCall;
 
                         try {
-                            // 解析参数
-                            const args = JSON.parse(fn.arguments);
-
-                            if (!options?.silent) {
-                                this.logger.info(`Executing tool: ${fn.name}(${fn.arguments})`);
+                            // 解析参数（带容错处理）
+                            let args: unknown;
+                            try {
+                                args = JSON.parse(fn.arguments);
+                            } catch (parseError) {
+                                // JSON 解析失败 - 记录详细信息并返回友好的错误信息
+                                const truncatedArgs = fn.arguments.length > 200
+                                    ? fn.arguments.slice(0, 200) + '...'
+                                    : fn.arguments;
+                                const parseErrorMsg = parseError instanceof Error ? parseError.message : String(parseError);
+                                const errorMsg = `Invalid JSON in tool parameters: ${parseErrorMsg}\nReceived: ${truncatedArgs}`;
+                                this.logger.error(errorMsg);
+                                return {
+                                    toolCall,
+                                    result: `Error: Failed to parse tool arguments. The JSON was malformed. Please try again with properly formatted parameters.`,
+                                    error: errorMsg
+                                };
                             }
-                            const spinner= this.logger.spinner(`Tool ${fn.name}(${fn.arguments})`)   
+
+                            const spinner = this.logger.spinner(`Tool ${fn.name}(...)`);
                             // 执行工具
                             const result = await ToolRegistry.execute(fn.name, args);
+                            spinner.succeed(`Tool ${fn.name} completed`);
 
-                            spinner.succeed(`Tool ${fn.name}(${fn.arguments}) execution end`);
+                            if (!options?.silent) {
+                                this.logger.info(`Tool ${fn.name} result: ${formatToolResult(fn.name, result)}`);
+                            }
 
-                            this.logger.info(`Tool ${fn.name} result: \n ${result.slice(0,500)}...`);
-
-                            // 添加工具结果消息（必须包含 tool_call_id）
-                            await this.sessionManager.addMessage(sessionId, userId, {
-                                role: 'tool',
-                                content: result,
-                                type: 'tool',
-                                tool_call_id: id,
-                            });
-
+                            // 返回成功结果
+                            return { toolCall, result, error: undefined };
                         } catch (error) {
                             const errorMsg = error instanceof Error ? error.message : String(error);
                             this.logger.error(`Tool execution error: ${errorMsg}`);
 
-                            // 添加错误结果（必须包含 tool_call_id）
-                            await this.sessionManager.addMessage(sessionId, userId, {
-                                role: 'tool',
-                                content: `Error: ${errorMsg}`,
-                                type: 'tool',
-                                tool_call_id: id,
-                            });
+                            // 返回错误结果
+                            return { toolCall, result: `Error: ${errorMsg}`, error: errorMsg };
                         }
+                    });
+
+                    // 等待所有工具调用完成
+                    const results = await Promise.all(toolPromises);
+
+                    // 按原始顺序添加工具结果消息
+                    for (const { toolCall, result, error } of results) {
+                        const { id } = toolCall;
+
+                        await this.sessionManager.addMessage(sessionId, userId, {
+                            role: 'tool',
+                            content: result,
+                            type: 'tool',
+                            tool_call_id: id,
+                        });
                     }
 
                     // 继续循环，让 LLM 基于工具结果生成响应

@@ -9,7 +9,7 @@ import { connectDB } from './storage/mongoose';
 import { SessionManager } from './application/SessionManager';
 import { MessageRepository } from './infrastructure/MessageRepository';
 import { CLI } from './cli';
-import { registerDefaultTools } from './tool';
+import { registerDefaultToolsAsync } from './tool';
 
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}`, override: true });
@@ -29,20 +29,23 @@ async function initializeApp(config: AppConfig) {
     // 1. 连接数据库
     await connectDB();
 
-    // 2. 初始化基础设施层
+    // 2. 初始化工具（包括 MCP 工具）
+    await registerDefaultToolsAsync();
+
+    // 3. 初始化基础设施层
     const messageRepo = new MessageRepository();
 
-    // 3. 初始化应用层
+    // 4. 初始化应用层
     const sessionManager = new SessionManager(messageRepo);
 
-    // 4. 初始化 LLM Provider
+    // 5. 初始化 LLM Provider
     const llmProvider = new OpenAIProvider({
         apiKey: config.deepseekApiKey,
         baseURL: config.deepseekBaseUrl,
     });
-    
-  
-    // 5. 初始化 Agent
+
+
+    // 6. 初始化 Agent
     const agent = new Agent({
         llmProvider,
         sessionManager,

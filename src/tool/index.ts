@@ -20,6 +20,7 @@
 
 import { BaseTool } from './base';
 import BashTool from './bash';
+import GlobTool from './glob';
 import { ReadFileTool } from './file';
 import { WriteFileTool } from './file';
 import GrepTool from './grep';
@@ -27,6 +28,7 @@ import { SurgicalEditTool } from './surgical';
 import { BatchReplaceTool } from './batch-replace';
 import { TodoReadTool } from './todo';
 import { TodoWriteTool } from './todo';
+import { initializeMcp } from '../mcp/index.js';
 
 // =============================================================================
 // Tool Registry
@@ -315,11 +317,51 @@ export class ToolRegistry {
  */
 export function registerDefaultTools(): void {
 
-    ToolRegistry.register([new BashTool(),new GrepTool(), new ReadFileTool(), new WriteFileTool(), new SurgicalEditTool(), new BatchReplaceTool(), new TodoReadTool(), new TodoWriteTool()]);
+    ToolRegistry.register([new BashTool(), new GlobTool(), new GrepTool(), new ReadFileTool(), new WriteFileTool(), new SurgicalEditTool(), new BatchReplaceTool(), new TodoReadTool(), new TodoWriteTool()]);
 }
 
-// 自动注册默认工具
-registerDefaultTools();
+/**
+ * 初始化并注册所有工具（包括 MCP 服务器工具）
+ *
+ * 在应用启动时调用此函数，异步加载 MCP 服务器
+ *
+ * @param configPath - MCP 配置文件路径（可选）
+ * @returns MCP 管理器实例
+ *
+ * @example
+ * ```ts
+ * import { registerDefaultToolsAsync } from './tool';
+ *
+ * // 使用默认配置路径
+ * await registerDefaultToolsAsync();
+ *
+ * // 或指定配置文件路径
+ * await registerDefaultToolsAsync('./my-mcp-config.json');
+ * ```
+ */
+export async function registerDefaultToolsAsync(configPath?: string) {
+    // 注册内置工具
+    registerDefaultTools();
+
+    // 初始化 MCP 服务器（如果配置文件存在）
+    try {
+        const manager = await initializeMcp(configPath);
+        const servers = manager.getConnectedServers();
+        const totalTools = manager.getTotalToolsCount();
+
+        if (servers.length > 0) {
+            console.log(`[MCP] Loaded ${totalTools} tools from ${servers.length} server(s)`);
+        }
+
+        return manager;
+    } catch (error) {
+        // MCP 加载失败不应该阻止应用启动
+        if (error instanceof Error && !error.message.includes('not found')) {
+            console.warn('[MCP] Failed to load MCP servers:', error.message);
+        }
+        return null;
+    }
+}
 
 // =============================================================================
 // Exports

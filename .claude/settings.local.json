@@ -22,14 +22,23 @@
       "Bash(echo:*)",
       "Bash(ls:*)",
       "Bash(cd:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(brew install:*)",
+      "Bash(/Users/wrr/work/ai-agent-v2/node_modules/.pnpm/vscode-ripgrep@1.13.2/node_modules/vscode-ripgrep/bin/rg:*)",
+      "mcp__web-search-prime__webSearchPrime",
+      "Bash(npm search:*)",
+      "mcp__zread__read_file",
+      "mcp__web-reader__webReader",
+      "mcp__zread__get_repo_structure",
+      "Bash(timeout 10 pnpm dev:*)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "sequential-thinking",
     "context7",
     "tavily",
     "shadcn"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

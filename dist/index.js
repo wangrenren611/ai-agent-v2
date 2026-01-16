@@ -14,6 +14,7 @@ const mongoose_1 = require("./storage/mongoose");
 const SessionManager_1 = require("./application/SessionManager");
 const MessageRepository_1 = require("./infrastructure/MessageRepository");
 const cli_1 = require("./cli");
+const tool_1 = require("./tool");
 const env = process.env.NODE_ENV || 'development';
 dotenv_1.default.config({ path: `.env.${env}`, override: true });
 /**
@@ -22,16 +23,18 @@ dotenv_1.default.config({ path: `.env.${env}`, override: true });
 async function initializeApp(config) {
     // 1. 连接数据库
     await (0, mongoose_1.connectDB)();
-    // 2. 初始化基础设施层
+    // 2. 初始化工具（包括 MCP 工具）
+    await (0, tool_1.registerDefaultToolsAsync)();
+    // 3. 初始化基础设施层
     const messageRepo = new MessageRepository_1.MessageRepository();
-    // 3. 初始化应用层
+    // 4. 初始化应用层
     const sessionManager = new SessionManager_1.SessionManager(messageRepo);
-    // 4. 初始化 LLM Provider
+    // 5. 初始化 LLM Provider
     const llmProvider = new openai_1.OpenAIProvider({
         apiKey: config.deepseekApiKey,
         baseURL: config.deepseekBaseUrl,
     });
-    // 5. 初始化 Agent
+    // 6. 初始化 Agent
     const agent = new agent_1.default({
         llmProvider,
         sessionManager,
