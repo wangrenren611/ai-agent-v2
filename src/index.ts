@@ -143,7 +143,7 @@ async function main() {
         default:
             // 获取指定的 session ID（如果提供）
             const sessionId = args[1];
-            await startCLI(agent, sessionId);
+            await startCLI(agent, "session_1768499954417");
             break;
     }
 }

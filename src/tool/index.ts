@@ -329,7 +329,7 @@ export function registerDefaultTools(): void {
         new BatchReplaceTool(),
         new TodoReadTool(),
         new TodoWriteTool(),
-        new RollbackTool(),
+        // new RollbackTool(),
         new ListBackupsTool(),
         new CleanBackupsTool(),
     ]);

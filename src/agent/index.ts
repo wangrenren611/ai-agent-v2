@@ -9,6 +9,7 @@ import { formatToolResult } from "../util/log-format";
 import { SessionManager } from "../application/SessionManager";
 import { SYSTEM_PROMPT } from "../prompts/system";
 import { ToolRegistry } from "../tool";
+import { Compaction } from "../session/compaction";
 
 export interface AgentConfig {
     llmProvider: LLMProvider;
@@ -66,10 +67,20 @@ export default class Agent extends EventEmitter {
             this.sessionManager.getOrCreateSession(sessionId, userId);
 
             // 2. 添加用户消息到会话
-            await this.sessionManager.addMessage(sessionId, userId, {
-                role: 'user',
-                content: query,
-            });
+            // await this.sessionManager.addMessage(sessionId, userId, {
+            //     role: 'user',
+            //     content: query,
+            // });
+            //TODO
+            const compaction = new Compaction();
+            const history = await this.sessionManager.getMessages(sessionId);
+
+            if(compaction.isOverflow(query,history)){
+                this.logger.error("Compaction overflow")
+                return null;
+            }
+
+            return '';
 
             // 3. 获取工具 schemas（优先级：传入参数 > 默认配置 > ToolRegistry 全部）
             const tools = options?.tools ?? this.defaultTools ?? ToolRegistry.getSchemas();

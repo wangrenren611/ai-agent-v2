@@ -32,7 +32,11 @@
       "mcp__web-reader__webReader",
       "mcp__zread__get_repo_structure",
       "Bash(timeout 10 pnpm dev:*)",
-      "mcp__tavily__tavily-search"
+      "mcp__tavily__tavily-search",
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Bash(where:*)",
+      "Bash(findstr:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

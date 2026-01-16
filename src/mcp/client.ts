@@ -81,9 +81,11 @@ export class McpClient extends EventEmitter {
       console.log(`[MCP:${this.serverName}] Starting process: ${this.config.command} ${(this.config.args || []).join(' ')}`);
 
       // 启动服务器进程
+      // Windows 上需要 shell: true 来正确执行 .cmd 文件
       this.process = spawn(this.config.command, this.config.args || [], {
         env: { ...process.env, ...this.config.env },
         stdio: ['pipe', 'pipe', 'pipe'],
+        shell:  process.platform === 'win32',
       });
 
       // 设置输出处理
