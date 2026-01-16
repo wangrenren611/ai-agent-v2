@@ -16,6 +16,8 @@ export interface AgentConfig {
     systemPrompt?: string;
     /** 默认工具列表（可选），不传则使用 ToolRegistry 中所有工具 */
     defaultTools?: ToolSchema[];
+    /** 最大循环次数，防止无限循环，默认 10 */
+    maxLoop?: number;
 }
 
 export interface AgentResponse {
@@ -30,7 +32,7 @@ export default class Agent extends EventEmitter {
     private sessionManager: SessionManager;
     private systemPrompt: string;
     private defaultTools: ToolSchema[] | undefined;
-    private maxLoop:number=100
+    private maxLoop: number;
     constructor(config: AgentConfig) {
         super();
         this.llmProvider = config.llmProvider;
@@ -38,7 +40,7 @@ export default class Agent extends EventEmitter {
         this.systemPrompt = config.systemPrompt || SYSTEM_PROMPT;
         this.defaultTools = config.defaultTools;
         this.logger = new ScopedLogger('Agent');
-        this.maxLoop=100
+        this.maxLoop = config.maxLoop || 100; // 默认 10 次，与系统提示词建议一致
     }
 
     /**
@@ -77,7 +79,8 @@ export default class Agent extends EventEmitter {
             let finalResponse: AgentResponse | null = null;
 
             while (i < this.maxLoop) {
-                const spinner= this.logger.spinner(`Thinking-${i+1}...`)
+                i++; // 在循环开始时递增计数器
+                const spinner = this.logger.spinner(`Thinking-${i}...`);
                 // 获取会话历史（自动懒加载）
                 const history = await this.sessionManager.getMessages(sessionId);
 
@@ -88,8 +91,6 @@ export default class Agent extends EventEmitter {
                 };
 
                 const fullMessages = [systemMessage, ...history];
-
-                i++
 
                 // 调用 LLM
                 const llmResponse = await this.llmProvider.generate(fullMessages, {

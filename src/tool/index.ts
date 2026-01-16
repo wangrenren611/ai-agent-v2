@@ -28,6 +28,7 @@ import { SurgicalEditTool } from './surgical';
 import { BatchReplaceTool } from './batch-replace';
 import { TodoReadTool } from './todo';
 import { TodoWriteTool } from './todo';
+import { RollbackTool, ListBackupsTool, CleanBackupsTool } from './rollback';
 import { initializeMcp } from '../mcp/index.js';
 
 // =============================================================================
@@ -150,13 +151,14 @@ export class ToolRegistry {
     static async execute(name: string, args: unknown): Promise<string> {
         const tool = this.get(name);
         if (!tool) {
-            throw new Error(`Tool "${name}" not found`);
+            return `Tool "${name}" not found`;
         }
 
         // 验证参数
         const parsed = tool.schema.safeParse(args);
+
         if (!parsed.success) {
-            throw new Error(`Invalid arguments for tool "${name}": ${parsed.error.errors.map((e: { message: string }) => e.message).join(', ')}`);
+            return `Invalid arguments for tool "${name}": ${parsed.error.errors.map((e: { message: string }) => e.message).join(', ')}`;
         }
 
         return await tool.execute(parsed.data);
@@ -317,7 +319,20 @@ export class ToolRegistry {
  */
 export function registerDefaultTools(): void {
 
-    ToolRegistry.register([new BashTool(), new GlobTool(), new GrepTool(), new ReadFileTool(), new WriteFileTool(), new SurgicalEditTool(), new BatchReplaceTool(), new TodoReadTool(), new TodoWriteTool()]);
+    ToolRegistry.register([
+        new BashTool(),
+        new GlobTool(),
+        new GrepTool(),
+        new ReadFileTool(),
+        new WriteFileTool(),
+        new SurgicalEditTool(),
+        new BatchReplaceTool(),
+        new TodoReadTool(),
+        new TodoWriteTool(),
+        new RollbackTool(),
+        new ListBackupsTool(),
+        new CleanBackupsTool(),
+    ]);
 }
 
 /**

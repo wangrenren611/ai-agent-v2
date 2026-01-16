@@ -3,6 +3,7 @@ import path from 'path';
 import { isBinaryFile } from 'isbinaryfile';
 import { z } from 'zod';
 import { BaseTool } from './base';
+import { getBackupManager } from '../util/backup-manager';
 
 
 const readFileSchema = z.object({
@@ -63,8 +64,16 @@ export class WriteFileTool extends BaseTool<typeof writeFileSchema> {
 
   async execute({ filePath, content }: any) {
     const fullPath = path.resolve(process.cwd(), filePath);
+
+    // 在写入前备份现有文件（如果存在）
+    const backupManager = getBackupManager();
+    await backupManager.initialize();
+    const backupId = await backupManager.backup(fullPath);
+
     fs.mkdirSync(path.dirname(fullPath), { recursive: true });
     fs.writeFileSync(fullPath, content);
-    return `File ${filePath} written successfully.`;
+
+    const backupInfo = backupId ? ` (backup: ${backupId})` : '';
+    return `File ${filePath} written successfully.${backupInfo}`;
   }
 }

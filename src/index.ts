@@ -45,7 +45,7 @@ async function initializeApp(config: AppConfig) {
     });
 
 
-    // 6. 初始化 Agent
+ 
     const agent = new Agent({
         llmProvider,
         sessionManager,

@@ -3,6 +3,7 @@ import path from 'path';
 import { z } from 'zod';
 import { BaseTool } from './base';
 import chalk from 'chalk';
+import { getBackupManager } from '../util/backup-manager';
 
 export  class SurgicalEditTool extends BaseTool<any> {
 
@@ -31,11 +32,16 @@ export  class SurgicalEditTool extends BaseTool<any> {
 
     if (!fs.existsSync(fullPath)) return "Error: File not found.";
 
+    // 在修改前备份文件
+    const backupManager = getBackupManager();
+    await backupManager.initialize();
+    const backupId = await backupManager.backup(fullPath);
+
     const content = fs.readFileSync(fullPath, 'utf-8');
     const lines = content.split('\n');
-    
+
     if (line < 1 || line > lines.length) return "Error: Line number out of range.";
-    
+
     const targetLineIdx = line - 1;
     const originalLine = lines[targetLineIdx];
 
@@ -47,11 +53,12 @@ export  class SurgicalEditTool extends BaseTool<any> {
     lines[targetLineIdx] = newLine;
 
     fs.writeFileSync(fullPath, lines.join('\n'));
-    
+
     console.log(chalk.yellow(`\n[Edit] Modified ${filePath}:${line}`));
     console.log(chalk.red(`- ${originalLine.trim()}`));
     console.log(chalk.green(`+ ${newLine.trim()}`));
 
-    return "Modification successful.";
+    const backupInfo = backupId ? ` (backup: ${backupId})` : '';
+    return `Modification successful.${backupInfo}`;
   }
 }

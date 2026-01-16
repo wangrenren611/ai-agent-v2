@@ -3,6 +3,7 @@ import path from 'path';
 import { z } from 'zod';
 import { BaseTool } from './base';
 import chalk from 'chalk';
+import { getBackupManager } from '../util/backup-manager';
 
 /**
  * BatchReplaceTool - 批量替换工具
@@ -31,6 +32,11 @@ export class BatchReplaceTool extends BaseTool<any> {
     if (!fs.existsSync(fullPath)) {
       return `Error: File not found: ${filePath}`;
     }
+
+    // 在修改前备份文件
+    const backupManager = getBackupManager();
+    await backupManager.initialize();
+    const backupId = await backupManager.backup(fullPath);
 
     const content = fs.readFileSync(fullPath, 'utf-8');
     const lines = content.split('\n');
@@ -72,7 +78,8 @@ export class BatchReplaceTool extends BaseTool<any> {
       fs.writeFileSync(fullPath, lines.join('\n'));
     }
 
-    const summary = `\n✅ Modified ${modifiedCount}/${replacements.length} replacements in ${filePath}`;
+    const backupInfo = backupId ? ` (backup: ${backupId})` : '';
+    const summary = `\n✅ Modified ${modifiedCount}/${replacements.length} replacements in ${filePath}${backupInfo}`;
     console.log(chalk.green(summary));
 
     if (results.length > 0) {

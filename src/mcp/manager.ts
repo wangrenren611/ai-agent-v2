@@ -8,8 +8,8 @@
 import { McpClient } from './client';
 import { createToolAdapters } from './tool-adapter';
 import { ToolRegistry } from '../tool/index';
-import { loadMcpConfig, type McpConfigFile } from './config-loader';
-import type { McpServerConfig, Tool, McpConnectionInfo } from './types';
+import { loadMcpConfig } from './config-loader';
+import type { McpServerConfig,  McpConnectionInfo } from './types';
 import { ConnectionState } from './types';
 
 // =============================================================================
