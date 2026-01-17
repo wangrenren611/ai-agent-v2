@@ -3,7 +3,7 @@
  * 负责编排 LLM 调用和会话管理
  */
 import EventEmitter from "events";
-import { LLMProvider, message, ToolSchema } from "../providers/base";
+import { LLMProvider, Message, ToolSchema } from "../providers/base";
 import { ScopedLogger } from "../util/log";
 import { formatToolResult } from "../util/log-format";
 import { SessionManager } from "../application/SessionManager";
@@ -19,6 +19,10 @@ export interface AgentConfig {
     defaultTools?: ToolSchema[];
     /** 最大循环次数，防止无限循环，默认 10 */
     maxLoop?: number;
+    /** 最大 token 数，默认 8000 */
+    maxTokens?: number;
+    /** 最大输出 token 数，默认 8000 */
+    maxOutputTokens?: number;
 }
 
 export interface AgentResponse {
@@ -34,6 +38,8 @@ export default class Agent extends EventEmitter {
     private systemPrompt: string;
     private defaultTools: ToolSchema[] | undefined;
     private maxLoop: number;
+    maxOutputTokens: any;
+    maxTokens: number;
     constructor(config: AgentConfig) {
         super();
         this.llmProvider = config.llmProvider;
@@ -42,6 +48,8 @@ export default class Agent extends EventEmitter {
         this.defaultTools = config.defaultTools;
         this.logger = new ScopedLogger('Agent');
         this.maxLoop = config.maxLoop || 100; // 默认 10 次，与系统提示词建议一致
+        this.maxOutputTokens = config.maxOutputTokens || 8000;
+        this.maxTokens = config.maxTokens || 200 * 1000;
     }
 
     /**
@@ -66,21 +74,14 @@ export default class Agent extends EventEmitter {
             // 1. 确保会话存在
             this.sessionManager.getOrCreateSession(sessionId, userId);
 
+         
+
             // 2. 添加用户消息到会话
-            // await this.sessionManager.addMessage(sessionId, userId, {
-            //     role: 'user',
-            //     content: query,
-            // });
-            //TODO
-            const compaction = new Compaction();
-            const history = await this.sessionManager.getMessages(sessionId);
-
-            if(compaction.isOverflow(query,history)){
-                this.logger.error("Compaction overflow")
-                return null;
-            }
-
-            return '';
+            await this.sessionManager.addMessage(sessionId, userId, {
+                role: 'user',
+                content: query,
+            });
+        
 
             // 3. 获取工具 schemas（优先级：传入参数 > 默认配置 > ToolRegistry 全部）
             const tools = options?.tools ?? this.defaultTools ?? ToolRegistry.getSchemas();
@@ -91,24 +92,42 @@ export default class Agent extends EventEmitter {
 
             while (i < this.maxLoop) {
                 i++; // 在循环开始时递增计数器
-                const spinner = this.logger.spinner(`Thinking-${i}...`);
+              
                 // 获取会话历史（自动懒加载）
                 const history = await this.sessionManager.getMessages(sessionId);
-
+              
                 // 构建完整消息（系统提示 + 历史消息）
-                const systemMessage: message = {
+                const systemMessage: Message = {
                     role: 'system',
                     content: this.systemPrompt,
                 };
 
-                const fullMessages = [systemMessage, ...history];
+               const messages = [systemMessage, ...history];
+               
+               console.log("history:", messages.slice(0, 3), messages.slice(messages.length - 3, messages.length));
 
+               //压缩
+                const compaction = new Compaction({
+                    maxTokens: this.maxTokens,
+                    maxOutputTokens: this.maxOutputTokens,
+                });
+
+               const fullMessages = await compaction.compact(messages);
+               
+               if(compaction.lastSummaryMessage){
+                  await this.sessionManager.addMessage(sessionId, userId, compaction.lastSummaryMessage);
+               }
+            
+               console.log("new history:", fullMessages.slice(0, 3), fullMessages.slice(fullMessages.length - 3, fullMessages.length));
+             
+               const spinner = this.logger.spinner(`Thinking-${i}...`);
                 // 调用 LLM
                 const llmResponse = await this.llmProvider.generate(fullMessages, {
                     model: 'deepseek-chat',
                     tools: tools.length > 0 ? tools : undefined,
+                    max_tokens: this.maxTokens,
                 });
-                
+
                 spinner.succeed(`Thinking-${i} end`);
 
                 if (!llmResponse) {
@@ -203,7 +222,7 @@ export default class Agent extends EventEmitter {
                     sessionId,
                     role: 'assistant',
                 };
-                
+
                 break;
             }
 
@@ -232,7 +251,7 @@ export default class Agent extends EventEmitter {
     /**
      * 获取会话历史
      */
-    async getHistory(sessionId: string): Promise<message[]> {
+    async getHistory(sessionId: string): Promise<Message[]> {
         return await this.sessionManager.getMessages(sessionId);
     }
 

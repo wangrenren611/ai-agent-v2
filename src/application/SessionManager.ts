@@ -4,7 +4,7 @@
  */
 import { MessageQueue } from "../domain/MessageQueue";
 import { Session, createSession } from "../domain/session";
-import { message } from "../providers/base";
+import { Message } from "../providers/base";
 import { MessageRepository } from "../infrastructure/MessageRepository";
 import { ScopedLogger } from "../util/log";
 
@@ -40,17 +40,28 @@ export class SessionManager {
     /**
      * 获取或创建会话
      */
-    getOrCreateSession(sessionId: string, userId: string): Session {
+    async getOrCreateSession(sessionId: string, userId: string): Promise<Session> {
         let session = this.sessions.get(sessionId);
         if (!session) {
             session = createSession(userId);
             // 使用指定的 sessionId
             this.sessions.set(sessionId, session);
             this.queues.set(sessionId, new MessageQueue());
+        
+           const messages =await this.loadHistory(sessionId);
+
+           if(messages.length){
+               let queue = this.queues.get(sessionId);
+               messages.forEach((message)=>{
+                  queue?.add(message)
+               })
+           }
         }
+
         return session;
     }
 
+ 
     /**
      * 获取会话的消息队列
      */
@@ -66,7 +77,7 @@ export class SessionManager {
     /**
      * 添加消息到会话（内存 + 持久化）
      */
-    async addMessage(sessionId: string, userId: string, msg: message): Promise<void> {
+    async addMessage(sessionId: string, userId: string, msg: Message): Promise<void> {
         const queue = this.getQueue(sessionId);
         queue.add(msg);
 
@@ -82,13 +93,8 @@ export class SessionManager {
      * 获取会话的所有消息
      * 如果内存队列为空，自动从数据库加载历史记录
      */
-    async getMessages(sessionId: string): Promise<message[]> {
+    async getMessages(sessionId: string): Promise<Message[]> {
         const queue = this.getQueue(sessionId);
-
-        // 懒加载：如果队列为空，自动从数据库加载
-        if (queue.size() === 0) {
-            await this.loadHistory(sessionId);
-        }
 
         return queue.getAll();
     }
@@ -96,7 +102,7 @@ export class SessionManager {
     /**
      * 同步获取内存中的消息（不触发数据库加载）
      */
-    getMessagesFromMemory(sessionId: string): message[] {
+    getMessagesFromMemory(sessionId: string): Message[] {
         const queue = this.getQueue(sessionId);
         return queue.getAll();
     }
@@ -104,16 +110,18 @@ export class SessionManager {
     /**
      * 从数据库加载会话历史
      */
-    async loadHistory(sessionId: string): Promise<void> {
+    async loadHistory(sessionId: string): Promise<Message[]> {
         try {
             const messages = await this.repository.findBySession(sessionId);
-            const queue = this.getQueue(sessionId);
-            queue.clear();
-            messages.forEach(msg => queue.add(msg));
+            
             this.logger.info(`Loaded ${messages.length} messages for session ${sessionId}`);
+            return messages
+
         } catch (error) {
             this.logger.error(`Failed to load history for session ${sessionId}`);
         }
+
+        return []
     }
 
     /**

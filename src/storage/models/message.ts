@@ -28,7 +28,7 @@ const messageSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['text', 'tool', 'tool_call'],
+        enum: ['text', 'tool', 'tool_call','summary'],
         default: 'text',
     },
     /** Tool call ID (required for tool response messages) */

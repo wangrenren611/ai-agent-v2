@@ -25,10 +25,10 @@ export interface LLMOptions {
   system_prompt?: string
   tools?: ToolSchema[]
 }
-export type message = {
+export type Message = {
   role: 'user' | 'system' | 'assistant' | 'tool';
   content: string;
-  type?: 'text' | 'tool' | 'tool_call';
+  type?: 'text' | 'tool' | 'tool_call'| 'summary';
   /** Tool call ID (required for tool response messages) */
   tool_call_id?: string;
   /** Tool calls (for assistant messages that request tool execution) */
@@ -70,5 +70,5 @@ export abstract class LLMProvider{
    * @param prompt The input prompt for the model
    * @returns A promise that resolves to the model's response
    */
-  abstract generate(messages: message[], options?: LLMOptions): Promise<LLMResponse|null>
+  abstract generate(messages: Message[], options?: LLMOptions): Promise<LLMResponse|null>
 }

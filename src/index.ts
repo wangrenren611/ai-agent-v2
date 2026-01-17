@@ -30,14 +30,14 @@ async function initializeApp(config: AppConfig) {
     await connectDB();
 
     // 2. 初始化工具（包括 MCP 工具）
-    await registerDefaultToolsAsync();
+    //  await registerDefaultToolsAsync();
 
     // 3. 初始化基础设施层
     const messageRepo = new MessageRepository();
 
     // 4. 初始化应用层
     const sessionManager = new SessionManager(messageRepo);
-
+   
     // 5. 初始化 LLM Provider
     const llmProvider = new OpenAIProvider({
         apiKey: config.deepseekApiKey,

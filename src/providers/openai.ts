@@ -6,7 +6,7 @@
  * OpenAI API provider implementation.
  */
 
-import { LLMProvider, LLMOptions, LLMResponse, message, ToolSchema, type ProviderConfig } from './base'
+import { LLMProvider, LLMOptions, LLMResponse, Message, ToolSchema, type ProviderConfig } from './base'
 
 /**
  * 修复 LLM 生成的格式错误的 JSON
@@ -176,7 +176,7 @@ export class OpenAIProvider extends LLMProvider {
     this.model = config.model || 'gpt-4o-mini'
   }
 
-  async generate(messages: message[], options?: LLMOptions): Promise<LLMResponse|null> {
+  async generate(messages: Message[], options?: LLMOptions): Promise<LLMResponse|null> {
     const { model, max_tokens, temperature, tools } = options || {}
     try {
       const requestBody: Record<string, unknown> = {
