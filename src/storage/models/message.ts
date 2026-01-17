@@ -53,4 +53,4 @@ const messageSchema = new mongoose.Schema({
 // 复合索引优化查询
 messageSchema.index({ sessionId: 1, createdAt: 1 });
 
-export const Message = mongoose.model('Message', messageSchema);
+export const MessageData = mongoose.model('Message', messageSchema);

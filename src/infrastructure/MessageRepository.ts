@@ -2,8 +2,8 @@
  * MessageRepository - 消息持久化仓储
  * 负责消息的数据库操作
  */
-import { message } from "../providers/base";
-import { Message } from "../storage/models/message";
+import { Message } from "../providers/base";
+import { MessageData } from "../storage/models/message";
 import { ScopedLogger } from "../util/log";
 
 export class MessageRepository {
@@ -16,9 +16,9 @@ export class MessageRepository {
     /**
      * 保存单条消息
      */
-    async save(sessionId: string, userId: string, msg: message): Promise<void> {
+    async save(sessionId: string, userId: string, msg: Message): Promise<void> {
         try {
-            await Message.create({
+            await MessageData.create({
                 sessionId,
                 userId,
                 content: msg.content || '',
@@ -37,7 +37,7 @@ export class MessageRepository {
     /**
      * 批量保存消息
      */
-    async saveBatch(sessionId: string, userId: string, messages: message[]): Promise<void> {
+    async saveBatch(sessionId: string, userId: string, messages: Message[]): Promise<void> {
         try {
             const docs = messages.map(msg => ({
                 sessionId,
@@ -48,7 +48,7 @@ export class MessageRepository {
                 toolCallId: msg.tool_call_id,
                 toolCalls: msg.tool_calls ? JSON.stringify(msg.tool_calls) : undefined,
             }));
-            await Message.insertMany(docs);
+            await MessageData.insertMany(docs);
         } catch (error) {
             const errorMsg = error instanceof Error ? error.message : String(error);
             this.logger.error(`Failed to save messages batch: ${errorMsg}`);
@@ -59,11 +59,11 @@ export class MessageRepository {
     /**
      * 根据会话 ID 查询消息
      */
-    async findBySession(sessionId: string): Promise<message[]> {
+    async findBySession(sessionId: string): Promise<Message[]> {
         try {
-            const docs = await Message.find({ sessionId }).sort({ createdAt: 1 });
+            const docs = await MessageData.find({ sessionId }).sort({ createdAt: 1 });
             return docs.map(doc => {
-                const msg: message = {
+                const msg: Message = {
                     role: doc.role as any,
                     content: doc.content,
                     type: doc.type as any,
@@ -92,7 +92,7 @@ export class MessageRepository {
      */
     async deleteBySession(sessionId: string): Promise<void> {
         try {
-            await Message.deleteMany({ sessionId });
+            await MessageData.deleteMany({ sessionId });
         } catch (error) {
             const errorMsg = error instanceof Error ? error.message : String(error);
             this.logger.error(`Failed to delete messages: ${errorMsg}`);
