@@ -125,7 +125,7 @@ export default class Agent extends EventEmitter {
                 const llmResponse = await this.llmProvider.generate(fullMessages, {
                     model: 'deepseek-chat',
                     tools: tools.length > 0 ? tools : undefined,
-                    max_tokens: this.maxTokens,
+                    max_tokens: this.maxOutputTokens,
                 });
 
                 spinner.succeed(`Thinking-${i} end`);
