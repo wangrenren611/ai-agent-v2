@@ -6,7 +6,7 @@ import EventEmitter from "events";
 import { LLMProvider, Message, ToolSchema } from "../providers/base";
 import { ScopedLogger } from "../util/log";
 import { formatToolResult } from "../util/log-format";
-import { SessionManager } from "../application/SessionManager";
+import { SessionManager } from "../session-v2";
 import { SYSTEM_PROMPT } from "../prompts/system";
 import { ToolRegistry } from "../tool";
 import { Compaction } from "../session/compaction";
@@ -27,7 +27,6 @@ export interface AgentConfig {
 
 export interface AgentResponse {
     content: string;
-    sessionId: string;
     role: 'assistant';
 }
 
@@ -47,9 +46,9 @@ export default class Agent extends EventEmitter {
         this.systemPrompt = config.systemPrompt || SYSTEM_PROMPT;
         this.defaultTools = config.defaultTools;
         this.logger = new ScopedLogger('Agent');
-        this.maxLoop = config.maxLoop || 10; // 默认 10 次，与系统提示词建议一致
-        this.maxOutputTokens = config.maxOutputTokens || 8000;
-        this.maxTokens = config.maxTokens || 200 * 1000;
+        this.maxLoop = config.maxLoop || 1024; 
+        this.maxOutputTokens =  this.llmProvider.maxOutputTokens;
+        this.maxTokens = this.llmProvider.maxTokens;
     }
 
     /**
@@ -61,29 +60,12 @@ export default class Agent extends EventEmitter {
      * @returns Agent 响应
      */
     async run(
-        sessionId: string,
-        userId: string,
         query: string,
         options?: { silent?: boolean; tools?: ToolSchema[] }
     ): Promise<AgentResponse | null> {
 
-        if (!options?.silent) {
-            this.logger.info(`Processing query for session ${sessionId}: ${query}`);
-        }
+     
         try {
-            // 1. 确保会话存在
-           await this.sessionManager.getOrCreateSession(sessionId, userId);
-
-         
-           const systemMessage: Message = {
-                 role: 'system',
-                 content: this.systemPrompt,
-           };
-
-        //   const history = await this.sessionManager.getMessages(sessionId);
-        //     console.log(history)
-        //         // 构建完整消息（系统提示 
-        //   return
 
             // 3. 获取工具 schemas（优先级：传入参数 > 默认配置 > ToolRegistry 全部）
             const tools = options?.tools ?? this.defaultTools ?? ToolRegistry.getSchemas();
@@ -93,51 +75,26 @@ export default class Agent extends EventEmitter {
             let finalResponse: AgentResponse | null = null;
   
   
-            this.sessionManager.addMessage(sessionId,userId,{
-                    role:'user',
-                    type:'text',
-                    content:query
-            })
+            this.sessionManager.addMessage({
+                role: 'user',
+                type: 'text',
+                content: query
+            });
 
             while (i < this.maxLoop) {
                 i++; // 在循环开始时递增计数器
 
-                // 检查是否需要压缩
-                const usableThreshold = this.maxTokens - this.maxOutputTokens;
-                const needsCompaction = this.sessionManager.needsCompaction(
-                    sessionId,
-                    usableThreshold * 0.92 // 92% 触发压缩
-                );
-
-                if (needsCompaction) {
-                    const compaction = new Compaction({
-                        maxTokens: this.maxTokens,
-                        maxOutputTokens: this.maxOutputTokens,
-                        llmProvider: this.llmProvider,
-                    });
-
-                    const currentMessages = await this.sessionManager.getMessages(sessionId);
-                    const messagesForCompaction = [systemMessage, ...currentMessages];
-
-                    const compactedMessages = await compaction.compact(messagesForCompaction);
-
-                    if (compaction.lastSummaryMessage) {
-                        // 执行三层存储压缩（移除已压缩消息）
-                        await this.sessionManager.compact(
-                            sessionId,
-                            userId,
-                            compaction.lastSummaryMessage,
-                            6 // KEEP_RECENT_COUNT: 保留最近 6 条消息
-                        );
-                    }
-                }
-
-                // 统一构建 LLM 上下文
-                const llmMessages = await this.sessionManager.buildLLMContext(sessionId, systemMessage);
+                const llmMessages =await this.sessionManager.getMessages();
 
                 const spinner = this.logger.spinner(`Thinking-${i}...`);
                 // 调用 LLM
-                const llmResponse = await this.llmProvider.generate(llmMessages, {
+                const llmResponse = await this.llmProvider.generate([
+                     {
+                       role: 'system',
+                        content: this.systemPrompt,
+                    },
+                    ...llmMessages
+                ], {
                     model: 'deepseek-chat',
                     tools: tools.length > 0 ? tools : undefined,
                     max_tokens: this.maxOutputTokens,
@@ -148,7 +105,7 @@ export default class Agent extends EventEmitter {
                 spinner.succeed(`Thinking-${i} end`);
 
                 if (!llmResponse) {
-                    this.emit('failure', { sessionId, error: 'LLM returned null response' });
+                    this.emit('failure', {error: 'LLM returned null response' });
                     this.logger.error("LLM error")
                     return null;
                 }
@@ -156,7 +113,7 @@ export default class Agent extends EventEmitter {
                 // 检查是否有工具调用
                 if (llmResponse.tool_calls && llmResponse.tool_calls.length > 0) {
                     // 添加 assistant 消息（包含 tool_calls）
-                    await this.sessionManager.addMessage(sessionId, userId, {
+                    this.sessionManager.addMessage({
                         role: 'assistant',
                         content: llmResponse.content,
                         type: 'tool_call',
@@ -167,7 +124,7 @@ export default class Agent extends EventEmitter {
 
                     // 并行执行所有工具调用
                     const toolPromises = llmResponse.tool_calls.map(async (toolCall) => {
-                        const { id, function: fn } = toolCall;
+                        const {  function: fn } = toolCall;
 
                         try {
                             // 解析参数（带容错处理）
@@ -216,7 +173,7 @@ export default class Agent extends EventEmitter {
                     for (const { toolCall, result, error } of results) {
                         const { id } = toolCall;
 
-                        await this.sessionManager.addMessage(sessionId, userId, {
+                        this.sessionManager.addMessage({
                             role: 'tool',
                             content: result,
                             type: 'tool',
@@ -229,14 +186,14 @@ export default class Agent extends EventEmitter {
                 }
 
                 // 没有工具调用，这是最终响应
-                await this.sessionManager.addMessage(sessionId, userId, {
+                this.sessionManager.addMessage({
                     role: 'assistant',
+                    type: 'text',
                     content: llmResponse.content,
                 });
 
                 finalResponse = {
                     content: llmResponse.content,
-                    sessionId,
                     role: 'assistant',
                 };
 
@@ -245,45 +202,18 @@ export default class Agent extends EventEmitter {
 
             if (i >= this.maxLoop) {
                 this.logger.error('Max iterations reached, possible infinite loop');
-                this.emit('failure', { sessionId, error: 'Max iterations reached' });
                 return null;
             }
 
-            if (finalResponse) {
-                this.emit('success', { sessionId, response: finalResponse });
-            }
+    
 
             return finalResponse;
 
         } catch (error) {
             const errorMsg = error instanceof Error ? error.message : String(error);
-            this.emit('failure', { sessionId, error: errorMsg });
             this.logger.error(`Agent error: ${errorMsg}`);
             return null;
-        } finally {
-            this.emit('end', { sessionId });
         }
     }
 
-    /**
-     * 获取会话历史
-     */
-    async getHistory(sessionId: string): Promise<Message[]> {
-        return await this.sessionManager.getMessages(sessionId);
-    }
-
-    /**
-     * 从数据库加载会话历史
-     */
-    async loadHistory(sessionId: string): Promise<void> {
-        await this.sessionManager.loadHistory(sessionId);
-    }
-
-    /**
-     * 清除会话历史
-     */
-    async clearSession(sessionId: string): Promise<void> {
-        await this.sessionManager.deleteSession(sessionId);
-        this.logger.info(`Cleared session ${sessionId}`);
-    }
 }

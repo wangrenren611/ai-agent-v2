@@ -5,7 +5,6 @@ import type Agent from '../../agent';
 
 export interface CommandContext {
     agent: Agent;
-    sessionId: { value: string };
     running: { value: boolean };
 }
 

@@ -65,6 +65,8 @@ export abstract class LLMProvider{
     protected readonly config: ProviderConfig
   ) {}
   
+  abstract maxOutputTokens:number;
+  abstract maxTokens:number;
   /**
    * 从提供商生成响应
    * @param prompt The input prompt for the model

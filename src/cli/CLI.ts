@@ -5,21 +5,17 @@
 import { ScopedLogger } from '../util/log';
 import Agent from '../agent';
 import { executeCommand } from './commands';
-import { formatSessionId, InputHistory } from './utils';
+import {  InputHistory } from './utils';
 import { readWithHistory } from './utils/reader';
 import type { CommandContext } from './commands/types';
 
 export interface CLIConfig {
     agent: Agent;
-    sessionId: string;
-    userId: string;
     prompt?: string;
 }
 
 export class CLI {
     private agent: Agent;
-    private sessionId: string;
-    private userId: string;
     private promptText: string;
     private running: boolean;
     private logger: ScopedLogger;
@@ -27,8 +23,6 @@ export class CLI {
 
     constructor(config: CLIConfig) {
         this.agent = config.agent;
-        this.sessionId = config.sessionId;
-        this.userId = config.userId;
         this.promptText = config.prompt || 'You';
         this.running = false;
         this.logger = new ScopedLogger('CLI');
@@ -77,7 +71,6 @@ export class CLI {
     private async handleInput(input: string): Promise<void> {
         const context: CommandContext = {
             agent: this.agent,
-            sessionId: { value: this.sessionId },
             running: { value: this.running },
         };
 
@@ -85,7 +78,6 @@ export class CLI {
 
         // 更新运行状态
         this.running = context.running.value;
-        this.sessionId = context.sessionId.value;
 
         if (!isCommand) {
             await this.handleChat(input);
@@ -97,7 +89,7 @@ export class CLI {
      */
     private async handleChat(input: string): Promise<void> {
         try {
-            const response = await this.agent.run(this.sessionId, this.userId, input, { silent: true });
+            const response = await this.agent.run(input, { silent: true });
             if (response) {
                 this.logger.info(`\n🤖 Agent:\n${response.content}\n`);
             } else {
@@ -116,7 +108,6 @@ export class CLI {
         console.log('\n╔════════════════════════════════════════════════╗');
         console.log('║       AI Agent - Interactive Mode              ║');
         console.log('╚════════════════════════════════════════════════╝');
-        console.log(`Session: ${formatSessionId(this.sessionId)}`);
         console.log('Type /help for available commands\n');
     }
 

@@ -24,45 +24,45 @@ import { LLMProvider, LLMOptions, LLMResponse, Message, ToolSchema, type Provide
  * 此函数尝试修复这些常见问题。
  */
 function fixMalformedJson(potentiallyMalformedJson: string): string {
-    const originalError: { message: string; attempt?: number }[] = [];
+  const originalError: { message: string; attempt?: number }[] = [];
 
-    // 如果 JSON 本身是有效的，直接返回
+  // 如果 JSON 本身是有效的，直接返回
+  try {
+    JSON.parse(potentiallyMalformedJson);
+    return potentiallyMalformedJson;
+  } catch (e) {
+    originalError.push({ message: e instanceof Error ? e.message : String(e) });
+  }
+
+  let fixed = potentiallyMalformedJson;
+
+  // 尝试 1: 处理 JSON 字符串值中的未转义换行符
+  // 这是最常见的问题：LLM 在生成字符串值时直接包含换行而不是 \n
+  // 策略：找到所有字符串值（在引号之间），转义其中的特殊字符
+  if (!fixed.includes('\\n')) {
+    // 只有在没有转义换行符的情况下才尝试这个修复
+    // 如果已经有 \n，说明 JSON 可能是正确的，只是有其他问题
+    const fixed1 = fixUnescapedNewlinesInStrings(fixed);
     try {
-        JSON.parse(potentiallyMalformedJson);
-        return potentiallyMalformedJson;
+      JSON.parse(fixed1);
+      return fixed1;
     } catch (e) {
-        originalError.push({ message: e instanceof Error ? e.message : String(e) });
+      originalError.push({ message: e instanceof Error ? e.message : String(e), attempt: 1 });
     }
+    fixed = fixed1;
+  }
 
-    let fixed = potentiallyMalformedJson;
+  // 尝试 2: 去除所有控制字符并替换为转义序列
+  const fixed2 = fixed.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
+  try {
+    JSON.parse(fixed2);
+    return fixed2;
+  } catch (e) {
+    originalError.push({ message: e instanceof Error ? e.message : String(e), attempt: 2 });
+  }
 
-    // 尝试 1: 处理 JSON 字符串值中的未转义换行符
-    // 这是最常见的问题：LLM 在生成字符串值时直接包含换行而不是 \n
-    // 策略：找到所有字符串值（在引号之间），转义其中的特殊字符
-    if (!fixed.includes('\\n')) {
-        // 只有在没有转义换行符的情况下才尝试这个修复
-        // 如果已经有 \n，说明 JSON 可能是正确的，只是有其他问题
-        const fixed1 = fixUnescapedNewlinesInStrings(fixed);
-        try {
-            JSON.parse(fixed1);
-            return fixed1;
-        } catch (e) {
-            originalError.push({ message: e instanceof Error ? e.message : String(e), attempt: 1 });
-        }
-        fixed = fixed1;
-    }
-
-    // 尝试 2: 去除所有控制字符并替换为转义序列
-    const fixed2 = fixed.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
-    try {
-        JSON.parse(fixed2);
-        return fixed2;
-    } catch (e) {
-        originalError.push({ message: e instanceof Error ? e.message : String(e), attempt: 2 });
-    }
-
-    // 所有尝试都失败，抛出原始错误
-    throw new Error(`Failed to fix malformed JSON. Original errors: ${JSON.stringify(originalError)}`);
+  // 所有尝试都失败，抛出原始错误
+  throw new Error(`Failed to fix malformed JSON. Original errors: ${JSON.stringify(originalError)}`);
 }
 
 /**
@@ -71,55 +71,55 @@ function fixMalformedJson(potentiallyMalformedJson: string): string {
  * 通过解析 JSON 结构，找到所有字符串值，并转义其中的特殊字符。
  */
 function fixUnescapedNewlinesInStrings(json: string): string {
-    // 这是一个简化的实现，处理最常见的模式
-    // 模式: "key": "value with
-    // actual newline"
+  // 这是一个简化的实现，处理最常见的模式
+  // 模式: "key": "value with
+  // actual newline"
 
-    const lines = json.split('\n');
-    const result: string[] = [];
-    let inString = false;
-    let escapeNext = false;
+  const lines = json.split('\n');
+  const result: string[] = [];
+  let inString = false;
+  let escapeNext = false;
 
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
 
-        if (!inString) {
-            result.push(line);
-            // 检查这一行后是否进入字符串状态
-            for (const char of line) {
-                if (escapeNext) {
-                    escapeNext = false;
-                    continue;
-                }
-                if (char === '\\') {
-                    escapeNext = true;
-                    continue;
-                }
-                if (char === '"') {
-                    inString = !inString;
-                }
-            }
-        } else {
-            // 在字符串中，添加转义的换行
-            result.push('\\n' + line.trim());
-            // 检查这一行后是否退出字符串状态
-            for (const char of line) {
-                if (escapeNext) {
-                    escapeNext = false;
-                    continue;
-                }
-                if (char === '\\') {
-                    escapeNext = true;
-                    continue;
-                }
-                if (char === '"') {
-                    inString = !inString;
-                }
-            }
+    if (!inString) {
+      result.push(line);
+      // 检查这一行后是否进入字符串状态
+      for (const char of line) {
+        if (escapeNext) {
+          escapeNext = false;
+          continue;
         }
+        if (char === '\\') {
+          escapeNext = true;
+          continue;
+        }
+        if (char === '"') {
+          inString = !inString;
+        }
+      }
+    } else {
+      // 在字符串中，添加转义的换行
+      result.push('\\n' + line.trim());
+      // 检查这一行后是否退出字符串状态
+      for (const char of line) {
+        if (escapeNext) {
+          escapeNext = false;
+          continue;
+        }
+        if (char === '\\') {
+          escapeNext = true;
+          continue;
+        }
+        if (char === '"') {
+          inString = !inString;
+        }
+      }
     }
+  }
 
-    return result.join('\n');
+  return result.join('\n');
 }
 
 /**
@@ -133,7 +133,9 @@ export interface OpenAIConfig extends ProviderConfig {
   /** Model name (default: gpt-4o-mini) */
   model?: string
   /** Organization ID */
-  organization?: string
+  organization?: string,
+  maxTokens?: number;
+  maxOutputTokens?: number;
 }
 
 /**
@@ -169,20 +171,24 @@ interface ChatCompletionResponse {
 export class OpenAIProvider extends LLMProvider {
   baseURL: string
   model: string
+  maxTokens: number;
+  maxOutputTokens: number;
 
   constructor(config: OpenAIConfig) {
     super(config)
     this.baseURL = config.baseURL || 'https://api.openai.com/v1'
     this.model = config.model || 'gpt-4o-mini'
+    this.maxTokens = config.maxTokens || 128 * 1024;
+    this.maxOutputTokens = config.maxOutputTokens || 8000;
   }
 
-  async generate(messages: Message[], options?: LLMOptions): Promise<LLMResponse|null> {
+  async generate(messages: Message[], options?: LLMOptions): Promise<LLMResponse | null> {
     const { model, max_tokens, temperature, tools } = options || {}
     try {
       const requestBody: Record<string, unknown> = {
         model: model || this.model,
         messages,
-        max_tokens: max_tokens || 2000,
+        max_tokens: max_tokens || this.maxOutputTokens,
         temperature: temperature || 0.1,
       };
 
@@ -192,7 +198,7 @@ export class OpenAIProvider extends LLMProvider {
         // 调试：打印工具 schemas
         // console.log('Tools sent to API:', JSON.stringify(tools, null, 2));
       }
-    
+
       const response = await fetch(`${this.baseURL}/chat/completions`, {
         method: 'POST',
         headers: {
