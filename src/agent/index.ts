@@ -38,7 +38,7 @@ export default class Agent extends EventEmitter {
     private systemPrompt: string;
     private defaultTools: ToolSchema[] | undefined;
     private maxLoop: number;
-    maxOutputTokens: any;
+    maxOutputTokens: number;
     maxTokens: number;
     constructor(config: AgentConfig) {
         super();
@@ -47,7 +47,7 @@ export default class Agent extends EventEmitter {
         this.systemPrompt = config.systemPrompt || SYSTEM_PROMPT;
         this.defaultTools = config.defaultTools;
         this.logger = new ScopedLogger('Agent');
-        this.maxLoop = config.maxLoop || 100; // 默认 10 次，与系统提示词建议一致
+        this.maxLoop = config.maxLoop || 10; // 默认 10 次，与系统提示词建议一致
         this.maxOutputTokens = config.maxOutputTokens || 8000;
         this.maxTokens = config.maxTokens || 200 * 1000;
     }
@@ -70,7 +70,6 @@ export default class Agent extends EventEmitter {
         if (!options?.silent) {
             this.logger.info(`Processing query for session ${sessionId}: ${query}`);
         }
-         this.logger.info(sessionId)   
         try {
             // 1. 确保会话存在
            await this.sessionManager.getOrCreateSession(sessionId, userId);
@@ -102,32 +101,43 @@ export default class Agent extends EventEmitter {
 
             while (i < this.maxLoop) {
                 i++; // 在循环开始时递增计数器
-              
-                // 获取会话历史（自动懒加载）
-                const history = await this.sessionManager.getMessages(sessionId);
-              
-                // 构建完整消息（系统提示 + 历史消息）
-          
-               const messages = [systemMessage,...history];
-               
 
-               //压缩
-                const compaction = new Compaction({
-                    maxTokens: this.maxTokens,
-                    maxOutputTokens: this.maxOutputTokens,
-                });
+                // 检查是否需要压缩
+                const usableThreshold = this.maxTokens - this.maxOutputTokens;
+                const needsCompaction = this.sessionManager.needsCompaction(
+                    sessionId,
+                    usableThreshold * 0.92 // 92% 触发压缩
+                );
 
-               const fullMessages = await compaction.compact(messages);
-               
-               if(compaction.lastSummaryMessage){
-                  await this.sessionManager.addMessage(sessionId, userId, compaction.lastSummaryMessage);
-               }
-            
-             
-               const spinner = this.logger.spinner(`Thinking-${i}...`);
-                console.log("fullMessages",fullMessages)
+                if (needsCompaction) {
+                    const compaction = new Compaction({
+                        maxTokens: this.maxTokens,
+                        maxOutputTokens: this.maxOutputTokens,
+                        llmProvider: this.llmProvider,
+                    });
+
+                    const currentMessages = await this.sessionManager.getMessages(sessionId);
+                    const messagesForCompaction = [systemMessage, ...currentMessages];
+
+                    const compactedMessages = await compaction.compact(messagesForCompaction);
+
+                    if (compaction.lastSummaryMessage) {
+                        // 执行三层存储压缩（移除已压缩消息）
+                        await this.sessionManager.compact(
+                            sessionId,
+                            userId,
+                            compaction.lastSummaryMessage,
+                            6 // KEEP_RECENT_COUNT: 保留最近 6 条消息
+                        );
+                    }
+                }
+
+                // 统一构建 LLM 上下文
+                const llmMessages = await this.sessionManager.buildLLMContext(sessionId, systemMessage);
+
+                const spinner = this.logger.spinner(`Thinking-${i}...`);
                 // 调用 LLM
-                const llmResponse = await this.llmProvider.generate(fullMessages, {
+                const llmResponse = await this.llmProvider.generate(llmMessages, {
                     model: 'deepseek-chat',
                     tools: tools.length > 0 ? tools : undefined,
                     max_tokens: this.maxOutputTokens,

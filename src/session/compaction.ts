@@ -1,23 +1,24 @@
-import { Message } from "../providers/base";
-import { OpenAIProvider } from "../providers/openai";
+import { Message, LLMProvider } from "../providers/base";
 import { ScopedLogger } from "../util/log";
 
 export class Compaction {
   private readonly maxTokens: number;
   private readonly maxOutputTokens: number;
-  private readonly triggerRatio = 0.05; // 92% 触发压缩
+  private readonly triggerRatio = 0.92; // 92% 触发压缩
   private readonly targetRatio = 0.75; // 压缩到 75% 停止
 
   // 经验系数：中文 1:1, 英文 4:1
   private readonly WEIGHT_ZH = 1.0;
   private readonly WEIGHT_EN = 0.25;
-  loger: ScopedLogger;
+  logger: ScopedLogger;
   lastSummaryMessage: Message|null;
+  private readonly llmProvider: LLMProvider;
 
-  constructor(config: { maxTokens: number; maxOutputTokens: number }) {
+  constructor(config: { maxTokens: number; maxOutputTokens: number; llmProvider: LLMProvider }) {
     this.maxTokens = config.maxTokens;
     this.maxOutputTokens = config.maxOutputTokens;
-    this.loger = new ScopedLogger("Compaction");
+    this.llmProvider = config.llmProvider;
+    this.logger = new ScopedLogger("Compaction");
     this.lastSummaryMessage=null
   }
 
@@ -29,18 +30,14 @@ export class Compaction {
   async compact(history: Message[]): Promise<Message[]> {
     const totalUsed = this.calculateTotalUsage(history);
     const usableLimit = this.maxTokens - this.maxOutputTokens;
-    console.log(
-      "usableLimit",
-      `${totalUsed / 1000}/${(usableLimit * this.triggerRatio) / 1000}`,
-    );
 
     // 如果没达到 92% 的阈值，直接返回原数据
     if (totalUsed < usableLimit * this.triggerRatio) {
       return history;
     }
-  
-    console.log(
-      `[Compaction] 触发压缩。当前 Token: ${totalUsed}, 阈值: ${Math.floor(usableLimit * this.triggerRatio)}`,
+
+    this.logger.info(
+      `[Compaction] 触发压缩。当前 Token: ${totalUsed}, 阈值: ${Math.floor(usableLimit * this.triggerRatio)}`
     );
 
     // 1. 分离不可压缩的 System Message
@@ -48,7 +45,7 @@ export class Compaction {
 
     // 2. 确定保护区（最近的对话不参与摘要，保证当前逻辑连贯）
     // 对于编程 Agent，建议保留最近 12 条消息（包含约 3-6 次工具交互）
-    const KEEP_RECENT_COUNT = 2;
+    const KEEP_RECENT_COUNT = 6;
     const otherMessages = history.filter((m) => !systemMessages.includes(m));
 
     if (otherMessages.length <= KEEP_RECENT_COUNT) return history;
@@ -104,7 +101,8 @@ export class Compaction {
 
       return newHistory;
     } catch (error) {
-      console.error("[Compaction] 摘要生成失败:", error);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`[Compaction] 摘要生成失败: ${errorMsg}`);
       return history; // 失败则降级返回原样，避免丢失数据
     }
   }
@@ -133,16 +131,10 @@ export class Compaction {
   }
 
   async summarizer(textToSummarize: string, previousSummary?: string) {
-    const llmProvider = new OpenAIProvider({
-      baseURL: process.env.DEEPSEEK_BASE_URL,
-      apiKey: process.env.DEEPSEEK_API_KEY as string,
-      model: "deepseek-chat",
-    });
-
-    const spinner = this.loger.spinner("上下文压缩...");
+    const spinner = this.logger.spinner("上下文压缩...");
 
     try {
-      const llmResponse = await llmProvider.generate(
+      const llmResponse = await this.llmProvider.generate(
         [
           {
             role: "user",
@@ -181,7 +173,7 @@ ${textToSummarize}
       spinner.succeed("上下文压缩成功");
       return llmResponse?.content||'';
     } catch (error: any) {
-      this.loger.error(error.toString());
+      this.logger.error(error.toString());
 
       spinner.fail("上下文压缩失败");
     }

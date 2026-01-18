@@ -34,7 +34,6 @@ async function initializeApp(config) {
         apiKey: config.deepseekApiKey,
         baseURL: config.deepseekBaseUrl,
     });
-    // 6. 初始化 Agent
     const agent = new agent_1.default({
         llmProvider,
         sessionManager,
@@ -49,7 +48,7 @@ async function startCLI(agent, sessionId) {
         agent,
         sessionId: sessionId || `session_${Date.now()}`,
         userId: 'cli_user',
-        prompt: '》',
+        prompt: '>',
     });
     await cli.start();
 }

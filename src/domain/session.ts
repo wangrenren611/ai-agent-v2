@@ -11,11 +11,13 @@ export interface Session {
 
 /**
  * 创建新会话
+ * @param userId 用户 ID
+ * @param sessionId 可选的会话 ID，如果不提供则自动生成
  */
-export function createSession(userId: string): Session {
+export function createSession(userId: string, sessionId?: string): Session {
     const now = new Date();
     return {
-        id: generateSessionId(),
+        id: sessionId || generateSessionId(),
         userId,
         createdAt: now,
         updatedAt: now,

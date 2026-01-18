@@ -196,11 +196,12 @@ export function execCommand(command: string): { stdout: string; stderr: string; 
  * @param command - 要执行的命令
  * @param options - 可选配置
  * @param options.timeout - 超时时间（毫秒）
+ * @param options.cwd - 工作目录
  * @returns 执行结果
  */
 export async function execCommandAsync(
     command: string,
-    options?: { timeout?: number }
+    options?: { timeout?: number; cwd?: string }
 ): Promise<{
     stdout: string;
     stderr: string;
@@ -211,6 +212,7 @@ export async function execCommandAsync(
             shell: true,
             encoding: 'utf8' as any,
             timeout: options?.timeout,
+            cwd: options?.cwd,
         });
         return {
             stdout: String(result.stdout || ''),
