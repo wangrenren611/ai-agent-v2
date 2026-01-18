@@ -66,22 +66,25 @@ export default class Agent extends EventEmitter {
         query: string,
         options?: { silent?: boolean; tools?: ToolSchema[] }
     ): Promise<AgentResponse | null> {
+
         if (!options?.silent) {
             this.logger.info(`Processing query for session ${sessionId}: ${query}`);
         }
-
+         this.logger.info(sessionId)   
         try {
             // 1. 确保会话存在
-            this.sessionManager.getOrCreateSession(sessionId, userId);
+           await this.sessionManager.getOrCreateSession(sessionId, userId);
 
          
+           const systemMessage: Message = {
+                 role: 'system',
+                 content: this.systemPrompt,
+           };
 
-            // 2. 添加用户消息到会话
-            await this.sessionManager.addMessage(sessionId, userId, {
-                role: 'user',
-                content: query,
-            });
-        
+        //   const history = await this.sessionManager.getMessages(sessionId);
+        //     console.log(history)
+        //         // 构建完整消息（系统提示 
+        //   return
 
             // 3. 获取工具 schemas（优先级：传入参数 > 默认配置 > ToolRegistry 全部）
             const tools = options?.tools ?? this.defaultTools ?? ToolRegistry.getSchemas();
@@ -89,6 +92,13 @@ export default class Agent extends EventEmitter {
             // 4. LLM 调用循环（处理工具调用）
             let i = 0; // 防止无限循环
             let finalResponse: AgentResponse | null = null;
+  
+  
+            this.sessionManager.addMessage(sessionId,userId,{
+                    role:'user',
+                    type:'text',
+                    content:query
+            })
 
             while (i < this.maxLoop) {
                 i++; // 在循环开始时递增计数器
@@ -97,14 +107,9 @@ export default class Agent extends EventEmitter {
                 const history = await this.sessionManager.getMessages(sessionId);
               
                 // 构建完整消息（系统提示 + 历史消息）
-                const systemMessage: Message = {
-                    role: 'system',
-                    content: this.systemPrompt,
-                };
-
-               const messages = [systemMessage, ...history];
+          
+               const messages = [systemMessage,...history];
                
-               console.log("history:", messages.slice(0, 3), messages.slice(messages.length - 3, messages.length));
 
                //压缩
                 const compaction = new Compaction({
@@ -118,15 +123,17 @@ export default class Agent extends EventEmitter {
                   await this.sessionManager.addMessage(sessionId, userId, compaction.lastSummaryMessage);
                }
             
-               console.log("new history:", fullMessages.slice(0, 3), fullMessages.slice(fullMessages.length - 3, fullMessages.length));
              
                const spinner = this.logger.spinner(`Thinking-${i}...`);
+                console.log("fullMessages",fullMessages)
                 // 调用 LLM
                 const llmResponse = await this.llmProvider.generate(fullMessages, {
                     model: 'deepseek-chat',
                     tools: tools.length > 0 ? tools : undefined,
                     max_tokens: this.maxOutputTokens,
                 });
+
+              
 
                 spinner.succeed(`Thinking-${i} end`);
 

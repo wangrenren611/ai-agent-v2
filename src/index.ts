@@ -30,7 +30,7 @@ async function initializeApp(config: AppConfig) {
     await connectDB();
 
     // 2. 初始化工具（包括 MCP 工具）
-    //  await registerDefaultToolsAsync();
+    await registerDefaultToolsAsync();
 
     // 3. 初始化基础设施层
     const messageRepo = new MessageRepository();
@@ -62,7 +62,7 @@ async function startCLI(agent: Agent, sessionId?: string): Promise<void> {
         agent,
         sessionId: sessionId || `session_${Date.now()}`,
         userId: 'cli_user',
-        prompt: '》',
+        prompt: '>',
     });
 
     await cli.start();
@@ -143,7 +143,8 @@ async function main() {
         default:
             // 获取指定的 session ID（如果提供）
             const sessionId = args[1];
-            await startCLI(agent, "session_1768499954417");
+             
+            await startCLI(agent, sessionId);
             break;
     }
 }

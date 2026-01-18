@@ -48,14 +48,14 @@ export class SessionManager {
             this.sessions.set(sessionId, session);
             this.queues.set(sessionId, new MessageQueue());
         
-           const messages =await this.loadHistory(sessionId);
+        //    const messages =await this.loadHistory(sessionId);
 
-           if(messages.length){
-               let queue = this.queues.get(sessionId);
-               messages.forEach((message)=>{
-                  queue?.add(message)
-               })
-           }
+        //    if(messages.length){
+        //        const queue = this.getQueue(sessionId);
+        //        messages.forEach((message)=>{
+        //           queue?.add(message)
+        //        })
+        //    }
         }
 
         return session;

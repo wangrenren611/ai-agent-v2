@@ -192,7 +192,7 @@ export class OpenAIProvider extends LLMProvider {
         // 调试：打印工具 schemas
         // console.log('Tools sent to API:', JSON.stringify(tools, null, 2));
       }
-
+    
       const response = await fetch(`${this.baseURL}/chat/completions`, {
         method: 'POST',
         headers: {

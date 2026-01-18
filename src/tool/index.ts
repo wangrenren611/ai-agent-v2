@@ -30,6 +30,7 @@ import { TodoReadTool } from './todo';
 import { TodoWriteTool } from './todo';
 import { RollbackTool, ListBackupsTool, CleanBackupsTool } from './rollback';
 import { initializeMcp } from '../mcp/index.js';
+import { WebSearchTool } from './web-search';
 
 // =============================================================================
 // Tool Registry
@@ -332,6 +333,7 @@ export function registerDefaultTools(): void {
         // new RollbackTool(),
         new ListBackupsTool(),
         new CleanBackupsTool(),
+        new WebSearchTool()
     ]);
 }
 

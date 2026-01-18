@@ -5,7 +5,7 @@ import { ScopedLogger } from "../util/log";
 export class Compaction {
   private readonly maxTokens: number;
   private readonly maxOutputTokens: number;
-  private readonly triggerRatio = 0.1; // 92% 触发压缩
+  private readonly triggerRatio = 0.05; // 92% 触发压缩
   private readonly targetRatio = 0.75; // 压缩到 75% 停止
 
   // 经验系数：中文 1:1, 英文 4:1
@@ -48,7 +48,7 @@ export class Compaction {
 
     // 2. 确定保护区（最近的对话不参与摘要，保证当前逻辑连贯）
     // 对于编程 Agent，建议保留最近 12 条消息（包含约 3-6 次工具交互）
-    const KEEP_RECENT_COUNT = 12;
+    const KEEP_RECENT_COUNT = 2;
     const otherMessages = history.filter((m) => !systemMessages.includes(m));
 
     if (otherMessages.length <= KEEP_RECENT_COUNT) return history;

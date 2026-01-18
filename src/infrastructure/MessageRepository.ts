@@ -21,7 +21,7 @@ export class MessageRepository {
             await MessageData.create({
                 sessionId,
                 userId,
-                content: msg.content || '',
+                content: msg.role === 'tool' ? '' : (msg.content || ''),
                 role: msg.role,
                 type: msg.type || 'text',
                 toolCallId: msg.tool_call_id,
@@ -42,7 +42,7 @@ export class MessageRepository {
             const docs = messages.map(msg => ({
                 sessionId,
                 userId,
-                content: msg.content || '',
+                content: msg.role === 'tool' ? '' : (msg.content || ''),
                 role: msg.role,
                 type: msg.type || 'text',
                 toolCallId: msg.tool_call_id,
@@ -61,6 +61,7 @@ export class MessageRepository {
      */
     async findBySession(sessionId: string): Promise<Message[]> {
         try {
+            console.log(sessionId)
             const docs = await MessageData.find({ sessionId }).sort({ createdAt: 1 });
             return docs.map(doc => {
                 const msg: Message = {
