@@ -4,7 +4,7 @@
  * 用于通过通配符模式查找文件，替代 bash find/dir 命令
  */
 import { z } from 'zod';
-import { glob as fg } from 'fast-glob';
+import fg from 'fast-glob';
 import { resolve } from 'path';
 import { BaseTool } from './base';
 

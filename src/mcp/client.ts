@@ -17,8 +17,10 @@ import type {
   ToolsListResponse,
   ToolCallRequest,
   McpServerConfig,
+  Tool,
+  ToolCallResponse,
 } from './types';
-import { ConnectionState, Tool, ToolCallResponse } from './types';
+import { ConnectionState } from './types';
 
 // =============================================================================
 // MCP Client

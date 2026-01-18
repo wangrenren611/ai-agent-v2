@@ -31,6 +31,7 @@ import { TodoWriteTool } from './todo';
 import {  ListBackupsTool, CleanBackupsTool } from './rollback';
 import { initializeMcp } from '../mcp/index';
 import { WebSearchTool } from './web-search';
+import { ReadSkillTool, ListSkillsTool } from '../skills/skill-tool';
 
 // =============================================================================
 // Tool Registry
@@ -333,7 +334,9 @@ export function registerDefaultTools(): void {
         // new RollbackTool(),
         new ListBackupsTool(),
         new CleanBackupsTool(),
-        new WebSearchTool()
+        new WebSearchTool(),
+        new ReadSkillTool(),
+        new ListSkillsTool()
     ]);
 }
 
@@ -389,3 +392,8 @@ export { default as BashTool } from './bash';
 export { getBashParser } from './bash-parser';
 export type { CommandInfo, SecurityIssue, ParseResult } from './bash-parser';
 export { BatchReplaceTool } from './batch-replace';
+
+// Skill tools
+export { ReadSkillTool, ListSkillsTool } from '../skills/skill-tool';
+export { initializeSkills, getSkillLoader } from '../skills/loader';
+export type { Skill, SkillMetadata, SkillLoaderOptions } from '../skills/types';

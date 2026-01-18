@@ -4,7 +4,7 @@
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "bin": {
     "@qps": "bin/index.js"
@@ -47,6 +47,7 @@
     "dotenv": "^17.2.3",
     "execa": "^8.0.1",
     "fast-glob": "^3.3.3",
+    "gray-matter": "^4.0.3",
     "iconv-lite": "^0.7.2",
     "isbinaryfile": "^6.0.0",
     "mongoose": "^9.1.3",

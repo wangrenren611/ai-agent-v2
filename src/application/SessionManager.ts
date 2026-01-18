@@ -317,7 +317,7 @@ export class SessionManager {
             } else {
                 this.logger.error(`Failed to delete session ${sessionId} from database`);
             }
-            throw error; // 重新抛出错误，不清理内存状态
+            throw _error; // 重新抛出错误，不清理内存状态
         }
 
         // 只有数据库删除成功后才清理内存状态

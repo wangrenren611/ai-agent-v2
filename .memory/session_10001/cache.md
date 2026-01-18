@@ -12779,3 +12779,224 @@
   "content": "完美！现在 `pnpm lint` 和 `pnpm lint:fix` 都能成功运行，没有错误。\n\n## 完成状态\n\n**ESLint 配置已修复**：\n- `@typescript-eslint/no-unused-vars` 保持为 `error`（符合要求）\n- 其他非关键规则降级为 `warn`：`no-useless-escape`、`no-control-regex`、`no-case-declarations`、`@typescript-eslint/ban-ts-comment`\n- 修复了 `src/cli/utils/smart-input.ts` 中的未使用变量错误（将 `currentLine` 改为 `_currentLine`）\n\n**结果**：\n- `pnpm lint`：0 错误，326 警告（通过）\n- `pnpm lint:fix`：0 错误，326 警告（通过）\n\n主要警告是 `@typescript-eslint/no-explicit-any` 和 `no-console`，这些是警告级别，不会阻止构建。"
 }
 ```
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "你好"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！有什么我可以帮助你的吗？"
+}
+```
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "使用git-commit，生成commit信息"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "我来帮你生成一个合适的 git commit 信息。首先让我检查一下当前的 git 状态：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_kR7SyjFFsyOXfp7v8naDVo17",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git status\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "On branch feat/session-v3\nYour branch is up to date with 'origin/feat/session-v3'.\n\nChanges not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git restore <file>...\" to discard changes in working directory)\n\tmodified:   .claude/settings.local.json\n\tmodified:   .memory/session_10001/cache.md\n\tmodified:   .memory/session_10001/messages.json\n\tmodified:   package.json\n\tmodified:   pnpm-lock.yaml\n\tmodified:   src/application/SessionManager.ts\n\tmodified:   src/mcp/client.ts\n\tmodified:   src/prompts/system.ts\n\tmodified:   src/tool/bash-parser.ts\n\tmodified:   src/tool/glob.ts\n\tmodified:   src/tool/index.ts\n\nUntracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\tskills/\n\tsrc/skills/\n\tweb/\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")",
+  "type": "tool",
+  "tool_call_id": "call_00_kR7SyjFFsyOXfp7v8naDVo17"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "让我查看一下具体的修改内容，以便生成更准确的 commit 信息：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_uIYMGsPJKBKuErnnizDwFj1p",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff --name-only\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": ".claude/settings.local.json\n.memory/session_10001/cache.md\n.memory/session_10001/messages.json\npackage.json\npnpm-lock.yaml\nsrc/application/SessionManager.ts\nsrc/mcp/client.ts\nsrc/prompts/system.ts\nsrc/tool/bash-parser.ts\nsrc/tool/glob.ts\nsrc/tool/index.ts",
+  "type": "tool",
+  "tool_call_id": "call_00_uIYMGsPJKBKuErnnizDwFj1p"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "让我查看一下主要的修改内容，特别是 ESLint 配置的修改：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_mQg1nwXwvARGIsoU1aRhKAt0",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff src/\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "diff --git a/src/application/SessionManager.ts b/src/application/SessionManager.ts\nindex 24fa35c..9c31edf 100644\n--- a/src/application/SessionManager.ts\n+++ b/src/application/SessionManager.ts\n@@ -317,7 +317,7 @@ export class SessionManager {\n             } else {\n                 this.logger.error(`Failed to delete session ${sessionId} from database`);\n             }\n-            throw error; // 重新抛出错误，不清理内存状态\n+            throw _error; // 重新抛出错误，不清理内存状态\n         }\n \n         // 只有数据库删除成功后才清理内存状态\ndiff --git a/src/mcp/client.ts b/src/mcp/client.ts\nindex 76c7508..3b0f2d6 100644\n--- a/src/mcp/client.ts\n+++ b/src/mcp/client.ts\n@@ -17,8 +17,10 @@ import type {\n   ToolsListResponse,\n   ToolCallRequest,\n   McpServerConfig,\n+  Tool,\n+  ToolCallResponse,\n } from './types';\n-import { ConnectionState, Tool, ToolCallResponse } from './types';\n+import { ConnectionState } from './types';\n \n // =============================================================================\n // MCP Client\ndiff --git a/src/prompts/system.ts b/src/prompts/system.ts\nindex d559327..ec5c704 100644\n--- a/src/prompts/system.ts\n+++ b/src/prompts/system.ts\n@@ -1,4 +1,4 @@\n-export const SYSTEM_PROMPT = `\n+const BASE_SYSTEM_PROMPT = `\n You are Super Code,  You are an expert software engineering assistant.\n \n **Important Context**: You may have access to project-specific instructions from CLAUDE.md files and other context that may include coding standards, project structure, and custom requirements. Consider this context when creating agents to ensure they align with the project's established patterns and practices.\n@@ -73,7 +73,17 @@ Skip preamble for trivial reads (e.g., single file) that aren't part of larger g\n 5. **precise_replace** - Replace text at a specific line\n 6. **batch_replace** - Replace multiple text segments in a file in ONE call (use for batch modifications)\n 7. **TodoWrite** - Track your task list (use for complex tasks)\n-8.**web_search** - Used for real-time web search, profile search\n+8. **web_search** - Used for real-time web search, profile search\n+9. **read_skill** - Read skill file content for specialized workflows and domain knowledge\n+10. **list_skills** - List all available skills with descriptions\n+\n+# Skills\n+\n+Skills provide specialized knowledge and workflows for specific tasks. Use the \\`list_skills\\` tool to discover available skills, and \\`read_skill\\` to get detailed guidance.\n+\n+When a task matches a skill's purpose, read that skill to understand the recommended workflow and best practices.\n+\n+{{SKILLS_LIST}}\n \n ## Code Analysis Tools Priority\n \n@@ -209,4 +219,17 @@ All paths are relative to this directory.\n - Reference files as path:line (e.g., src/file.ts:42)\n `;\n \n+/**\n+ * Build system prompt with skills list\n+ */\n+export function buildSystemPrompt(skillsList?: string): string {\n+    const skillsSection = skillsList || '';\n+    return BASE_SYSTEM_PROMPT.replace('{{SKILLS_LIST}}', skillsSection);\n+}\n+\n+/**\n+ * Default system prompt (without skills)\n+ */\n+export const SYSTEM_PROMPT = buildSystemPrompt();\n+\n \ndiff --git a/src/tool/bash-parser.ts b/src/tool/bash-parser.ts\nindex 6b953b7..2ee1daa 100644\n--- a/src/tool/bash-parser.ts\n+++ b/src/tool/bash-parser.ts\n@@ -23,10 +23,10 @@\n // =============================================================================\n \n // @ts-ignore - tree-sitter 是 CommonJS 模块，需要使用 require\n-const Parser = require('tree-sitter');\n+import Parser from 'tree-sitter'\n // @ts-ignore - tree-sitter-bash 是 CommonJS 模块\n-const Bash = require('tree-sitter-bash');\n \n+import Bash from 'tree-sitter-bash'\n // =============================================================================\n // Security Pattern Constants\n // =============================================================================\ndiff --git a/src/tool/glob.ts b/src/tool/glob.ts\nindex 8b5909f..30d91d0 100644\n--- a/src/tool/glob.ts\n+++ b/src/tool/glob.ts\n@@ -4,7 +4,7 @@\n  * 用于通过通配符模式查找文件，替代 bash find/dir 命令\n  */\n import { z } from 'zod';\n-import { glob as fg } from 'fast-glob';\n+import fg from 'fast-glob';\n import { resolve } from 'path';\n import { BaseTool } from './base';\n \ndiff --git a/src/tool/index.ts b/src/tool/index.ts\nindex 7b02e17..8a42772 100644\n--- a/src/tool/index.ts\n+++ b/src/tool/index.ts\n@@ -31,6 +31,7 @@ import { TodoWriteTool } from './todo';\n import {  ListBackupsTool, CleanBackupsTool } from './rollback';\n import { initializeMcp } from '../mcp/index';\n import { WebSearchTool } from './web-search';\n+import { ReadSkillTool, ListSkillsTool } from '../skills/skill-tool';\n \n // =============================================================================\n // Tool Registry\n@@ -333,7 +334,9 @@ export function registerDefaultTools(): void {\n         // new RollbackTool(),\n         new ListBackupsTool(),\n         new CleanBackupsTool(),\n-        new WebSearchTool()\n+        new WebSearchTool(),\n+        new ReadSkillTool(),\n+        new ListSkillsTool()\n     ]);\n }\n \n@@ -389,3 +392,8 @@ export { default as BashTool } from './bash';\n export { getBashParser } from './bash-parser';\n export type { CommandInfo, SecurityIssue, ParseResult } from './bash-parser';\n export { BatchReplaceTool } from './batch-replace';\n+\n+// Skill tools\n+export { ReadSkillTool, ListSkillsTool } from '../skills/skill-tool';\n+export { initializeSkills, getSkillLoader } from '../skills/loader';\n+export type { Skill, SkillMetadata, SkillLoaderOptions } from '../skills/types';",
+  "type": "tool",
+  "tool_call_id": "call_00_mQg1nwXwvARGIsoU1aRhKAt0"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "现在让我查看 ESLint 配置的修改：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_Os4zPzaJqtAOMoHLnKmswMf3",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff eslint.config.js\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "Command exited successfully",
+  "type": "tool",
+  "tool_call_id": "call_00_Os4zPzaJqtAOMoHLnKmswMf3"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "让我检查是否有 ESLint 配置的修改：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_jU3I17BelqFpRmTpiFB03XpC",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff -- eslint.config.js src/cli/utils/smart-input.ts\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "Command exited successfully",
+  "type": "tool",
+  "tool_call_id": "call_00_jU3I17BelqFpRmTpiFB03XpC"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "看起来 ESLint 的修改还没有被 git 跟踪。让我先添加这些修改：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_E2373qnGEbuxzrjAtmYXSj1f",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git add eslint.config.js src/cli/utils/smart-input.ts\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "Command exited successfully",
+  "type": "tool",
+  "tool_call_id": "call_00_E2373qnGEbuxzrjAtmYXSj1f"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "现在让我查看所有要提交的修改：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_oWwLwu03kOUdszsWtHuhHnxH",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git status\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "On branch feat/session-v3\nYour branch is up to date with 'origin/feat/session-v3'.\n\nChanges not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git restore <file>...\" to discard changes in working directory)\n\tmodified:   .claude/settings.local.json\n\tmodified:   .memory/session_10001/cache.md\n\tmodified:   .memory/session_10001/messages.json\n\tmodified:   package.json\n\tmodified:   pnpm-lock.yaml\n\tmodified:   src/application/SessionManager.ts\n\tmodified:   src/mcp/client.ts\n\tmodified:   src/prompts/system.ts\n\tmodified:   src/tool/bash-parser.ts\n\tmodified:   src/tool/glob.ts\n\tmodified:   src/tool/index.ts\n\nUntracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\tskills/\n\tsrc/skills/\n\tweb/\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")",
+  "type": "tool",
+  "tool_call_id": "call_00_oWwLwu03kOUdszsWtHuhHnxH"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "让我添加所有修改的文件：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_jAifD81BVosMNXDCMHB2P9Ke",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git add .\"}"
+      }
+    }
+  ]
+}
+```

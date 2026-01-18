@@ -37,7 +37,13 @@
       "Bash(npx --version)",
       "Bash(where:*)",
       "Bash(findstr:*)",
-      "Bash(pnpm run lint)"
+      "Bash(pnpm run lint)",
+      "Bash(if:*)",
+      "Bash(then mkdir -p \"D:/work/ai-agent-v2/web\")",
+      "Bash(fi:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(npm run build:*)",
+      "Bash(timeout:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
