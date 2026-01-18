@@ -1,17 +1,12 @@
 // Chat API route
 import { NextRequest, NextResponse } from 'next/server';
-import { getAgent, getLLMProvider, isAgentInitialized } from '@/lib/agent';
+import { getAgent, getLLMProvider, ensureAgentInitialized } from '@/lib/agent';
 import { getSessionManager } from '@/lib/session-manager';
 import type { ChatRequest, ChatResponse } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
   try {
-    if (!isAgentInitialized()) {
-      return NextResponse.json(
-        { error: 'Agent not initialized' },
-        { status: 503 }
-      );
-    }
+    await ensureAgentInitialized();
 
     const body: ChatRequest = await request.json();
     const { sessionId, query } = body;

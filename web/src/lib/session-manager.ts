@@ -5,12 +5,11 @@ import { LLMProvider } from '@agent/providers/base';
 // Global session cache
 const sessionCache = new Map<string, AgentSessionManager>();
 
-export function getSessionManager(sessionId: string, llmProvider: LLMProvider, userId?: string): AgentSessionManager {
+export function getSessionManager(sessionId: string, llmProvider: LLMProvider): AgentSessionManager {
   if (!sessionCache.has(sessionId)) {
     const sessionManager = new AgentSessionManager({
       sessionId,
-      llmProvider,
-      userId: userId || 'web_user'
+      llmProvider
     });
     sessionCache.set(sessionId, sessionManager);
   }

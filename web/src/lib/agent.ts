@@ -3,11 +3,14 @@ import Agent from '@agent/agent/index-eventbus';
 import { LLMProvider } from '@agent/providers/base';
 import { getSessionManager } from './session-manager';
 import { sseEventManager } from './event-bus';
+import { connectDB } from '@agent/storage/mongoose';
+import { registerDefaultToolsAsync } from '@agent/tool';
 import type { ChatRequest, ChatResponse } from './types';
 
 // Global agent instance
 let globalAgent: Agent | null = null;
 let globalLLMProvider: LLMProvider | null = null;
+let initializationPromise: Promise<void> | null = null;
 
 export interface AgentManagerConfig {
   llmProvider: LLMProvider;
@@ -17,20 +20,24 @@ export interface AgentManagerConfig {
 }
 
 /**
- * Initialize the global agent instance
+ * Initialize the application (database, tools, agent)
  */
-export function initializeAgent(config: AgentManagerConfig): void {
-  if (globalAgent) {
-    console.warn('Agent already initialized');
-    return;
-  }
+async function initializeApplication(config: AgentManagerConfig): Promise<void> {
+  // 1. Connect to database
+  await connectDB();
 
+  // 2. Register default tools (including MCP tools)
+  await registerDefaultToolsAsync();
+
+  // 3. Store the LLM provider
   globalLLMProvider = config.llmProvider;
 
-  // Create a new session manager for the agent
+  // 4. Create a default session manager for the agent
   const defaultSessionId = `session_${Date.now()}`;
   const sessionManager = getSessionManager(defaultSessionId, config.llmProvider);
+  await sessionManager.init();
 
+  // 5. Create the agent
   globalAgent = new Agent({
     llmProvider: config.llmProvider,
     sessionManager,
@@ -41,7 +48,7 @@ export function initializeAgent(config: AgentManagerConfig): void {
     enableEventLogging: true,
   });
 
-  // Subscribe to agent events and broadcast to SSE clients
+  // 6. Subscribe to agent events and broadcast to SSE clients
   const eventBus = globalAgent.getEventBus();
   const eventNames = eventBus.eventNames();
 
@@ -52,7 +59,25 @@ export function initializeAgent(config: AgentManagerConfig): void {
     }, `web_sse_${String(eventName)}`);
   });
 
-  console.log('Agent initialized successfully');
+  console.log('Application initialized successfully');
+}
+
+/**
+ * Initialize the global agent instance (idempotent)
+ */
+export async function initializeAgent(config: AgentManagerConfig): Promise<void> {
+  if (globalAgent) {
+    console.warn('Agent already initialized');
+    return;
+  }
+
+  // Use a promise to prevent concurrent initializations
+  if (initializationPromise) {
+    return initializationPromise;
+  }
+
+  initializationPromise = initializeApplication(config);
+  await initializationPromise;
 }
 
 /**
@@ -74,6 +99,7 @@ export async function processChatRequest(request: ChatRequest): Promise<ChatResp
 
   // Get or create session manager for this session
   const sessionManager = getSessionManager(request.sessionId, llmProvider);
+  await sessionManager.init();
 
   // Swap the session manager in the agent
   (agent as any).sessionManager = sessionManager;
@@ -112,4 +138,22 @@ export function getLLMProvider(): LLMProvider {
     throw new Error('LLM provider not initialized. Call initializeAgent() first.');
   }
   return globalLLMProvider;
+}
+
+/**
+ * Ensure agent is initialized (for use in API routes)
+ */
+export async function ensureAgentInitialized(): Promise<void> {
+  if (!isAgentInitialized()) {
+    const apiKey = process.env.DEEPSEEK_API_KEY || '';
+    const baseURL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
+
+    if (!apiKey) {
+      throw new Error('DEEPSEEK_API_KEY environment variable is not set');
+    }
+
+    const { OpenAIProvider } = await import('@agent/providers/openai');
+    const llmProvider = new OpenAIProvider({ apiKey, baseURL, model: 'deepseek-chat' });
+    await initializeAgent({ llmProvider });
+  }
 }

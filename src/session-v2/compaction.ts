@@ -4,7 +4,7 @@ import { ScopedLogger } from "../util/log";
 export class Compaction {
   private readonly maxTokens: number;
   private readonly maxOutputTokens: number;
-  private readonly triggerRatio = 0.08; // 92% 触发压缩
+  private readonly triggerRatio = 0.90; // 92% 触发压缩
   private readonly targetRatio = 0.75; // 压缩到 75% 停止
 
   // 经验系数：中文 1:1, 英文 4:1

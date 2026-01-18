@@ -38,3 +38,81 @@ export interface SSEEvent {
   event: string;
   data: unknown;
 }
+
+// 思考步骤类型
+export interface ThinkingStep {
+  id: string;
+  type: 'thinking' | 'tool_call' | 'tool_result' | 'response';
+  content: string;
+  toolName?: string;
+  toolParams?: unknown;
+  toolResult?: unknown;
+  iteration?: number;
+  timestamp: number;
+  duration?: number;
+}
+
+// Todo 列表项类型
+export interface TodoItem {
+  id: string;
+  content: string;
+  activeForm: string;
+  status: 'pending' | 'in_progress' | 'completed';
+}
+
+// 扩展的消息类型，包含思考过程和 todo list
+export interface ExtendedMessage extends Message {
+  thinkingSteps?: ThinkingStep[];
+  todos?: TodoItem[];
+}
+
+// Agent 事件类型
+export interface AgentRunStartEvent {
+  query: string;
+  sessionId?: string;
+}
+
+export interface AgentLoopStartEvent {
+  iteration: number;
+  maxLoop: number;
+}
+
+export interface AgentLLMCallStartEvent {
+  iteration: number;
+  model: string;
+}
+
+export interface AgentLLMCallCompleteEvent {
+  iteration: number;
+  response: string;
+  hasToolCalls: boolean;
+  duration: number;
+}
+
+export interface AgentToolCallStartEvent {
+  toolName: string;
+  params: unknown;
+  toolCallId: string;
+  iteration: number;
+}
+
+export interface AgentToolCallCompleteEvent {
+  toolName: string;
+  result: unknown;
+  duration: number;
+  toolCallId: string;
+  iteration: number;
+}
+
+export interface AgentMessageAddedEvent {
+  role: string;
+  content: string;
+  type: string;
+  sessionId?: string;
+}
+
+export interface AgentRunCompleteEvent {
+  query: string;
+  response: string | null;
+  duration: number;
+}

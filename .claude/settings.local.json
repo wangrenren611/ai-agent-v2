@@ -43,7 +43,8 @@
       "Bash(fi:*)",
       "Bash(npx create-next-app:*)",
       "Bash(npm run build:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(pnpm --filter web typecheck:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

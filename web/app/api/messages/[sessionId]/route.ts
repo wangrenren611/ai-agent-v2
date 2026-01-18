@@ -1,13 +1,15 @@
 // Messages API route
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionManager } from '@/lib/session-manager';
-import { getLLMProvider } from '@/lib/agent';
+import { getLLMProvider, ensureAgentInitialized } from '@/lib/agent';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
+    await ensureAgentInitialized();
+
     const { sessionId } = await params;
     const llmProvider = getLLMProvider();
     const sessionManager = getSessionManager(sessionId, llmProvider);
@@ -31,6 +33,8 @@ export async function DELETE(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
+    await ensureAgentInitialized();
+
     const { sessionId } = await params;
     const llmProvider = getLLMProvider();
     const sessionManager = getSessionManager(sessionId, llmProvider);

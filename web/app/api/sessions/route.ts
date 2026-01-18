@@ -1,25 +1,9 @@
 // Sessions API route
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllSessionIds, hasSession } from '@/lib/session-manager';
-import { getLLMProvider, isAgentInitialized, initializeAgent } from '@/lib/agent';
-import { DeepSeekProvider } from '@agent/providers/deepseek';
+import { getLLMProvider, ensureAgentInitialized } from '@/lib/agent';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-
-// Ensure agent is initialized
-function ensureAgentInitialized() {
-  if (!isAgentInitialized()) {
-    const apiKey = process.env.DEEPSEEK_API_KEY || '';
-    const baseURL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
-
-    if (!apiKey) {
-      throw new Error('DEEPSEEK_API_KEY environment variable is not set');
-    }
-
-    const llmProvider = new DeepSeekProvider({ apiKey, baseURL, model: 'deepseek-chat' });
-    initializeAgent({ llmProvider });
-  }
-}
 
 export async function GET() {
   try {
@@ -65,7 +49,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    ensureAgentInitialized();
+    await ensureAgentInitialized();
 
     const body = await request.json();
     const { sessionId, userId } = body;
@@ -82,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     const llmProvider = getLLMProvider();
     const { getSessionManager } = await import('@/lib/session-manager');
-    const sessionManager = getSessionManager(newSessionId, llmProvider, userId);
+    const sessionManager = getSessionManager(newSessionId, llmProvider);
     await sessionManager.init();
 
     return NextResponse.json({

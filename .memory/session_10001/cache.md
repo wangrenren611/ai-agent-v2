@@ -13555,3 +13555,251 @@
   ]
 }
 ```
+```
+{
+  "role": "tool",
+  "content": "Command exited successfully",
+  "type": "tool",
+  "tool_call_id": "call_00_UtH1Bk98q9LxhX8sCjFPHCVh"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "根据 git-commit 技能标准和修改内容，生成 commit 信息：\n\n**类型**: `feat`（添加了新的功能特性）\n**范围**: `web`（主要修改在 web 应用部分）\n**主题**: `improve session creation and agent initialization`\n\n**主体**: 增强会话创建流程，添加自动代理初始化和用户ID支持，改进错误处理",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_U8wGOcRvwoBTeR9RWSlIGrO6",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git commit -m \\\"feat(web): improve session creation and agent initialization\\n\\nEnhance session creation API to automatically initialize agent\\nand support user ID parameter. Add agent initialization check\\nto ensure LLM provider is ready before creating sessions.\\n\\n- Add ensureAgentInitialized function to sessions API\\n- Support optional userId parameter in session creation\\n- Improve error handling for missing API keys\\n- Update session manager to accept userId parameter\\\"\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "[feat/session-v3 cba3c51] feat(web): improve session creation and agent initialization\n 5 files changed, 534 insertions(+), 15 deletions(-)",
+  "type": "tool",
+  "tool_call_id": "call_00_U8wGOcRvwoBTeR9RWSlIGrO6"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "已使用 git-commit 技能标准生成了 commit 信息：\n\n**feat(web): improve session creation and agent initialization**\n\n- **类型**: `feat` - 添加了新功能特性\n- **范围**: `web` - web 应用相关修改\n- **主题**: 遵循命令式语气，不超过50字符\n- **主体**: 解释了修改内容和原因，符合72字符换行规范，列出了具体改进点"
+}
+```
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "使用git-commit技能"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "我看到您想使用 git-commit 技能。让我先检查当前的 git 状态：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_Nppy6XYOHosTC1A5BH1VZtC7",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git status\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "On branch feat/session-v3\nYour branch is ahead of 'origin/feat/session-v3' by 3 commits.\n  (use \"git push\" to publish your local commits)\n\nChanges not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git restore <file>...\" to discard changes in working directory)\n\tmodified:   .claude/settings.local.json\n\tmodified:   .memory/session_10001/cache.md\n\tmodified:   .memory/session_10001/messages.json\n\tmodified:   src/session-v2/compaction.ts\n\tmodified:   web/app/api/chat/route.ts\n\tmodified:   web/app/api/messages/[sessionId]/route.ts\n\tmodified:   web/app/api/sessions/[sessionId]/route.ts\n\tmodified:   web/app/api/sessions/route.ts\n\tmodified:   web/src/components/Chat.tsx\n\tmodified:   web/src/components/MessageList.tsx\n\tmodified:   web/src/lib/agent.ts\n\tmodified:   web/src/lib/event-bus.ts\n\tmodified:   web/src/lib/session-manager.ts\n\tmodified:   web/src/lib/types.ts\n\nUntracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\tweb/.memory/\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")",
+  "type": "tool",
+  "tool_call_id": "call_00_Nppy6XYOHosTC1A5BH1VZtC7"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "我看到有多个修改。让我查看主要修改的文件：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_Q3CRsIGoaLNFdyRxo8bDxxBM",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff --name-only | head -10\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "'head' �����ڲ����ⲿ���Ҳ���ǿ����еĳ���\r\n���������ļ���",
+  "type": "tool",
+  "tool_call_id": "call_00_Q3CRsIGoaLNFdyRxo8bDxxBM"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_RhYAjvSPxucaoM31evp8grgH",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff --name-only\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": ".claude/settings.local.json\n.memory/session_10001/cache.md\n.memory/session_10001/messages.json\nsrc/session-v2/compaction.ts\nweb/app/api/chat/route.ts\nweb/app/api/messages/[sessionId]/route.ts\nweb/app/api/sessions/[sessionId]/route.ts\nweb/app/api/sessions/route.ts\nweb/src/components/Chat.tsx\nweb/src/components/MessageList.tsx\nweb/src/lib/agent.ts\nweb/src/lib/event-bus.ts\nweb/src/lib/session-manager.ts\nweb/src/lib/types.ts",
+  "type": "tool",
+  "tool_call_id": "call_00_RhYAjvSPxucaoM31evp8grgH"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "让我查看 web 应用的主要修改：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_Lz0rj8Yt4syrqvdbfIoqt25h",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff web/app/api/chat/route.ts | head -30\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "'head' �����ڲ����ⲿ���Ҳ���ǿ����еĳ���\r\n���������ļ���",
+  "type": "tool",
+  "tool_call_id": "call_00_Lz0rj8Yt4syrqvdbfIoqt25h"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_sv6WRyyTTH0APsg00m4bAjdW",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff web/app/api/chat/route.ts\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "diff --git a/web/app/api/chat/route.ts b/web/app/api/chat/route.ts\nindex 60612b3..d3f5c67 100644\n--- a/web/app/api/chat/route.ts\n+++ b/web/app/api/chat/route.ts\n@@ -1,17 +1,12 @@\n // Chat API route\n import { NextRequest, NextResponse } from 'next/server';\n-import { getAgent, getLLMProvider, isAgentInitialized } from '@/lib/agent';\n+import { getAgent, getLLMProvider, ensureAgentInitialized } from '@/lib/agent';\n import { getSessionManager } from '@/lib/session-manager';\n import type { ChatRequest, ChatResponse } from '@/lib/types';\n \n export async function POST(request: NextRequest) {\n   try {\n-    if (!isAgentInitialized()) {\n-      return NextResponse.json(\n-        { error: 'Agent not initialized' },\n-        { status: 503 }\n-      );\n-    }\n+    await ensureAgentInitialized();\n \n     const body: ChatRequest = await request.json();\n     const { sessionId, query } = body;",
+  "type": "tool",
+  "tool_call_id": "call_00_sv6WRyyTTH0APsg00m4bAjdW"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_ITVbOBfsKaJiwkaxpQBnIIfk",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff web/src/lib/agent.ts | head -50\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "'head' �����ڲ����ⲿ���Ҳ���ǿ����еĳ���\r\n���������ļ���",
+  "type": "tool",
+  "tool_call_id": "call_00_ITVbOBfsKaJiwkaxpQBnIIfk"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_si7tRR7NizxRRnxY7Bwu7Jud",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff web/src/lib/agent.ts\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "diff --git a/web/src/lib/agent.ts b/web/src/lib/agent.ts\nindex 2e1041e..e56bd0d 100644\n--- a/web/src/lib/agent.ts\n+++ b/web/src/lib/agent.ts\n@@ -3,11 +3,14 @@ import Agent from '@agent/agent/index-eventbus';\n import { LLMProvider } from '@agent/providers/base';\n import { getSessionManager } from './session-manager';\n import { sseEventManager } from './event-bus';\n+import { connectDB } from '@agent/storage/mongoose';\n+import { registerDefaultToolsAsync } from '@agent/tool';\n import type { ChatRequest, ChatResponse } from './types';\n \n // Global agent instance\n let globalAgent: Agent | null = null;\n let globalLLMProvider: LLMProvider | null = null;\n+let initializationPromise: Promise<void> | null = null;\n \n export interface AgentManagerConfig {\n   llmProvider: LLMProvider;\n@@ -17,20 +20,24 @@ export interface AgentManagerConfig {\n }\n \n /**\n- * Initialize the global agent instance\n+ * Initialize the application (database, tools, agent)\n  */\n-export function initializeAgent(config: AgentManagerConfig): void {\n-  if (globalAgent) {\n-    console.warn('Agent already initialized');\n-    return;\n-  }\n+async function initializeApplication(config: AgentManagerConfig): Promise<void> {\n+  // 1. Connect to database\n+  await connectDB();\n+\n+  // 2. Register default tools (including MCP tools)\n+  await registerDefaultToolsAsync();\n \n+  // 3. Store the LLM provider\n   globalLLMProvider = config.llmProvider;\n \n-  // Create a new session manager for the agent\n+  // 4. Create a default session manager for the agent\n   const defaultSessionId = `session_${Date.now()}`;\n   const sessionManager = getSessionManager(defaultSessionId, config.llmProvider);\n+  await sessionManager.init();\n \n+  // 5. Create the agent\n   globalAgent = new Agent({\n     llmProvider: config.llmProvider,\n     sessionManager,\n@@ -41,7 +48,7 @@ export function initializeAgent(config: AgentManagerConfig): void {\n     enableEventLogging: true,\n   });\n \n-  // Subscribe to agent events and broadcast to SSE clients\n+  // 6. Subscribe to agent events and broadcast to SSE clients\n   const eventBus = globalAgent.getEventBus();\n   const eventNames = eventBus.eventNames();\n \n@@ -52,7 +59,25 @@ export function initializeAgent(config: AgentManagerConfig): void {\n     }, `web_sse_${String(eventName)}`);\n   });\n \n-  console.log('Agent initialized successfully');\n+  console.log('Application initialized successfully');\n+}\n+\n+/**\n+ * Initialize the global agent instance (idempotent)\n+ */\n+export async function initializeAgent(config: AgentManagerConfig): Promise<void> {\n+  if (globalAgent) {\n+    console.warn('Agent already initialized');\n+    return;\n+  }\n+\n+  // Use a promise to prevent concurrent initializations\n+  if (initializationPromise) {\n+    return initializationPromise;\n+  }\n+\n+  initializationPromise = initializeApplication(config);\n+  await initializationPromise;\n }\n \n /**\n@@ -74,6 +99,7 @@ export async function processChatRequest(request: ChatRequest): Promise<ChatResp\n \n   // Get or create session manager for this session\n   const sessionManager = getSessionManager(request.sessionId, llmProvider);\n+  await sessionManager.init();\n \n   // Swap the session manager in the agent\n   (agent as any).sessionManager = sessionManager;\n@@ -113,3 +139,21 @@ export function getLLMProvider(): LLMProvider {\n   }\n   return globalLLMProvider;\n }\n+\n+/**\n+ * Ensure agent is initialized (for use in API routes)\n+ */\n+export async function ensureAgentInitialized(): Promise<void> {\n+  if (!isAgentInitialized()) {\n+    const apiKey = process.env.DEEPSEEK_API_KEY || '';\n+    const baseURL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';\n+\n+    if (!apiKey) {\n+      throw new Error('DEEPSEEK_API_KEY environment variable is not set');\n+    }\n+\n+    const { OpenAIProvider } = await import('@agent/providers/openai');\n+    const llmProvider = new OpenAIProvider({ apiKey, baseURL, model: 'deepseek-chat' });\n+    await initializeAgent({ llmProvider });\n+  }\n+}",
+  "type": "tool",
+  "tool_call_id": "call_00_si7tRR7NizxRRnxY7Bwu7Jud"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "现在让我添加所有修改并生成符合 git-commit 技能标准的 commit 信息：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_W8BfIBqBeFNBNmQMF4pBNl4Q",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git add .\"}"
+      }
+    }
+  ]
+}
+```
