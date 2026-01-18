@@ -6,7 +6,7 @@
  * OpenAI API provider implementation.
  */
 
-import { LLMProvider, LLMOptions, LLMResponse, Message, ToolSchema, type ProviderConfig } from './base'
+import { LLMProvider, LLMOptions, LLMResponse, Message, type ProviderConfig } from './base'
 
 /**
  * 修复 LLM 生成的格式错误的 JSON

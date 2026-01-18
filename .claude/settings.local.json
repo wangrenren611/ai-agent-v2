@@ -36,7 +36,8 @@
       "Bash(npm --version)",
       "Bash(npx --version)",
       "Bash(where:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(pnpm run lint)"
     ]
   },
   "enableAllProjectMcpServers": true,

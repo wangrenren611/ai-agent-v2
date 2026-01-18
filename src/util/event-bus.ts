@@ -509,10 +509,13 @@ export class ScopedEventBus {
  */
 export interface SessionEvents {
   'session.created': { sessionId: string; userId: string };
-  'session.message.added': { sessionId: string; message: any };
-  'session.compaction.triggered': { sessionId: string; tokenCount: number };
-  'session.compaction.completed': { sessionId: string; summary: any; compressedCount: number };
-  'session.error': { sessionId: string; error: Error };
+  'session.message.added': { sessionId: string; message: any; timestamp?: number; messageCount?: number };
+  'session.messages.retrieved': { sessionId: string; count: number; timestamp?: number };
+  'session.compaction.triggered': { sessionId: string; tokenCount: number; threshold: number; timestamp?: number };
+  'session.compaction.completed': { sessionId: string; summary: any; compressedCount: number; originalTokenCount?: number; compressedTokenCount?: number; timestamp?: number };
+  'session.compaction.failed': { sessionId: string; error: Error; tokenCount?: number; timestamp?: number };
+  'session.error': { sessionId: string; error: Error; operation?: string; timestamp?: number };
+  'session.cleared': { sessionId: string; clearedCount: number; timestamp?: number };
 }
 
 export interface AgentEvents {

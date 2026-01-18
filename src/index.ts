@@ -6,7 +6,6 @@ import dotenv from 'dotenv';
 import { OpenAIProvider } from './providers/openai';
 import Agent from './agent';
 import { connectDB } from './storage/mongoose';
-import { MessageRepository } from './infrastructure/MessageRepository';
 import { CLI } from './cli';
 import { registerDefaultToolsAsync } from './tool';
 import { SessionManager } from './session-v2';
@@ -57,9 +56,11 @@ async function initializeApp(config: AppConfig) {
 /**
  * 启动 CLI 交互模式
  */
-async function startCLI(agent: Agent): Promise<void> {
+async function startCLI(agent: Agent, sessionManager: SessionManager): Promise<void> {
     const cli = new CLI({
         agent,
+        sessionManager,
+        sessionId: 'session_10001',
         prompt: '>',
     });
 
@@ -84,7 +85,7 @@ async function main() {
     }
 
     // 初始化应用
-    const { agent } = await initializeApp({
+    const { agent, sessionManager } = await initializeApp({
         deepseekApiKey,
         deepseekBaseUrl,
     });
@@ -96,7 +97,7 @@ async function main() {
     switch (mode) {
         case 'cli':
         default:
-            await startCLI(agent);
+            await startCLI(agent, sessionManager);
             break;
     }
 }

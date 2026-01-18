@@ -2,10 +2,13 @@
  * 命令处理器类型定义
  */
 import type Agent from '../../agent';
+import type { SessionManager } from '../../session-v2';
 
 export interface CommandContext {
     agent: Agent;
     running: { value: boolean };
+    sessionId: { value: string };
+    sessionManager: SessionManager;
 }
 
 export interface CommandHandler {

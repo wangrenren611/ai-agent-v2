@@ -9,7 +9,7 @@ import { ShortTermStore, SummaryMetadata } from "../domain/ShortTermStore";
 import { ILongTermStore } from "../domain/LongTermStore";
 import { ScopedLogger } from "../util/log";
 
-const DEFAULT_COMPRESSION_THRESHOLD = 0.92; // 92% 触发压缩
+const _DEFAULT_COMPRESSION_THRESHOLD = 0.92; // 92% 触发压缩
 const KEEP_RECENT_COUNT = 6; // 压缩后保留最近 N 条消息（保留足够上下文）
 
 export class SessionManager {
@@ -37,7 +37,7 @@ export class SessionManager {
         // 持久化会话到数据库
         try {
             await this.repository.saveSession(session);
-        } catch (error) {
+        } catch (_error) {
             this.logger.error(`Failed to persist session ${session.id}`);
         }
 
@@ -75,7 +75,7 @@ export class SessionManager {
             if (!loadedSession) {
                 try {
                     await this.repository.saveSession(session);
-                } catch (error) {
+                } catch (_error) {
                     this.logger.error(`Failed to persist session ${session.id}`);
                 }
             } else {
@@ -125,7 +125,7 @@ export class SessionManager {
         // 所有消息都持久化到数据库
         try {
             await this.repository.save(sessionId, userId, msg);
-        } catch (error) {
+        } catch (_error) {
             this.logger.error(`Failed to persist message for session ${sessionId}`);
         }
     }
@@ -155,7 +155,7 @@ export class SessionManager {
         // 持久化到数据库
         try {
             await this.repository.save(sessionId, userId, summaryMessage);
-        } catch (error) {
+        } catch (_error) {
             this.logger.error(`Failed to persist summary for session ${sessionId}`);
         }
     }
@@ -288,7 +288,7 @@ export class SessionManager {
             this.logger.info(
                 `Loaded ${originalMessages.length} original messages and ${summaryMessages.length} summaries for session ${sessionId}`
             );
-        } catch (error) {
+        } catch (_error) {
             this.logger.error(`Failed to load history for session ${sessionId}`);
         }
     }
@@ -310,7 +310,7 @@ export class SessionManager {
             await this.repository.deleteSession(sessionId);
             sessionDeleted = true;
             await this.repository.deleteBySession(sessionId);
-        } catch (error) {
+        } catch (_error) {
             // 如果消息删除失败但会话已删除，记录错误
             if (sessionDeleted) {
                 this.logger.error(`Failed to delete messages for session ${sessionId}, but session was already deleted. Manual cleanup may be required.`);
@@ -351,7 +351,7 @@ export class SessionManager {
                 }
             }
             this.logger.info(`Loaded ${sessions.length} sessions for user ${userId}`);
-        } catch (error) {
+        } catch (_error) {
             this.logger.error(`Failed to load sessions for user ${userId}`);
         }
     }

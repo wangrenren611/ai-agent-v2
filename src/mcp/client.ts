@@ -295,7 +295,7 @@ export class McpClient extends EventEmitter {
    * 拒绝所有待处理的请求
    */
   private rejectAllPendingRequests(error: Error): void {
-    for (const [id, pending] of this.pendingRequests) {
+    for (const [, pending] of this.pendingRequests) {
       clearTimeout(pending.timeout);
       pending.reject(error);
     }

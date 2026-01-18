@@ -12,9 +12,7 @@ import {
   createErrorHandlingMiddleware,
   createValidationMiddleware,
   ScopedEventBus,
-  type EventHandler,
-  type AsyncEventHandler,
-  type Subscription
+  type EventMetrics,
 } from './event-bus';
 
 describe('EventBus', () => {
@@ -260,32 +258,32 @@ describe('EventBus', () => {
       const handler = vi.fn(async () => {
         await new Promise(resolve => setTimeout(resolve, 10));
       });
-      
+
       monitoredBus.onAsync('test.event', handler);
       await monitoredBus.emit('test.event', {});
-      
-      const metrics = monitoredBus.getMetrics('test.event');
+
+      const metrics = monitoredBus.getMetrics('test.event') as EventMetrics;
       expect(metrics).toBeDefined();
       expect(metrics.totalEvents).toBe(1);
       expect(metrics.totalHandlers).toBe(1);
       expect(metrics.avgExecutionTime).toBeGreaterThan(0);
-      
+
       monitoredBus.offAll();
     });
 
     it('应该重置指标', () => {
       const monitoredBus = new EventBus({ enableMetrics: true });
-      
+
       monitoredBus.on('test.event', vi.fn());
       monitoredBus.emit('test.event', {});
-      
-      let metrics = monitoredBus.getMetrics('test.event');
+
+      let metrics = monitoredBus.getMetrics('test.event') as EventMetrics;
       expect(metrics.totalEvents).toBe(1);
-      
+
       monitoredBus.resetMetrics('test.event');
-      metrics = monitoredBus.getMetrics('test.event');
+      metrics = monitoredBus.getMetrics('test.event') as EventMetrics;
       expect(metrics.totalEvents).toBe(0);
-      
+
       monitoredBus.offAll();
     });
   });

@@ -93,7 +93,7 @@ export default class BashTool extends BaseTool<typeof schema> {
     private async runCommand(command: string): Promise<string> {
         const normalizedCommand = this.normalizeCommand(command);
         const cdOutput = this.tryHandleCd(normalizedCommand);
-        if (cdOutput !== null) return cdOutput;
+        if (cdOutput !== null) return this.truncateOutput( `ERROR: Command failed: ${cdOutput}`);
 
         const result = await execCommandAsync(normalizedCommand, {
             timeout: this.timeout,
@@ -110,7 +110,12 @@ export default class BashTool extends BaseTool<typeof schema> {
 
     private tryHandleCd(command: string): string | null {
         const platform = getPlatform();
-        const cdMatch = command.match(/^\s*cd(?:\s+\/d)?\s+(.+?)\s*$/i);
+        // 检测复杂命令（包含管道、重定向、命令连接符等），不做 cd 特殊处理
+        if (/[|;&<>]|\|\||&&/.test(command)) {
+            return null;
+        }
+
+        const cdMatch = command.match(/^\s*cd(?:\s+\/d)?\s+(.+)\s*$/i);
         if (!cdMatch) return null;
 
         const rawTarget = cdMatch[1]?.trim();

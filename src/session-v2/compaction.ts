@@ -4,7 +4,7 @@ import { ScopedLogger } from "../util/log";
 export class Compaction {
   private readonly maxTokens: number;
   private readonly maxOutputTokens: number;
-  private readonly triggerRatio = 0.15; // 92% 触发压缩
+  private readonly triggerRatio = 0.08; // 92% 触发压缩
   private readonly targetRatio = 0.75; // 压缩到 75% 停止
 
   // 经验系数：中文 1:1, 英文 4:1
@@ -29,7 +29,7 @@ export class Compaction {
 
     return {
       totalUsed,
-      usableLimit
+     usableLimit:usableLimit*this.triggerRatio
     }
   }
 
@@ -38,6 +38,29 @@ export class Compaction {
    * @param history 原始历史记录
    * @param summarizer 外部注入的 LLM 摘要执行器
    */
+  /**
+   * 查找与 tool 消息配对的 assistant 消息索引
+   * @param messages 完整消息列表
+   * @param toolMessage tool 消息
+   * @returns assistant 消息的索引，未找到返回 -1
+   */
+  private findMatchingAssistant(messages: Message[], toolMessage: Message): number {
+    const toolCallId = toolMessage.tool_call_id;
+    if (!toolCallId) return -1;
+
+    const toolIndex = messages.indexOf(toolMessage);
+
+    // 从 tool 消息的位置向前查找 assistant 消息
+    for (let i = toolIndex - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (msg.role === 'assistant' && msg.tool_calls) {
+        const hasMatchingCall = msg.tool_calls.some(call => call.id === toolCallId);
+        if (hasMatchingCall) return i;
+      }
+    }
+    return -1;
+  }
+
   async compact(history: Message[]): Promise<{
     isCompacted: boolean,
     summaryMessage: Message | null,
@@ -61,9 +84,22 @@ export class Compaction {
       `[Compaction] 触发压缩。当前 Token: ${totalUsed}, 阈值: ${Math.floor(usableLimit * this.triggerRatio)}`
     );
 
-
-    const activeMessages = history.slice(-KEEP_RECENT_COUNT); // 保护区
+    let activeMessages = history.slice(-KEEP_RECENT_COUNT); // 保护区
     let pendingMessages = history.slice(0, -KEEP_RECENT_COUNT); // 待压缩区
+
+    // 检查保护区的第一条是否是 tool 消息，如果是则将其配对的 assistant 消息也保留
+    if (activeMessages.length > 0 && activeMessages[0].role === 'tool') {
+      const assistantIndex = this.findMatchingAssistant(history, activeMessages[0]);
+      // assistantIndex 是在 history 中的索引，pendingMessages 是 history.slice(0, -KEEP_RECENT_COUNT)
+      // 所以 assistantIndex 直接对应 pendingMessages 中的索引
+      if (assistantIndex >= 0 && assistantIndex < pendingMessages.length) {
+        // 将配对的 assistant 消息从待压缩区移到保护区
+        const assistantMessage = pendingMessages[assistantIndex];
+        pendingMessages = pendingMessages.filter((_, i) => i !== assistantIndex);
+        activeMessages = [assistantMessage, ...activeMessages];
+        this.logger.info(`[Compaction] 保护区首条是 tool 消息，已将其配对的 assistant 消息也保留在保护区`);
+      }
+    }
 
     // 3. 提取之前的摘要（如果存在）
     let previousSummary = "";

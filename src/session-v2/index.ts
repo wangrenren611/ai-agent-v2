@@ -43,8 +43,9 @@ export class SessionManager {
           this.messageList = messageList;
         }
       }
-    } catch (err) {
+    } catch (_:any) {
       // 文件不存在或其他错误，忽略
+      console.log("NOT FOUND HISTORY")
     }
   }
 

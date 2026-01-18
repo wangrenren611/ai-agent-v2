@@ -28,8 +28,8 @@ import { SurgicalEditTool } from './surgical';
 import { BatchReplaceTool } from './batch-replace';
 import { TodoReadTool } from './todo';
 import { TodoWriteTool } from './todo';
-import { RollbackTool, ListBackupsTool, CleanBackupsTool } from './rollback';
-import { initializeMcp } from '../mcp/index.js';
+import {  ListBackupsTool, CleanBackupsTool } from './rollback';
+import { initializeMcp } from '../mcp/index';
 import { WebSearchTool } from './web-search';
 
 // =============================================================================

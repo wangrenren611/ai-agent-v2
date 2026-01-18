@@ -85,10 +85,11 @@ export function buildFindCommand(pattern: string, directory?: string): string {
     const dir = directory || '.';
 
     switch (platform) {
-        case 'windows':
+        case 'windows': {
             // Windows: dir /s /b src\*.ts
             const normDir = dir.replace(/\//g, '\\');
             return `dir /s /b "${normDir}\\${pattern}"`;
+        }
 
         case 'mac':
         case 'linux':
@@ -110,9 +111,10 @@ export function buildListCommand(directory: string = '.'): string {
     const platform = getPlatform();
 
     switch (platform) {
-        case 'windows':
+        case 'windows': {
             const normDir = directory.replace(/\//g, '\\');
             return `dir /a "${normDir}"`;
+        }
 
         case 'mac':
         case 'linux':

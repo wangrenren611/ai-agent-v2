@@ -14,21 +14,30 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.js",
+    "lint:fix": "eslint . --ext .ts,.js --fix",
+    "lint:strict": "eslint . --ext .ts,.js --max-warnings 0",
     "build": "cross-env NODE_ENV=production  tsc",
     "dev": "cross-env NODE_ENV=development  tsx src/index.ts",
     "dev:demo": "cross-env NODE_ENV=development  tsx src/index.ts demo",
     "dev:cli": "cross-env NODE_ENV=development  tsx src/index.ts cli",
-    "test": "vitest",
+    "test": "vitest run src/tool/bash.test.ts",
     "codeCompressor": "cross-env NODE_ENV=development  tsx src/codeCompressor.ts",
     "test:ui": "vitest --ui"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/dotenv": "^8.2.3",
     "@types/node": "^22.19.3",
     "@types/prompts": "^2.4.9",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
     "cross-env": "^10.1.0",
+    "eslint": "^9.39.2",
+    "eslint-plugin-import": "^2.31.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.53.0",
     "vitest": "^3.2.4"
   },
   "dependencies": {

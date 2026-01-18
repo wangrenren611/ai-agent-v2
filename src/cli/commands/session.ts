@@ -44,7 +44,7 @@ export const handler: CommandHandler = {
 
             case 'delete': {
                 const targetSessionId = args[1] || context.sessionId.value;
-                await context.agent.clearSession(targetSessionId);
+                await context.sessionManager.clearAll();
                 if (targetSessionId === context.sessionId.value) {
                     const newSessionId = `session_${Date.now()}`;
                     context.sessionId.value = newSessionId;

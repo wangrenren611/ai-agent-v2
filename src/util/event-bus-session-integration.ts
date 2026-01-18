@@ -230,41 +230,46 @@ export class SessionMonitorService {
   private setupEventHandlers(): void {
     // 监控消息添加
     typedEventBus.on('session.message.added', (data) => {
-      this.updateSessionStats(data.sessionId, {
-        lastMessage: data.timestamp,
-        messageCount: data.messageCount
+      const d = data as any;
+      this.updateSessionStats(d.sessionId, {
+        lastMessage: d.timestamp,
+        messageCount: d.messageCount
       });
-      this.logActivity(`消息添加: ${data.sessionId}`);
+      this.logActivity(`消息添加: ${d.sessionId}`);
     });
 
     // 监控压缩事件
     typedEventBus.on('session.compaction.triggered', (data) => {
-      this.logActivity(`压缩触发: ${data.sessionId} (${data.tokenCount}/${data.threshold} tokens)`);
+      const d = data as any;
+      this.logActivity(`压缩触发: ${d.sessionId} (${d.tokenCount}/${d.threshold} tokens)`);
     });
 
     typedEventBus.on('session.compaction.completed', (data) => {
-      this.updateSessionStats(data.sessionId, {
-        lastCompaction: data.timestamp,
-        compressionRate: data.compressedCount
+      const d = data as any;
+      this.updateSessionStats(d.sessionId, {
+        lastCompaction: d.timestamp,
+        compressionRate: d.compressedCount
       });
-      this.logActivity(`压缩完成: ${data.sessionId}，节省 ${data.originalTokenCount - data.compressedTokenCount} tokens`);
+      this.logActivity(`压缩完成: ${d.sessionId}，节省 ${d.originalTokenCount - d.compressedTokenCount} tokens`);
     });
 
     // 监控错误
     typedEventBus.on('session.error', (data) => {
+      const d = data as any;
       this.errorLog.push({
-        sessionId: data.sessionId,
-        error: data.error.message,
-        operation: data.operation,
-        timestamp: data.timestamp
+        sessionId: d.sessionId,
+        error: d.error.message,
+        operation: d.operation,
+        timestamp: d.timestamp
       });
-      console.error(`[Monitor] 会话错误: ${data.sessionId} - ${data.error.message}`);
+      console.error(`[Monitor] 会话错误: ${d.sessionId} - ${d.error.message}`);
     });
 
     // 监控清空事件
     typedEventBus.on('session.cleared', (data) => {
-      this.sessionStats.delete(data.sessionId);
-      this.logActivity(`会话清空: ${data.sessionId} (${data.clearedCount} 条消息)`);
+      const d = data as any;
+      this.sessionStats.delete(d.sessionId);
+      this.logActivity(`会话清空: ${d.sessionId} (${d.clearedCount} 条消息)`);
     });
   }
 
@@ -380,10 +385,3 @@ async function runIntegrationExample() {
 if (require.main === module) {
   runIntegrationExample().catch(console.error);
 }
-
-// 导出
-export {
-  SessionManagerWithEvents,
-  SessionMonitorService,
-  runIntegrationExample
-};

@@ -1,15 +1,17 @@
 /**
  * Agent - AI 代理
  * 负责编排 LLM 调用和会话管理
+ * 
+ * 注意：此文件是旧版 Agent，建议使用 index-eventbus.ts 以获得 EventBus 集成
+ * 要启用 EventBus 功能，请导入 './index-eventbus' 而不是此文件
  */
 import EventEmitter from "events";
-import { LLMProvider, Message, ToolSchema } from "../providers/base";
+import { LLMProvider, ToolSchema } from "../providers/base";
 import { ScopedLogger } from "../util/log";
 import { formatToolResult } from "../util/log-format";
 import { SessionManager } from "../session-v2";
 import { SYSTEM_PROMPT } from "../prompts/system";
 import { ToolRegistry } from "../tool";
-import { Compaction } from "../session/compaction";
 
 export interface AgentConfig {
     llmProvider: LLMProvider;
@@ -91,7 +93,7 @@ export default class Agent extends EventEmitter {
                 const llmResponse = await this.llmProvider.generate([
                      {
                        role: 'system',
-                        content: this.systemPrompt,
+                         content: this.systemPrompt,
                     },
                     ...llmMessages
                 ], {
@@ -100,8 +102,7 @@ export default class Agent extends EventEmitter {
                     max_tokens: this.maxOutputTokens,
                 });
 
-              
-
+               
                 spinner.succeed(`Thinking-${i} end`);
 
                 if (!llmResponse) {
@@ -170,7 +171,7 @@ export default class Agent extends EventEmitter {
                     const results = await Promise.all(toolPromises);
 
                     // 按原始顺序添加工具结果消息
-                    for (const { toolCall, result, error } of results) {
+                    for (const { toolCall, result, error: _error } of results) {
                         const { id } = toolCall;
 
                         this.sessionManager.addMessage({

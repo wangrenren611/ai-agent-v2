@@ -4,6 +4,7 @@
  */
 import { ScopedLogger } from '../util/log';
 import Agent from '../agent';
+import { SessionManager } from '../session-v2';
 import { executeCommand } from './commands';
 import {  InputHistory } from './utils';
 import { readWithHistory } from './utils/reader';
@@ -11,11 +12,15 @@ import type { CommandContext } from './commands/types';
 
 export interface CLIConfig {
     agent: Agent;
+    sessionManager: SessionManager;
+    sessionId?: string;
     prompt?: string;
 }
 
 export class CLI {
     private agent: Agent;
+    private sessionManager: SessionManager;
+    private sessionId: { value: string };
     private promptText: string;
     private running: boolean;
     private logger: ScopedLogger;
@@ -23,6 +28,8 @@ export class CLI {
 
     constructor(config: CLIConfig) {
         this.agent = config.agent;
+        this.sessionManager = config.sessionManager;
+        this.sessionId = { value: config.sessionId || 'session_10001' };
         this.promptText = config.prompt || 'You';
         this.running = false;
         this.logger = new ScopedLogger('CLI');
@@ -72,6 +79,8 @@ export class CLI {
         const context: CommandContext = {
             agent: this.agent,
             running: { value: this.running },
+            sessionId: this.sessionId,
+            sessionManager: this.sessionManager,
         };
 
         const isCommand = await executeCommand(input, context);
