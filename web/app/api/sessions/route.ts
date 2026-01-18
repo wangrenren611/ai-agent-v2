@@ -1,9 +1,25 @@
 // Sessions API route
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllSessionIds, hasSession } from '@/lib/session-manager';
-import { getLLMProvider } from '@/lib/agent';
+import { getLLMProvider, isAgentInitialized, initializeAgent } from '@/lib/agent';
+import { DeepSeekProvider } from '@agent/providers/deepseek';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+
+// Ensure agent is initialized
+function ensureAgentInitialized() {
+  if (!isAgentInitialized()) {
+    const apiKey = process.env.DEEPSEEK_API_KEY || '';
+    const baseURL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
+
+    if (!apiKey) {
+      throw new Error('DEEPSEEK_API_KEY environment variable is not set');
+    }
+
+    const llmProvider = new DeepSeekProvider({ apiKey, baseURL, model: 'deepseek-chat' });
+    initializeAgent({ llmProvider });
+  }
+}
 
 export async function GET() {
   try {
@@ -49,30 +65,28 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    ensureAgentInitialized();
+
     const body = await request.json();
-    const { sessionId } = body;
+    const { sessionId, userId } = body;
 
-    if (!sessionId) {
-      return NextResponse.json(
-        { error: 'Missing required field: sessionId' },
-        { status: 400 }
-      );
-    }
+    // Generate session ID if not provided
+    const newSessionId = sessionId || `session_${Date.now()}`;
 
-    if (hasSession(sessionId)) {
+    if (hasSession(newSessionId)) {
       return NextResponse.json(
-        { error: 'Session already exists', sessionId },
+        { error: 'Session already exists', sessionId: newSessionId },
         { status: 409 }
       );
     }
 
     const llmProvider = getLLMProvider();
     const { getSessionManager } = await import('@/lib/session-manager');
-    const sessionManager = getSessionManager(sessionId, llmProvider);
+    const sessionManager = getSessionManager(newSessionId, llmProvider, userId);
     await sessionManager.init();
 
     return NextResponse.json({
-      sessionId,
+      sessionId: newSessionId,
       messageCount: 0,
       createdAt: new Date().toISOString(),
     });

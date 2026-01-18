@@ -13281,3 +13281,277 @@
   ]
 }
 ```
+```
+{
+  "role": "tool",
+  "content": "Command exited successfully",
+  "type": "tool",
+  "tool_call_id": "call_00_T7hB1XblnadmfclRhF2YOjGT"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "现在根据 git-commit 技能的标准生成 commit 信息：\n\n**类型**: `chore`（因为这些是内存/会话文件，不影响源代码）\n**范围**: `memory`\n**主题**: `update session memory files`\n\n**主体**: 更新会话内存文件以包含最新的对话历史记录和工具调用信息",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_emu8PwLQMyqG45C0OhSJ6zgH",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git commit -m \\\"chore(memory): update session memory files\\n\\nUpdate session memory files to include latest conversation history\\nand tool call information from ESLint configuration fixes and\\nskill system implementation.\\\"\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "[feat/session-v3 d09b77d] chore(memory): update session memory files\n 2 files changed, 354 insertions(+), 83 deletions(-)",
+  "type": "tool",
+  "tool_call_id": "call_00_emu8PwLQMyqG45C0OhSJ6zgH"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "已使用 git-commit 技能标准生成了 commit 信息：\n\n**chore(memory): update session memory files**\n\n- **类型**: `chore` - 不影响源代码的修改\n- **范围**: `memory` - 内存/会话文件相关\n- **主题**: 遵循命令式语气，不超过50字符\n- **主体**: 解释了修改内容和原因，符合72字符换行规范"
+}
+```
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "使用git-commit技能，生成commit信息"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "我看到您想再次使用 git-commit 技能生成 commit 信息。让我先检查当前的 git 状态：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_wRo9nuKUyNdhaN9Ngff2VoqL",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git status\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "On branch feat/session-v3\nYour branch is ahead of 'origin/feat/session-v3' by 2 commits.\n  (use \"git push\" to publish your local commits)\n\nChanges not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git restore <file>...\" to discard changes in working directory)\n\tmodified:   .memory/session_10001/cache.md\n\tmodified:   .memory/session_10001/messages.json\n\tmodified:   skills/git-commit/SKILL.md\n\tmodified:   web/app/api/sessions/route.ts\n\tmodified:   web/src/lib/session-manager.ts\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")",
+  "type": "tool",
+  "tool_call_id": "call_00_wRo9nuKUyNdhaN9Ngff2VoqL"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "我看到有新的修改。让我查看这些修改的内容：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_TSvQsZz6blmBG68DZDnZ1cGi",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff --name-only\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": ".memory/session_10001/cache.md\n.memory/session_10001/messages.json\nskills/git-commit/SKILL.md\nweb/app/api/sessions/route.ts\nweb/src/lib/session-manager.ts",
+  "type": "tool",
+  "tool_call_id": "call_00_TSvQsZz6blmBG68DZDnZ1cGi"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "让我查看主要修改的文件：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_yWJYyUgsXvqYYb3Ra4U5o0QQ",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff skills/git-commit/SKILL.md | head -50\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "'head' �����ڲ����ⲿ���Ҳ���ǿ����еĳ���\r\n���������ļ���",
+  "type": "tool",
+  "tool_call_id": "call_00_yWJYyUgsXvqYYb3Ra4U5o0QQ"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_5rExLAGp3QTnCVNMBKJJplD8",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff skills/git-commit/SKILL.md\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "diff --git a/skills/git-commit/SKILL.md b/skills/git-commit/SKILL.md\nindex e7d9acf..db35995 100644\n--- a/skills/git-commit/SKILL.md\n+++ b/skills/git-commit/SKILL.md\n@@ -41,7 +41,7 @@ Generate well-formatted git commit messages following conventional commit standa\n 5. **Body**: Explain what and why, not how\n 6. **Footer**: Reference issues (#123)\n \n-## Examples\n+## Output Examples\n \n ```\n feat(session): add lazy-loading for message history",
+  "type": "tool",
+  "tool_call_id": "call_00_5rExLAGp3QTnCVNMBKJJplD8"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_VqCYS0Hev23JL3c80R3YZ1pQ",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff web/app/api/sessions/route.ts | head -30\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "'head' �����ڲ����ⲿ���Ҳ���ǿ����еĳ���\r\n���������ļ���",
+  "type": "tool",
+  "tool_call_id": "call_00_VqCYS0Hev23JL3c80R3YZ1pQ"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_aeTGnQmEPixqbKP4OGKH7JEz",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff web/app/api/sessions/route.ts\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "diff --git a/web/app/api/sessions/route.ts b/web/app/api/sessions/route.ts\nindex d535a38..87ce9b8 100644\n--- a/web/app/api/sessions/route.ts\n+++ b/web/app/api/sessions/route.ts\n@@ -1,10 +1,26 @@\n // Sessions API route\n import { NextRequest, NextResponse } from 'next/server';\n import { getAllSessionIds, hasSession } from '@/lib/session-manager';\n-import { getLLMProvider } from '@/lib/agent';\n+import { getLLMProvider, isAgentInitialized, initializeAgent } from '@/lib/agent';\n+import { DeepSeekProvider } from '@agent/providers/deepseek';\n import fs from 'node:fs/promises';\n import path from 'node:path';\n \n+// Ensure agent is initialized\n+function ensureAgentInitialized() {\n+  if (!isAgentInitialized()) {\n+    const apiKey = process.env.DEEPSEEK_API_KEY || '';\n+    const baseURL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';\n+\n+    if (!apiKey) {\n+      throw new Error('DEEPSEEK_API_KEY environment variable is not set');\n+    }\n+\n+    const llmProvider = new DeepSeekProvider({ apiKey, baseURL, model: 'deepseek-chat' });\n+    initializeAgent({ llmProvider });\n+  }\n+}\n+\n export async function GET() {\n   try {\n     const sessionIds = getAllSessionIds();\n@@ -49,30 +65,28 @@ export async function GET() {\n \n export async function POST(request: NextRequest) {\n   try {\n+    ensureAgentInitialized();\n+\n     const body = await request.json();\n-    const { sessionId } = body;\n+    const { sessionId, userId } = body;\n \n-    if (!sessionId) {\n-      return NextResponse.json(\n-        { error: 'Missing required field: sessionId' },\n-        { status: 400 }\n-      );\n-    }\n+    // Generate session ID if not provided\n+    const newSessionId = sessionId || `session_${Date.now()}`;\n \n-    if (hasSession(sessionId)) {\n+    if (hasSession(newSessionId)) {\n       return NextResponse.json(\n-        { error: 'Session already exists', sessionId },\n+        { error: 'Session already exists', sessionId: newSessionId },\n         { status: 409 }\n       );\n     }\n \n     const llmProvider = getLLMProvider();\n     const { getSessionManager } = await import('@/lib/session-manager');\n-    const sessionManager = getSessionManager(sessionId, llmProvider);\n+    const sessionManager = getSessionManager(newSessionId, llmProvider, userId);\n     await sessionManager.init();\n \n     return NextResponse.json({\n-      sessionId,\n+      sessionId: newSessionId,\n       messageCount: 0,\n       createdAt: new Date().toISOString(),\n     });",
+  "type": "tool",
+  "tool_call_id": "call_00_aeTGnQmEPixqbKP4OGKH7JEz"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_KfJzuw30aPOV8cxSOvR89ezv",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff web/src/lib/session-manager.ts | head -50\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "'head' �����ڲ����ⲿ���Ҳ���ǿ����еĳ���\r\n���������ļ���",
+  "type": "tool",
+  "tool_call_id": "call_00_KfJzuw30aPOV8cxSOvR89ezv"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_qqrm17dhTyYs0dHyOLc4IA03",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git diff web/src/lib/session-manager.ts\"}"
+      }
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "diff --git a/web/src/lib/session-manager.ts b/web/src/lib/session-manager.ts\nindex 45bde64..e742fa6 100644\n--- a/web/src/lib/session-manager.ts\n+++ b/web/src/lib/session-manager.ts\n@@ -5,11 +5,12 @@ import { LLMProvider } from '@agent/providers/base';\n // Global session cache\n const sessionCache = new Map<string, AgentSessionManager>();\n \n-export function getSessionManager(sessionId: string, llmProvider: LLMProvider): AgentSessionManager {\n+export function getSessionManager(sessionId: string, llmProvider: LLMProvider, userId?: string): AgentSessionManager {\n   if (!sessionCache.has(sessionId)) {\n     const sessionManager = new AgentSessionManager({\n       sessionId,\n-      llmProvider\n+      llmProvider,\n+      userId: userId || 'web_user'\n     });\n     sessionCache.set(sessionId, sessionManager);\n   }",
+  "type": "tool",
+  "tool_call_id": "call_00_qqrm17dhTyYs0dHyOLc4IA03"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "现在让我添加所有修改并生成符合 git-commit 技能标准的 commit 信息：",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "index": 0,
+      "id": "call_00_UtH1Bk98q9LxhX8sCjFPHCVh",
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "arguments": "{\"command\": \"cd D:\\\\work\\\\ai-agent-v2 && git add .\"}"
+      }
+    }
+  ]
+}
+```

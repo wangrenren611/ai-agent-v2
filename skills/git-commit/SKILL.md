@@ -41,7 +41,7 @@ Generate well-formatted git commit messages following conventional commit standa
 5. **Body**: Explain what and why, not how
 6. **Footer**: Reference issues (#123)
 
-## Examples
+## Output Examples
 
 ```
 feat(session): add lazy-loading for message history
