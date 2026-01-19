@@ -44,7 +44,10 @@
       "Bash(npx create-next-app:*)",
       "Bash(npm run build:*)",
       "Bash(timeout:*)",
-      "Bash(pnpm --filter web typecheck:*)"
+      "Bash(pnpm --filter web typecheck:*)",
+      "mcp__zread__search_doc",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

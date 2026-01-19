@@ -204,12 +204,13 @@ class SSEEventManager {
    */
   broadcast(event: string, data: unknown): void {
     const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+    console.log(`[SSE] Broadcasting event: ${event}, clients: ${this.clients.size}`);
 
     this.clients.forEach((controller) => {
       try {
         controller.enqueue(new TextEncoder().encode(message));
       } catch (error) {
-        console.error('Error sending SSE message:', error);
+        console.error('[SSE] Error sending SSE message:', error);
         this.clients.delete(controller);
       }
     });

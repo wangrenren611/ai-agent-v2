@@ -62,6 +62,7 @@ export interface TodoItem {
 
 // 扩展的消息类型，包含思考过程和 todo list
 export interface ExtendedMessage extends Message {
+  _id?: string;  // 用于跟踪正在生成的消息
   thinkingSteps?: ThinkingStep[];
   todos?: TodoItem[];
 }

@@ -8,6 +8,11 @@
         "-y",
         "@modelcontextprotocol/server-sequential-thinking"
       ]
+    },
+    {
+      "name":"chrome-devtools",
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"]
     }
   ]
 }

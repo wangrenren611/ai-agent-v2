@@ -1,0 +1,17 @@
+{
+  "name": "personal-blog",
+  "version": "1.0.0",
+  "description": "Modern personal blog and portfolio website",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve .",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": ["blog", "portfolio", "personal", "website"],
+  "author": "Alex Chen",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.0.0"
+  }
+}

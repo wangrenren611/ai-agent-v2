@@ -55,7 +55,7 @@ export default class Agent extends EventEmitter {
         this.systemPrompt = config.systemPrompt || SYSTEM_PROMPT;
         this.defaultTools = config.defaultTools;
         this.logger = new ScopedLogger('Agent');
-        this.maxLoop = config.maxLoop || 10;
+        this.maxLoop = config.maxLoop || 1024;
         this.maxOutputTokens = config.maxOutputTokens || this.llmProvider.maxOutputTokens;
         this.maxTokens = config.maxTokens || this.llmProvider.maxTokens;
         this.eventBus = config.eventBus || typedEventBus;

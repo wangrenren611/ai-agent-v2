@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { Message } from '@agent/providers/base';
 import { ExtendedMessage, ThinkingStep, TodoItem } from '../lib/types';
 import ReactMarkdown from 'react-markdown';
@@ -12,22 +13,37 @@ interface MessageListProps {
 }
 
 export default function MessageList({ messages, isLoading, thinkingSteps = [], todos = [] }: MessageListProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLengthRef = useRef(0);
+
+  // Auto-scroll to bottom when new messages arrive or content changes
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    // Check if user is near bottom (within 100px)
+    const isNearBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight < 100;
+
+    const shouldScroll =
+      messages.length !== prevMessagesLengthRef.current || // New message added
+      isLoading; // Still loading
+
+    if (shouldScroll || isNearBottom) {
+      scrollContainer.scrollTo({
+        top: scrollContainer.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+
+    prevMessagesLengthRef.current = messages.length;
+  }, [messages, isLoading]);
+
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
-      {messages.length === 0 && !isLoading && thinkingSteps.length === 0 && (
+    <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+      {messages.length === 0 && !isLoading && (
         <div className="flex items-center justify-center h-full text-zinc-400">
           <p>No messages yet. Start a conversation!</p>
         </div>
-      )}
-
-      {/* Render thinking steps if loading and there are steps */}
-      {(isLoading || thinkingSteps.length > 0) && thinkingSteps.length > 0 && (
-        <ThinkingProcessView steps={thinkingSteps} />
-      )}
-
-      {/* Render todo list if available */}
-      {todos.length > 0 && (
-        <TodoListView todos={todos} />
       )}
 
       {messages.map((message, index) => {

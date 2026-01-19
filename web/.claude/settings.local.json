@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(ls:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(npx shadcn@latest init:*)",
+      "Bash(pnpm build)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(pkill:*)",
+      "Bash(kill:*)"
+    ]
+  }
+}

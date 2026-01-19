@@ -2,7 +2,7 @@
 import Agent from '@agent/agent/index-eventbus';
 import { LLMProvider } from '@agent/providers/base';
 import { getSessionManager } from './session-manager';
-import { sseEventManager } from './event-bus';
+import { sseEventManager, AllAgentEvents } from './event-bus';
 import { connectDB } from '@agent/storage/mongoose';
 import { registerDefaultToolsAsync } from '@agent/tool';
 import type { ChatRequest, ChatResponse } from './types';
@@ -50,16 +50,56 @@ async function initializeApplication(config: AgentManagerConfig): Promise<void> 
 
   // 6. Subscribe to agent events and broadcast to SSE clients
   const eventBus = globalAgent.getEventBus();
-  const eventNames = eventBus.eventNames();
 
-  eventNames.forEach((eventName: string | symbol) => {
+  // Define all events that should be broadcast via SSE
+  const eventsToBroadcast: (keyof AllAgentEvents)[] = [
+    // Lifecycle events
+    'agent.run.start',
+    'agent.run.complete',
+    'agent.run.error',
+    'agent.loop.start',
+    'agent.loop.complete',
+    'agent.loop.max.reached',
+    // LLM events
+    'agent.llm.call.start',
+    'agent.llm.call.complete',
+    'agent.llm.call.error',
+    'agent.llm.response.received',
+    'agent.llm.response.processed',
+    // Tool events
+    'agent.tool.call.start',
+    'agent.tool.call.complete',
+    'agent.tool.call.error',
+    'agent.tool.params.parse.start',
+    'agent.tool.params.parse.complete',
+    'agent.tool.params.parse.error',
+    'agent.tools.batch.start',
+    'agent.tools.batch.complete',
+    // Session events
+    'agent.message.added',
+    'agent.messages.retrieved',
+    'agent.session.initialized',
+    'agent.session.updated',
+    // Performance events
+    'agent.performance.metrics',
+    'agent.performance.slow.tool',
+    'agent.performance.slow.llm',
+    // Hook events
+    'agent.hook.registered',
+    'agent.hook.triggered',
+    'agent.hook.completed',
+    'agent.hook.error',
+  ];
+
+  eventsToBroadcast.forEach((eventName) => {
     eventBus.onAsync(eventName, async (data: unknown) => {
-      const name = typeof eventName === 'symbol' ? eventName.toString() : eventName;
-      sseEventManager.broadcast(name, data);
+      console.log(`[Agent] Broadcasting event: ${eventName}`, data);
+      sseEventManager.broadcast(String(eventName), data);
     }, `web_sse_${String(eventName)}`);
   });
 
   console.log('Application initialized successfully');
+  console.log(`[Agent] Subscribed to ${eventsToBroadcast.length} event types`);
 }
 
 /**

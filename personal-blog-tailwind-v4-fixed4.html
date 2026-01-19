@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex Chen | Personal Blog & Portfolio</title>
+    <meta name="description" content="Personal blog and portfolio of Alex Chen - sharing thoughts on technology, design, and creative writing.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS v4 Play CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <!-- Custom CSS with inline configuration -->
+    <style>
+        /* Custom theme configuration using CSS variables */
+        :root {
+            --color-primary: #18181B;
+            --color-secondary: #3F3F46;
+            --color-accent: #2563EB;
+            --color-background: #FAFAFA;
+            --color-text: #09090B;
+            
+            --font-heading: 'Caveat', cursive;
+            --font-body: 'Quicksand', sans-serif;
+        }
+        
+        /* Dark mode color variables */
+        .dark {
+            --color-primary: #F4F4F5;
+            --color-secondary: #A1A1AA;
+            --color-accent: #60A5FA;
+            --color-background: #0F172A;
+            --color-text: #F8FAFC;
+        }
+        
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Custom utility classes */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark .glass-card {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .typewriter-container {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid;
+            width: 0;
+            animation: typewriter 3s steps(40) 1s 1 normal both,
+                       blink 0.75s step-end infinite;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: var(--color-accent); }
+        }
+        
+        /* Animation utility classes */
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        /* Custom color utilities */
+        .bg-primary { background-color: var(--color-primary); }
+        .text-primary { color: var(--color-primary); }
+        .border-primary { border-color: var(--color-primary); }
+        
+        .bg-secondary { background-color: var(--color-secondary); }
+        .text-secondary { color: var(--color-secondary); }
+        .border-secondary { border-color: var(--color-secondary); }
+        
+        .bg-accent { background-color: var(--color-accent); }
+        .text-accent { color: var(--color-accent); }
+        .border-accent { border-color: var(--color-accent); }
+        
+        .bg-background { background-color: var(--color-background); }
+        .text-text { color: var(--color-text); }
+        
+        /* Custom font utilities */
+        .font-heading { font-family: var(--font-heading); }
+        .font-body { font-family: var(--font-body); }
+        
+        /* Center alignment utility */
+        .center-vertically {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body class="bg-background text-text font-body min-h-screen transition-colors duration-300">
+
+
+
+
+
+
+
+
+
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-40 glass-card shadow-sm animate-fade-in">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="#hero" class="flex items-center space-x-2 cursor-pointer">
+                    <span class="text-2xl font-heading font-bold text-accent">AC</span>
+                    <span class="text-lg font-body font-semibold text-primary hidden sm:block">Alex Chen</span>
+                </a>
+
+                
+                
+
+
+
+
+
+
+
+
+                <!-- Right side container -->
+                <div class="flex items-center space-x-4">
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" class="p-2 rounded-full glass-card hover-lift cursor-pointer transition-all duration-300" aria-label="Toggle dark mode">
+                        <svg id="sunIcon" class="w-5 h-5 md:w-6 md:h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg id="moonIcon" class="w-5 h-5 md:w-6 md:h-6 text-primary hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#blog" class="text-primary hover:text-accent transition-colors duration-200 cursor-pointer">Blog</a>
+                    <a href="#portfolio" class="text-primary hover:text-accent transition-colors duration-200 cursor-pointer">Portfolio</a>
+                    <a href="#about" class="text-primary hover:text-accent transition-colors duration-200 cursor-pointer">About</a>
+                    <a href="#newsletter" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors duration-200 cursor-pointer">Subscribe</a>
+                </div>
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobileMenuButton" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer" aria-label="Toggle menu">
+                        <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+
+
+
+
+
+
+
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="md:hidden hidden px-4 pb-4">
+            <div class="flex flex-col space-y-4">
+                <a href="#blog" class="text-primary hover:text-accent transition-colors duration-200 cursor-pointer py-2">Blog</a>
+                <a href="#portfolio" class="text-primary hover:text-accent transition-colors duration-200 cursor-pointer py-2">Portfolio</a>
+                <a href="#about" class="text-primary hover:text-accent transition-colors duration-200 cursor-pointer py-2">About</a>
+                <a href="#newsletter" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors duration-200 cursor-pointer text-center">Subscribe</a>
+                <!-- Dark Mode Toggle for Mobile -->
+                <button id="darkModeToggleMobile" class="flex items-center justify-center p-3 rounded-lg glass-card hover-lift cursor-pointer transition-all duration-300 mt-4" aria-label="Toggle dark mode">
+                    <svg id="sunIconMobile" class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <svg id="moonIconMobile" class="w-5 h-5 text-primary hidden mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                    <span class="text-primary">Toggle Dark Mode</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-[90vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 animate-slide-up">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-heading font-bold text-primary mb-6">
+                <span class="block">Hello, I'm</span>
+                <span class="text-accent typewriter-container">Alex Chen</span>
+            </h1>
+            <p class="text-xl sm:text-2xl text-secondary mb-8 max-w-2xl mx-auto">
+                Developer • Writer • Creative Thinker
+            </p>
+            <p class="text-lg text-secondary mb-12 max-w-3xl mx-auto">
+                Sharing thoughts on technology, design, and the creative process. 
+                Join me on this journey of exploration and discovery.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#blog" class="bg-accent text-white px-8 py-3 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors duration-200 text-lg font-medium cursor-pointer hover-lift">
+                    Read the Blog
+                </a>
+                <a href="#newsletter" class="border-2 border-accent text-accent px-8 py-3 rounded-lg hover:bg-accent hover:text-white dark:hover:bg-blue-500 dark:hover:text-white transition-all duration-200 text-lg font-medium cursor-pointer hover-lift">
+                    Subscribe
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section id="blog" class="py-20 px-4 sm:px-6 lg:px-8 bg-white/50 dark:bg-gray-900/50">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl sm:text-5xl font-heading font-bold text-primary mb-4">Latest Articles</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">Thoughts, tutorials, and insights from my journey</p>
+            </div>
+
+            <!-- Blog Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                <!-- Article 1 -->
+                <article class="glass-card rounded-2xl p-6 hover-lift cursor-pointer animate-fade-in" style="animation-delay: 0.1s">
+                    <div class="mb-4">
+                        <span class="inline-block px-3 py-1 text-sm font-medium bg-accent/10 text-accent dark:bg-blue-900/30 dark:text-blue-300 rounded-full">Technology</span>
+                        <span class="inline-block ml-2 text-sm text-secondary">3 days ago</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-3">The Future of Web Development in 2024</h3>
+                    <p class="text-secondary mb-4">Exploring the latest trends and technologies shaping the future of web development, from AI integration to new frameworks.</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-secondary">8 min read</span>
+                        <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </div>
+                </article>
+
+                <!-- Article 2 -->
+                <article class="glass-card rounded-2xl p-6 hover-lift cursor-pointer animate-fade-in" style="animation-delay: 0.2s">
+                    <div class="mb-4">
+                        <span class="inline-block px-3 py-1 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 rounded-full">Design</span>
+                        <span class="inline-block ml-2 text-sm text-secondary">1 week ago</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-3">Minimalism in Modern Web Design</h3>
+                    <p class="text-secondary mb-4">How minimal design principles can create better user experiences and improve website performance.</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-secondary">6 min read</span>
+                        <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </div>
+                </article>
+
+                <!-- Article 3 -->
+                <article class="glass-card rounded-2xl p-6 hover-lift cursor-pointer animate-fade-in" style="animation-delay: 0.3s">
+                    <div class="mb-4">
+                        <span class="inline-block px-3 py-1 text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 rounded-full">Writing</span>
+                        <span class="inline-block ml-2 text-sm text-secondary">2 weeks ago</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-3">The Art of Technical Writing</h3>
+                    <p class="text-secondary mb-4">Tips and techniques for writing clear, concise, and engaging technical documentation that people actually want to read.</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-secondary">10 min read</span>
+                        <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </div>
+                </article>
+            </div>
+
+            <!-- View All Button -->
+            <div class="text-center">
+                <a href="#" class="inline-flex items-center text-accent hover:text-blue-600 dark:hover:text-blue-400 font-medium text-lg cursor-pointer group">
+                    View all articles
+                    <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl sm:text-5xl font-heading font-bold text-primary mb-4">Featured Projects</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">A selection of my recent work and collaborations</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Project 1 -->
+                <div class="glass-card rounded-2xl p-8 hover-lift cursor-pointer animate-fade-in">
+                    <div class="mb-6">
+                        <div class="w-full h-48 bg-gradient-to-r from-accent to-purple-500 dark:from-blue-600 dark:to-purple-700 rounded-xl mb-6"></div>
+                        <h3 class="text-2xl font-bold text-primary mb-3">Design System Builder</h3>
+                        <p class="text-secondary mb-4">A comprehensive tool for creating and managing design systems with real-time collaboration features.</p>
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-secondary rounded-full">React</span>
+                            <span class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-secondary rounded-full">TypeScript</span>
+                            <span class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-secondary rounded-full">Tailwind</span>
+                        </div>
+                        <a href="#" class="text-accent hover:text-blue-600 dark:hover:text-blue-400 font-medium inline-flex items-center cursor-pointer">
+                            View Project
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="glass-card rounded-2xl p-8 hover-lift cursor-pointer animate-fade-in" style="animation-delay: 0.1s">
+                    <div class="mb-6">
+                        <div class="w-full h-48 bg-gradient-to-r from-green-400 to-blue-500 dark:from-green-600 dark:to-blue-700 rounded-xl mb-6"></div>
+                        <h3 class="text-2xl font-bold text-primary mb-3">AI Writing Assistant</h3>
+                        <p class="text-secondary mb-4">An intelligent writing tool that helps content creators improve their writing with AI-powered suggestions.</p>
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-secondary rounded-full">Python</span>
+                            <span class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-secondary rounded-full">FastAPI</span>
+                            <span class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-secondary rounded-full">OpenAI</span>
+                        </div>
+                        <a href="#" class="text-accent hover:text-blue-600 dark:hover:text-blue-400 font-medium inline-flex items-center cursor-pointer">
+                            View Project
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section id="newsletter" class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-accent/10 to-purple-500/10 dark:from-blue-900/20 dark:to-purple-900/20">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="glass-card rounded-2xl p-8 sm:p-12">
+                <h2 class="text-4xl sm:text-5xl font-heading font-bold text-primary mb-6">Stay Updated</h2>
+                <p class="text-xl text-secondary mb-8 max-w-2xl mx-auto">
+                    Join 2,500+ subscribers who receive my weekly newsletter with the latest articles, insights, and resources.
+                </p>
+                
+                <form id="newsletterForm" class="max-w-md mx-auto">
+                    <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                        <input type="email" name="email" id="newsletter-email" placeholder="Your email address" required
+                               class="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
+                        <button type="submit" class="bg-accent text-white px-6 py-3 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors duration-200 font-medium cursor-pointer">
+                            Subscribe
+                        </button>
+                    </div>
+                    <p class="text-sm text-secondary">
+                        No spam, ever. Unsubscribe at any time.
+                    </p>
+                </form>
+                
+                <div class="mt-8 flex items-center justify-center space-x-6 text-secondary">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-primary">2.5K+</div>
+                        <div class="text-sm">Subscribers</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-primary">98%</div>
+                        <div class="text-sm">Open Rate</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-primary">50+</div>
+                        <div class="text-sm">Issues</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="animate-fade-in">
+                    <h2 class="text-4xl sm:text-5xl font-heading font-bold text-primary mb-6">About Me</h2>
+                    <div class="space-y-4 text-secondary">
+                        <p>I'm a passionate developer and writer with over 8 years of experience building digital products and sharing knowledge through writing.</p>
+                        <p>My work focuses on creating meaningful experiences through clean code, thoughtful design, and compelling storytelling.</p>
+                        <p>When I'm not coding or writing, you can find me hiking, reading science fiction, or experimenting with new cooking recipes.</p>
+                    </div>
+                    
+                    <div class="mt-8 flex flex-wrap gap-4">
+                        <a href="#" class="inline-flex items-center text-primary hover:text-accent cursor-pointer">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                            GitHub
+                        </a>
+                        <a href="#" class="inline-flex items-center text-primary hover:text-accent cursor-pointer">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                            LinkedIn
+                        </a>
+                        <a href="#" class="inline-flex items-center text-primary hover:text-accent cursor-pointer">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                            Twitter
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="relative animate-fade-in" style="animation-delay: 0.2s">
+                    <div class="w-64 h-64 mx-auto rounded-full bg-gradient-to-r from-accent to-purple-500 dark:from-blue-600 dark:to-purple-700 flex items-center justify-center">
+                        <div class="w-60 h-60 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center">
+                            <span class="text-6xl font-heading font-bold text-accent">AC</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 sm:px-6 lg:px-8 border-t border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <a href="#hero" class="flex items-center space-x-2 cursor-pointer">
+                        <span class="text-2xl font-heading font-bold text-accent">AC</span>
+                        <span class="text-lg font-body font-semibold text-primary">Alex Chen</span>
+                    </a>
+                    <p class="text-secondary mt-2">© 2024 All rights reserved.</p>
+                </div>
+                
+                <div class="flex space-x-6">
+                    <a href="#blog" class="text-secondary hover:text-primary transition-colors duration-200 cursor-pointer">Blog</a>
+                    <a href="#portfolio" class="text-secondary hover:text-primary transition-colors duration-200 cursor-pointer">Portfolio</a>
+                    <a href="#about" class="text-secondary hover:text-primary transition-colors duration-200 cursor-pointer">About</a>
+                    <a href="#newsletter" class="text-secondary hover:text-primary transition-colors duration-200 cursor-pointer">Newsletter</a>
+                    <a href="#" class="text-secondary hover:text-primary transition-colors duration-200 cursor-pointer">Contact</a>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-secondary text-sm">
+                <p>Built with ❤️ using HTML, Tailwind CSS v4, and JavaScript</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+const darkModeToggleMobile = document.getElementById('darkModeToggleMobile');
+        const sunIcon = document.getElementById('sunIcon');
+const sunIconMobile = document.getElementById('sunIconMobile');
+        const moonIcon = document.getElementById('moonIcon');
+const moonIconMobile = document.getElementById('moonIconMobile');
+        
+        // Function to toggle dark mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            
+            if (document.body.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                sunIconMobile.classList.add('hidden');
+                moonIconMobile.classList.remove('hidden');
+            } else {
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                sunIconMobile.classList.remove('hidden');
+                moonIconMobile.classList.add('hidden');
+            }
+        }
+        
+        // Check for saved theme or prefer-color-scheme
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        const currentTheme = localStorage.getItem('theme');
+        
+        if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
+            document.body.classList.add('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+            sunIconMobile.classList.add('hidden');
+            moonIconMobile.classList.remove('hidden');
+        }
+        
+        // Add event listeners for both toggle buttons
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+        darkModeToggleMobile.addEventListener('click', toggleDarkMode);
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        // Mobile Menu Toggle
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+        
+        // Newsletter Form Submission
+        const newsletterForm = document.getElementById('newsletterForm');
+        newsletterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('newsletter-email').value;
+            
+            // In a real application, you would send this to your backend
+            alert(`Thank you for subscribing with ${email}! You'll receive the next newsletter soon.`);
+            newsletterForm.reset();
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+        
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe elements for animation
+        document.querySelectorAll('.glass-card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

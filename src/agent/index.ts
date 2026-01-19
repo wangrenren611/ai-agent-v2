@@ -97,7 +97,7 @@ export default class Agent extends EventEmitter {
                     },
                     ...llmMessages
                 ], {
-                    model: 'deepseek-chat',
+                    model: process.env.AI_MODEL,
                     tools: tools.length > 0 ? tools : undefined,
                     max_tokens: this.maxOutputTokens,
                 });

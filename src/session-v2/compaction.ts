@@ -26,7 +26,7 @@ export class Compaction {
    getToken(history: Message[]){
     const totalUsed = this.calculateTotalUsage(history);
     const usableLimit = this.maxTokens - this.maxOutputTokens;
-
+    console.log(totalUsed)
     return {
       totalUsed,
      usableLimit:usableLimit*this.triggerRatio
@@ -169,7 +169,7 @@ export class Compaction {
   public calculateTotalUsage(messages: Message[]): number {
     return messages.reduce((acc, m) => {
       // 每条消息基础开销 4 tokens (role, name, newline)
-      return acc + this.estimate(m.content) + 4;
+      return acc + this.estimate(JSON.stringify(m)) + 4;
     }, 0);
   }
 
@@ -182,7 +182,7 @@ export class Compaction {
     const chineseChars = text.match(/[\u4e00-\u9fa5]/g)?.length || 0;
     const otherChars = text.length - chineseChars;
     return Math.ceil(
-      chineseChars * this.WEIGHT_ZH + otherChars * this.WEIGHT_EN,
+      text.length/4,
     );
   }
 
@@ -221,7 +221,7 @@ ${textToSummarize}
           },
         ],
         {
-          model: "deepseek-chat",
+          model: process.env.AI_MODEL,
           max_tokens: 8000,
           temperature: 0.3,
         },

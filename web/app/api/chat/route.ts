@@ -30,7 +30,9 @@ export async function POST(request: NextRequest) {
     const startTime = Date.now();
 
     // Run the agent
+    console.log('[Chat API] Starting agent.run for query:', query);
     const response = await agent.run(query);
+    console.log('[Chat API] Agent.run completed, response:', response?.content?.substring(0, 100));
 
     const duration = Date.now() - startTime;
 

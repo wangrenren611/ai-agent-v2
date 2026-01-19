@@ -73,8 +73,8 @@ async function startCLI(agent: Agent, sessionManager: SessionManager): Promise<v
  */
 async function main() {
     // 验证环境变量
-    const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
-    const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL;
+    const deepseekApiKey = process.env.KIMI_API_KEY;
+    const deepseekBaseUrl = process.env.KIMI_BASE_URL;
 
     if (!deepseekApiKey) {
         throw new Error('DEEPSEEK_API_KEY is not set');
