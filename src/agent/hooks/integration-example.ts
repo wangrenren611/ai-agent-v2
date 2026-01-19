@@ -6,7 +6,7 @@
 import { ScopedLogger } from "../../util/log";
 import { typedEventBus, createLoggingMiddleware } from "../../util/event-bus";
 import Agent from "../index-eventbus";
-import { HookManager } from "./index";
+import { HookManager, StatisticsHookPlugin } from "./index";
 import { 
     RateLimitHookPlugin, 
     SecurityHookPlugin, 
@@ -158,7 +158,7 @@ export async function runIntegrationExample() {
     
     // 10. 展示统计信息
     const statsPlugin = hookManager.getPlugin('statistics');
-    if (statsPlugin) {
+    if (statsPlugin instanceof StatisticsHookPlugin) {
         const stats = statsPlugin.getStats();
         logger.info(`Final statistics: ${JSON.stringify(stats)}`);
     }

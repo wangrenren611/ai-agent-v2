@@ -3,14 +3,58 @@
  * 提供预定义的钩子处理器和插件
  */
 
-import { AgentHook } from "../../util/event-bus-agent";
+import { AgentHook, AgentHookConfig } from "../../util/event-bus-agent";
 import { ScopedLogger } from "../../util/log";
+
+export type HookRegistration = {
+    hook: AgentHook;
+    handlerId: string;
+};
+
+export interface HookAgent {
+    registerHook<T>(
+        hook: AgentHook,
+        handler: (_data: T) => void | Promise<void>,
+        config?: AgentHookConfig
+    ): string;
+    unregisterHook?(hook: AgentHook, handlerId: string): boolean;
+    getEventBus?(): { emit: (event: string, data: any) => Promise<void> | void };
+}
+
+export interface HookPlugin {
+    registerAllHooks(agent: HookAgent): HookRegistration[];
+}
+
+type BeforeRunData = { query: string };
+type AfterRunData = { query: string; duration: number; response: { content: string } | null };
+type ErrorData = { error: Error; duration: number };
+type BeforeLLMCallData = { prompt: string; model?: string; tools?: unknown[]; iteration: number };
+type AfterLLMCallData = {
+    prompt: string;
+    model?: string;
+    tools?: unknown[];
+    response: string;
+    duration: number;
+    iteration: number;
+};
+type LLMResponseData = { content: string; toolCalls?: unknown[]; iteration: number };
+type BeforeToolCallData = { toolName: string; params: unknown; toolCallId: string; iteration: number };
+type AfterToolCallData = { toolName: string; result: unknown; duration: number; toolCallId: string; iteration: number };
+type ToolErrorData = { toolName: string; error: Error; params: unknown; toolCallId: string; iteration: number };
+type PerformanceData = {
+    totalDuration: number;
+    llmCalls: number;
+    toolCalls: number;
+    avgToolDuration: number;
+    avgLLMDuration: number;
+    iteration: number;
+};
 
 /**
  * 日志钩子插件
  * 记录 Agent 执行过程中的关键事件
  */
-export class LoggingHookPlugin {
+export class LoggingHookPlugin implements HookPlugin {
     private logger: ScopedLogger;
 
     constructor(loggerName = 'AgentHook') {
@@ -20,62 +64,54 @@ export class LoggingHookPlugin {
     /**
      * 注册所有日志钩子
      */
-    registerAllHooks(agent: any): string[] {
-        const handlerIds: string[] = [];
+    registerAllHooks(agent: HookAgent): HookRegistration[] {
+        const registrations: HookRegistration[] = [];
+        const register = <T>(
+            hook: AgentHook,
+            handler: (_data: T) => void | Promise<void>,
+            config?: AgentHookConfig
+        ) => {
+            const handlerId = agent.registerHook(hook, handler, config);
+            registrations.push({ hook, handlerId });
+        };
 
         // 运行开始/结束日志
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_RUN, (data: any) => {
+        register(AgentHook.BEFORE_RUN, (data: BeforeRunData) => {
                 this.logger.info(`Agent run starting: ${data.query}`);
-            }, { priority: 10 })
-        );
+            }, { priority: 10 });
 
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_RUN, (data: any) => {
+        register(AgentHook.AFTER_RUN, (data: AfterRunData) => {
                 this.logger.info(`Agent run completed: ${data.query} (${data.duration}ms)`);
-            }, { priority: 90 })
-        );
+            }, { priority: 90 });
 
         // LLM 调用日志
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_LLM_CALL, (data: any) => {
-                this.logger.debug(`LLM call #${data.iteration}: ${data.model}`);
-            }, { priority: 20 })
-        );
+        register(AgentHook.BEFORE_LLM_CALL, (data: BeforeLLMCallData) => {
+            this.logger.debug(`LLM call #${data.iteration}: ${data.model}`);
+        }, { priority: 20 });
 
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_LLM_CALL, (data: any) => {
-                this.logger.debug(`LLM call #${data.iteration} completed (${data.duration}ms)`);
-            }, { priority: 80 })
-        );
+        register(AgentHook.AFTER_LLM_CALL, (data: AfterLLMCallData) => {
+            this.logger.debug(`LLM call #${data.iteration} completed (${data.duration}ms)`);
+        }, { priority: 80 });
 
         // 工具调用日志
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_TOOL_CALL, (data: any) => {
-                this.logger.debug(`Tool call: ${data.toolName}(${JSON.stringify(data.params).slice(0, 100)}...)`);
-            }, { priority: 30 })
-        );
+        register(AgentHook.BEFORE_TOOL_CALL, (data: BeforeToolCallData) => {
+            this.logger.debug(`Tool call: ${data.toolName}(${JSON.stringify(data.params).slice(0, 100)}...)`);
+        }, { priority: 30 });
 
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_TOOL_CALL, (data: any) => {
-                this.logger.debug(`Tool ${data.toolName} completed (${data.duration}ms)`);
-            }, { priority: 70 })
-        );
+        register(AgentHook.AFTER_TOOL_CALL, (data: AfterToolCallData) => {
+            this.logger.debug(`Tool ${data.toolName} completed (${data.duration}ms)`);
+        }, { priority: 70 });
 
         // 错误日志
-        handlerIds.push(
-            agent.registerHook(AgentHook.ON_ERROR, (data: any) => {
+        register(AgentHook.ON_ERROR, (data: ErrorData) => {
                 this.logger.error(`Agent error: ${data.error.message} (${data.duration}ms)`);
-            }, { priority: 1 })
-        );
+            }, { priority: 1 });
 
-        handlerIds.push(
-            agent.registerHook(AgentHook.ON_TOOL_ERROR, (data: any) => {
+        register(AgentHook.ON_TOOL_ERROR, (data: ToolErrorData) => {
                 this.logger.error(`Tool error: ${data.toolName} - ${data.error.message}`);
-            }, { priority: 1 })
-        );
+            }, { priority: 1 });
 
-        return handlerIds;
+        return registrations;
     }
 }
 
@@ -83,7 +119,7 @@ export class LoggingHookPlugin {
  * 性能监控钩子插件
  * 监控 Agent 执行性能并报告慢操作
  */
-export class PerformanceHookPlugin {
+export class PerformanceHookPlugin implements HookPlugin {
     private logger: ScopedLogger;
     private slowToolThreshold: number; // 毫秒
     private slowLLMThreshold: number; // 毫秒
@@ -101,12 +137,19 @@ export class PerformanceHookPlugin {
     /**
      * 注册性能监控钩子
      */
-    registerAllHooks(agent: any): string[] {
-        const handlerIds: string[] = [];
+    registerAllHooks(agent: HookAgent): HookRegistration[] {
+        const registrations: HookRegistration[] = [];
+        const register = <T>(
+            hook: AgentHook,
+            handler: (_data: T) => void | Promise<void>,
+            config?: AgentHookConfig
+        ) => {
+            const handlerId = agent.registerHook(hook, handler, config);
+            registrations.push({ hook, handlerId });
+        };
 
         // 慢工具检测
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_TOOL_CALL, (data: any) => {
+        register(AgentHook.AFTER_TOOL_CALL, (data: AfterToolCallData) => {
                 if (data.duration > this.slowToolThreshold) {
                     this.logger.warn(`Slow tool detected: ${data.toolName} took ${data.duration}ms (threshold: ${this.slowToolThreshold}ms)`);
                     
@@ -118,12 +161,10 @@ export class PerformanceHookPlugin {
                         iteration: data.iteration,
                     });
                 }
-            }, { priority: 50 })
-        );
+            }, { priority: 50 });
 
         // 慢 LLM 检测
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_LLM_CALL, (data: any) => {
+        register(AgentHook.AFTER_LLM_CALL, (data: AfterLLMCallData) => {
                 if (data.duration > this.slowLLMThreshold) {
                     this.logger.warn(`Slow LLM call detected: iteration #${data.iteration} took ${data.duration}ms (threshold: ${this.slowLLMThreshold}ms)`);
                     
@@ -134,18 +175,15 @@ export class PerformanceHookPlugin {
                         iteration: data.iteration,
                     });
                 }
-            }, { priority: 50 })
-        );
+            }, { priority: 50 });
 
         // 性能指标汇总
-        handlerIds.push(
-            agent.registerHook(AgentHook.ON_PERFORMANCE_METRICS, (data: any) => {
+        register(AgentHook.ON_PERFORMANCE_METRICS, (data: PerformanceData) => {
                 this.logger.info(`Performance metrics: ${data.totalDuration}ms total, ${data.llmCalls} LLM calls, ${data.toolCalls} tool calls`);
                 this.logger.info(`Average LLM duration: ${data.avgLLMDuration.toFixed(2)}ms, Average tool duration: ${data.avgToolDuration.toFixed(2)}ms`);
-            }, { priority: 60 })
-        );
+            }, { priority: 60 });
 
-        return handlerIds;
+        return registrations;
     }
 }
 
@@ -153,7 +191,7 @@ export class PerformanceHookPlugin {
  * 消息验证钩子插件
  * 验证输入和输出消息的格式和内容
  */
-export class ValidationHookPlugin {
+export class ValidationHookPlugin implements HookPlugin {
     private logger: ScopedLogger;
 
     constructor(loggerName = 'ValidationHook') {
@@ -163,24 +201,29 @@ export class ValidationHookPlugin {
     /**
      * 注册验证钩子
      */
-    registerAllHooks(agent: any): string[] {
-        const handlerIds: string[] = [];
+    registerAllHooks(agent: HookAgent): HookRegistration[] {
+        const registrations: HookRegistration[] = [];
+        const register = <T>(
+            hook: AgentHook,
+            handler: (_data: T) => void | Promise<void>,
+            config?: AgentHookConfig
+        ) => {
+            const handlerId = agent.registerHook(hook, handler, config);
+            registrations.push({ hook, handlerId });
+        };
 
         // 运行前验证
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_RUN, (data: any) => {
+        register(AgentHook.BEFORE_RUN, (data: BeforeRunData) => {
                 if (!data.query || data.query.trim().length === 0) {
                     throw new Error('Query cannot be empty');
                 }
                 if (data.query.length > 10000) {
                     this.logger.warn(`Query is very long: ${data.query.length} characters`);
                 }
-            }, { priority: 5 })
-        );
+            }, { priority: 5 });
 
         // LLM 响应验证
-        handlerIds.push(
-            agent.registerHook(AgentHook.ON_LLM_RESPONSE, (data: any) => {
+        register(AgentHook.ON_LLM_RESPONSE, (data: LLMResponseData) => {
                 if (!data.content && (!data.toolCalls || data.toolCalls.length === 0)) {
                     this.logger.warn(`Empty LLM response in iteration #${data.iteration}`);
                 }
@@ -188,12 +231,10 @@ export class ValidationHookPlugin {
                 if (data.content && data.content.length > 5000) {
                     this.logger.debug(`Long LLM response: ${data.content.length} characters`);
                 }
-            }, { priority: 40 })
-        );
+            }, { priority: 40 });
 
         // 工具参数验证
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_TOOL_CALL, (data: any) => {
+        register(AgentHook.BEFORE_TOOL_CALL, (data: BeforeToolCallData) => {
                 if (!data.toolName || data.toolName.trim().length === 0) {
                     throw new Error('Tool name cannot be empty');
                 }
@@ -202,10 +243,9 @@ export class ValidationHookPlugin {
                 if (data.params && JSON.stringify(data.params).length > 10000) {
                     this.logger.warn(`Tool parameters are very large: ${JSON.stringify(data.params).length} characters`);
                 }
-            }, { priority: 25 })
-        );
+            }, { priority: 25 });
 
-        return handlerIds;
+        return registrations;
     }
 }
 
@@ -213,7 +253,7 @@ export class ValidationHookPlugin {
  * 统计钩子插件
  * 收集 Agent 执行统计信息
  */
-export class StatisticsHookPlugin {
+export class StatisticsHookPlugin implements HookPlugin {
     private stats = {
         totalRuns: 0,
         totalQueries: 0,
@@ -233,54 +273,50 @@ export class StatisticsHookPlugin {
     /**
      * 注册统计钩子
      */
-    registerAllHooks(agent: any): string[] {
-        const handlerIds: string[] = [];
+    registerAllHooks(agent: HookAgent): HookRegistration[] {
+        const registrations: HookRegistration[] = [];
+        const register = <T>(
+            hook: AgentHook,
+            handler: (_data: T) => void | Promise<void>,
+            config?: AgentHookConfig
+        ) => {
+            const handlerId = agent.registerHook(hook, handler, config);
+            registrations.push({ hook, handlerId });
+        };
 
         // 运行统计
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_RUN, () => {
+        register(AgentHook.BEFORE_RUN, () => {
                 this.stats.totalRuns++;
                 this.stats.totalQueries++;
-            }, { priority: 95 })
-        );
+            }, { priority: 95 });
 
         // LLM 调用统计
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_LLM_CALL, () => {
+        register(AgentHook.BEFORE_LLM_CALL, () => {
                 this.stats.totalLLMCalls++;
-            }, { priority: 95 })
-        );
+            }, { priority: 95 });
 
         // 工具调用统计
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_TOOL_CALL, () => {
+        register(AgentHook.BEFORE_TOOL_CALL, () => {
                 this.stats.totalToolCalls++;
-            }, { priority: 95 })
-        );
+            }, { priority: 95 });
 
         // 错误统计
-        handlerIds.push(
-            agent.registerHook(AgentHook.ON_ERROR, () => {
+        register(AgentHook.ON_ERROR, () => {
                 this.stats.totalErrors++;
-            }, { priority: 95 })
-        );
+            }, { priority: 95 });
 
         // 性能统计
-        handlerIds.push(
-            agent.registerHook(AgentHook.ON_PERFORMANCE_METRICS, (data: any) => {
+        register(AgentHook.ON_PERFORMANCE_METRICS, (data: PerformanceData) => {
                 this.stats.totalDuration += data.totalDuration;
                 this.stats.lastRunTime = Date.now();
-            }, { priority: 95 })
-        );
+            }, { priority: 95 });
 
         // 运行完成时打印统计
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_RUN, () => {
+        register(AgentHook.AFTER_RUN, () => {
                 this.logger.info(`Current statistics: ${JSON.stringify(this.getStats())}`);
-            }, { priority: 99 })
-        );
+            }, { priority: 99 });
 
-        return handlerIds;
+        return registrations;
     }
 
     /**
@@ -310,7 +346,7 @@ export class StatisticsHookPlugin {
  * 缓存钩子插件
  * 缓存 LLM 响应和工具结果
  */
-export class CacheHookPlugin {
+export class CacheHookPlugin implements HookPlugin {
     private cache = new Map<string, any>();
     private logger: ScopedLogger;
     private ttl: number; // 缓存存活时间（毫秒）
@@ -323,12 +359,19 @@ export class CacheHookPlugin {
     /**
      * 注册缓存钩子
      */
-    registerAllHooks(agent: any): string[] {
-        const handlerIds: string[] = [];
+    registerAllHooks(agent: HookAgent): HookRegistration[] {
+        const registrations: HookRegistration[] = [];
+        const register = <T>(
+            hook: AgentHook,
+            handler: (_data: T) => void | Promise<void>,
+            config?: AgentHookConfig
+        ) => {
+            const handlerId = agent.registerHook(hook, handler, config);
+            registrations.push({ hook, handlerId });
+        };
 
         // LLM 响应缓存
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_LLM_CALL, async (data: any) => {
+        register(AgentHook.BEFORE_LLM_CALL, async (data: BeforeLLMCallData) => {
                 const cacheKey = this.generateLLMCacheKey(data);
                 const cached = this.cache.get(cacheKey);
                 
@@ -337,23 +380,19 @@ export class CacheHookPlugin {
                     // 这里可以返回缓存的响应，但需要修改 Agent 流程
                     // 目前只记录命中率
                 }
-            }, { priority: 15 })
-        );
+            }, { priority: 15, async: true });
 
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_LLM_CALL, (data: any) => {
+        register(AgentHook.AFTER_LLM_CALL, (data: AfterLLMCallData) => {
                 const cacheKey = this.generateLLMCacheKey(data);
                 this.cache.set(cacheKey, {
                     response: data.response,
                     timestamp: Date.now(),
                 });
                 this.logger.debug(`Cached LLM response: ${cacheKey}`);
-            }, { priority: 85 })
-        );
+            }, { priority: 85 });
 
         // 工具结果缓存
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_TOOL_CALL, async (data: any) => {
+        register(AgentHook.BEFORE_TOOL_CALL, async (data: BeforeToolCallData) => {
                 const cacheKey = this.generateToolCacheKey(data);
                 const cached = this.cache.get(cacheKey);
                 
@@ -361,28 +400,25 @@ export class CacheHookPlugin {
                     this.logger.debug(`Cache hit for tool: ${data.toolName}`);
                     // 这里可以返回缓存的结果
                 }
-            }, { priority: 35 })
-        );
+            }, { priority: 35, async: true });
 
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_TOOL_CALL, (data: any) => {
+        register(AgentHook.AFTER_TOOL_CALL, (data: AfterToolCallData) => {
                 const cacheKey = this.generateToolCacheKey(data);
                 this.cache.set(cacheKey, {
                     result: data.result,
                     timestamp: Date.now(),
                 });
                 this.logger.debug(`Cached tool result: ${data.toolName}`);
-            }, { priority: 65 })
-        );
+            }, { priority: 65 });
 
-        return handlerIds;
+        return registrations;
     }
 
-    private generateLLMCacheKey(data: any): string {
+    private generateLLMCacheKey(data: BeforeLLMCallData | AfterLLMCallData): string {
         return `llm:${data.model}:${JSON.stringify(data.prompt)}:${JSON.stringify(data.tools || [])}`;
     }
 
-    private generateToolCacheKey(data: any): string {
+    private generateToolCacheKey(data: BeforeToolCallData | AfterToolCallData): string {
         return `tool:${data.toolName}:${JSON.stringify(data.params)}`;
     }
 
@@ -410,8 +446,8 @@ export class CacheHookPlugin {
  * 方便地管理多个钩子插件
  */
 export class HookManager {
-    private plugins = new Map<string, any>();
-    private registeredHandlers = new Map<string, string[]>();
+    private plugins = new Map<string, HookPlugin>();
+    private registeredHandlers = new Map<string, HookRegistration[]>();
     private logger: ScopedLogger;
 
     constructor(loggerName = 'HookManager') {
@@ -421,33 +457,35 @@ export class HookManager {
     /**
      * 注册插件
      */
-    registerPlugin(name: string, plugin: any, agent: any): void {
+    registerPlugin(name: string, plugin: HookPlugin, agent: HookAgent): void {
         if (this.plugins.has(name)) {
             this.logger.warn(`Plugin ${name} already registered, replacing`);
+            this.unregisterPlugin(name, agent);
         }
 
         this.plugins.set(name, plugin);
         
         // 注册插件的所有钩子
         if (plugin.registerAllHooks) {
-            const handlerIds = plugin.registerAllHooks(agent);
-            this.registeredHandlers.set(name, handlerIds);
-            this.logger.info(`Registered plugin ${name} with ${handlerIds.length} handlers`);
+            const registrations = plugin.registerAllHooks(agent);
+            this.registeredHandlers.set(name, registrations);
+            this.logger.info(`Registered plugin ${name} with ${registrations.length} handlers`);
         }
     }
 
     /**
      * 移除插件
      */
-    unregisterPlugin(name: string, _agent: any): boolean {
+    unregisterPlugin(name: string, agent: HookAgent): boolean {
         const plugin = this.plugins.get(name);
         if (!plugin) return false;
 
         // 移除插件的所有钩子
-        const handlerIds = this.registeredHandlers.get(name) || [];
-        for (const _handlerId of handlerIds) {
-            // 这里需要知道每个 handlerId 对应的钩子类型
-            // 简化实现：插件需要自己管理钩子移除
+        const registrations = this.registeredHandlers.get(name) || [];
+        if (agent.unregisterHook) {
+            for (const registration of registrations) {
+                agent.unregisterHook(registration.hook, registration.handlerId);
+            }
         }
 
         this.plugins.delete(name);
@@ -460,21 +498,21 @@ export class HookManager {
     /**
      * 获取所有插件
      */
-    getPlugins(): Map<string, any> {
+    getPlugins(): Map<string, HookPlugin> {
         return new Map(this.plugins);
     }
 
     /**
      * 获取插件
      */
-    getPlugin(name: string): any {
+    getPlugin(name: string): HookPlugin | undefined {
         return this.plugins.get(name);
     }
 
     /**
      * 注册默认插件集合
      */
-    registerDefaultPlugins(agent: any): void {
+    registerDefaultPlugins(agent: HookAgent): void {
         this.registerPlugin('logging', new LoggingHookPlugin(), agent);
         this.registerPlugin('performance', new PerformanceHookPlugin(), agent);
         this.registerPlugin('validation', new ValidationHookPlugin(), agent);

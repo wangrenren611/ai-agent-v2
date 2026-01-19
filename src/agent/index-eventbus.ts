@@ -3,12 +3,12 @@
  * 负责编排 LLM 调用和会话管理，集成事件驱动架构
  */
 import EventEmitter from "events";
-import { LLMProvider, ToolSchema } from "../providers/base";
+import { LLMProvider, LLMResponse, Message, ToolSchema } from "../providers/base";
 import { ScopedLogger } from "../util/log";
 import { formatToolResult } from "../util/log-format";
 import { SessionManager } from "../session-v2";
 import { SYSTEM_PROMPT } from "../prompts/system";
-import { ToolRegistry } from "../tool";
+import { ToolRegistry } from "../tool/registry";
 import { typedEventBus, createLoggingMiddleware } from "../util/event-bus";
 import { AgentHook, AgentHookConfig, AgentHookRegistration } from "../util/event-bus-agent";
 
@@ -28,12 +28,32 @@ export interface AgentConfig {
     eventBus?: any;
     /** 是否启用事件日志 */
     enableEventLogging?: boolean;
+    /** 工具并发上限，默认 4 */
+    toolConcurrency?: number;
+    /** 单次工具调用超时（毫秒），默认 120000 */
+    toolTimeoutMs?: number;
+    /** 连续重复的工具调用轮次上限，默认 2 */
+    noProgressLimit?: number;
+    /** 覆盖模型名称（可选），默认使用 AI_MODEL */
+    model?: string;
 }
 
 export interface AgentResponse {
     content: string;
     role: 'assistant';
 }
+
+type AgentMessage = {
+    role: 'user' | 'assistant' | 'tool' | 'system';
+    content: string;
+    type: 'text' | 'tool' | 'tool_call';
+    tool_call_id?: string;
+    tool_calls?: LLMResponse['tool_calls'];
+};
+
+type ToolCall = NonNullable<LLMResponse['tool_calls']>[number];
+type ToolCallResult = { toolCall: ToolCall; result: string; error?: string };
+type ToolStats = { calls: number; duration: number };
 
 export default class Agent extends EventEmitter {
     private llmProvider: LLMProvider;
@@ -44,6 +64,10 @@ export default class Agent extends EventEmitter {
     private maxLoop: number;
     private maxOutputTokens: number;
     private maxTokens: number;
+    private toolConcurrency: number;
+    private toolTimeoutMs: number;
+    private noProgressLimit: number;
+    private model: string | undefined;
     private eventBus: any;
     private hooks = new Map<AgentHook, AgentHookRegistration[]>();
     private hookCounter = 0;
@@ -55,10 +79,18 @@ export default class Agent extends EventEmitter {
         this.systemPrompt = config.systemPrompt || SYSTEM_PROMPT;
         this.defaultTools = config.defaultTools;
         this.logger = new ScopedLogger('Agent');
-        this.maxLoop = config.maxLoop || 1024;
-        this.maxOutputTokens = config.maxOutputTokens || this.llmProvider.maxOutputTokens;
-        this.maxTokens = config.maxTokens || this.llmProvider.maxTokens;
+        this.maxLoop = config.maxLoop ?? 10;
+        const providerMaxOutput = this.llmProvider.maxOutputTokens;
+        const providerMaxTokens = this.llmProvider.maxTokens;
+        this.maxOutputTokens = Math.min(config.maxOutputTokens ?? providerMaxOutput, providerMaxOutput);
+        this.maxTokens = Math.min(config.maxTokens ?? providerMaxTokens, providerMaxTokens);
         this.eventBus = config.eventBus || typedEventBus;
+        this.toolConcurrency = Math.max(1, config.toolConcurrency ?? 4);
+        this.toolTimeoutMs = config.toolTimeoutMs ?? 120000;
+        this.noProgressLimit = Math.max(0, config.noProgressLimit ?? 2);
+        this.model = config.model ?? process.env.AI_MODEL;
+        this.sessionManager.maxOutputTokens = this.maxOutputTokens;
+        this.sessionManager.maxTokens = this.maxTokens;
 
         // 启用事件日志中间件
         if (config.enableEventLogging !== false) {
@@ -75,15 +107,15 @@ export default class Agent extends EventEmitter {
         config: AgentHookConfig = {}
     ): string {
         const handlerId = `hook_${++this.hookCounter}_${Date.now()}`;
+        const normalizedConfig: Required<AgentHookConfig> = {
+            priority: config.priority ?? 100,
+            async: config.async ?? false,
+            timeout: config.timeout ?? 5000,
+        };
         const registration: AgentHookRegistration = {
             hook,
             handler,
-            config: {
-                priority: config.priority || 100,
-                async: config.async || false,
-                timeout: config.timeout || 5000,
-                ...config,
-            },
+            config: normalizedConfig,
             handlerId,
         };
 
@@ -145,32 +177,7 @@ export default class Agent extends EventEmitter {
         try {
             // 按优先级顺序执行钩子
             for (const registration of hooks) {
-                const { handler, config } = registration;
-
-                try {
-                    if (config.async) {
-                        // 异步执行，带超时
-                        await Promise.race([
-                            handler(data),
-                            new Promise((_, reject) => 
-                                setTimeout(() => reject(new Error(`Hook timeout: ${hook}`)), config.timeout)
-                            ),
-                        ]);
-                    } else {
-                        // 同步执行
-                        handler(data);
-                    }
-                } catch (error) {
-                    // 发布钩子错误事件
-                    await this.eventBus.emit('agent.hook.error', {
-                        hookName: hook,
-                        error: error instanceof Error ? error : new Error(String(error)),
-                        handlerId: registration.handlerId,
-                    });
-                    
-                    // 继续执行其他钩子，不中断流程
-                    this.logger.warn(`Hook error in ${hook}: ${error}`);
-                }
+                await this.executeHookHandler(registration, hook, data);
             }
 
             // 发布钩子完成事件
@@ -185,6 +192,428 @@ export default class Agent extends EventEmitter {
         } catch (error) {
             this.logger.error(`Failed to trigger hook ${hook}: ${error}`);
         }
+    }
+
+    private isPromiseLike(value: unknown): value is Promise<unknown> {
+        return !!value && typeof (value as Promise<unknown>).then === 'function';
+    }
+
+    private async executeHookHandler<T>(
+        registration: AgentHookRegistration,
+        hook: AgentHook,
+        data: T
+    ): Promise<void> {
+        const { handler, config } = registration;
+        try {
+            const result = handler(data);
+            if (config.async) {
+                await this.withTimeout(
+                    Promise.resolve(result),
+                    config.timeout ?? 5000,
+                    `Hook timeout: ${hook}`
+                );
+                return;
+            }
+
+            if (this.isPromiseLike(result)) {
+                result.catch(async (error) => {
+                    await this.eventBus.emit('agent.hook.error', {
+                        hookName: hook,
+                        error: error instanceof Error ? error : new Error(String(error)),
+                        handlerId: registration.handlerId,
+                    });
+                    this.logger.warn(`Hook error in ${hook}: ${error}`);
+                });
+            }
+        } catch (error) {
+            await this.eventBus.emit('agent.hook.error', {
+                hookName: hook,
+                error: error instanceof Error ? error : new Error(String(error)),
+                handlerId: registration.handlerId,
+            });
+            this.logger.warn(`Hook error in ${hook}: ${error}`);
+        }
+    }
+
+    private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
+        if (!timeoutMs || timeoutMs <= 0) {
+            return promise;
+        }
+
+        let timeoutId: ReturnType<typeof setTimeout> | undefined;
+        const timeoutPromise = new Promise<never>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+        });
+
+        return Promise.race([promise, timeoutPromise]).finally(() => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+        });
+    }
+
+    private async runWithConcurrency<T, R>(
+        items: T[],
+        limit: number,
+        task: (item: T, index: number) => Promise<R>
+    ): Promise<R[]> {
+        if (items.length === 0) {
+            return [];
+        }
+
+        if (limit <= 1) {
+            const results: R[] = [];
+            for (let i = 0; i < items.length; i++) {
+                results.push(await task(items[i], i));
+            }
+            return results;
+        }
+
+        const results = new Array<R>(items.length);
+        let nextIndex = 0;
+        const workerCount = Math.min(limit, items.length);
+
+        const workers = Array.from({ length: workerCount }, async () => {
+            while (true) {
+                const currentIndex = nextIndex++;
+                if (currentIndex >= items.length) {
+                    break;
+                }
+                results[currentIndex] = await task(items[currentIndex], currentIndex);
+            }
+        });
+
+        await Promise.all(workers);
+        return results;
+    }
+
+    private buildToolSignature(toolCalls: NonNullable<LLMResponse['tool_calls']>): string {
+        try {
+            return JSON.stringify(
+                toolCalls.map((call) => ({
+                    name: call.function.name,
+                    arguments: call.function.arguments,
+                }))
+            );
+        } catch (_) {
+            return '';
+        }
+    }
+
+    private resolveTools(options?: { tools?: ToolSchema[] }): ToolSchema[] {
+        return options?.tools ?? this.defaultTools ?? ToolRegistry.getSchemas();
+    }
+
+    private normalizeToolSchemas(tools: ToolSchema[]): ToolSchema[] | undefined {
+        return tools.length > 0 ? tools : undefined;
+    }
+
+    private async recordMessage(message: AgentMessage): Promise<void> {
+        this.sessionManager.addMessage(message);
+        await this.eventBus.emit('agent.message.added', {
+            role: message.role,
+            content: message.content,
+            type: message.type,
+        });
+    }
+
+    private async generateLLMResponse(params: {
+        query: string;
+        llmMessages: Message[];
+        toolSchemas?: ToolSchema[];
+        iteration: number;
+        model?: string;
+    }): Promise<{ response: LLMResponse | null; duration: number }> {
+        const { query, llmMessages, toolSchemas, iteration, model } = params;
+        const spinner = this.logger.spinner(`Thinking-${iteration}...`);
+
+        await this.triggerHook(AgentHook.BEFORE_LLM_CALL, {
+            prompt: query,
+            model,
+            tools: toolSchemas,
+            iteration,
+        });
+
+        const llmStartTime = Date.now();
+        await this.eventBus.emit('agent.llm.call.start', {
+            prompt: query,
+            model,
+            tools: toolSchemas,
+            iteration,
+        });
+
+        let llmResponse: LLMResponse | null = null;
+        try {
+            llmResponse = await this.llmProvider.generate([
+                {
+                    role: 'system',
+                    content: this.systemPrompt,
+                },
+                ...llmMessages,
+            ], {
+                model,
+                tools: toolSchemas,
+                max_tokens: this.maxOutputTokens,
+            });
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : String(error);
+            spinner.fail(`Thinking-${iteration} failed`);
+            await this.eventBus.emit('agent.llm.call.error', {
+                error: new Error(errorMsg),
+                prompt: query,
+                iteration,
+            });
+            throw error;
+        }
+
+        const llmDuration = Date.now() - llmStartTime;
+
+        if (!llmResponse) {
+            await this.eventBus.emit('agent.llm.call.error', {
+                error: new Error('LLM returned null response'),
+                prompt: query,
+                iteration,
+            });
+
+            this.logger.error("LLM error");
+            spinner.fail(`Thinking-${iteration} failed`);
+            return { response: null, duration: llmDuration };
+        }
+
+        spinner.succeed(`Thinking-${iteration} end`);
+
+        await this.eventBus.emit('agent.llm.call.complete', {
+            response: llmResponse.content,
+            hasToolCalls: !!(llmResponse.tool_calls && llmResponse.tool_calls.length > 0),
+            duration: llmDuration,
+            iteration,
+        });
+
+        await this.triggerHook(AgentHook.AFTER_LLM_CALL, {
+            prompt: query,
+            model,
+            tools: toolSchemas,
+            response: llmResponse.content,
+            toolCalls: llmResponse.tool_calls,
+            duration: llmDuration,
+            iteration,
+        });
+
+        await this.triggerHook(AgentHook.ON_LLM_RESPONSE, {
+            content: llmResponse.content,
+            toolCalls: llmResponse.tool_calls,
+            iteration,
+        });
+
+        await this.eventBus.emit('agent.llm.response.received', {
+            content: llmResponse.content,
+            toolCalls: llmResponse.tool_calls,
+            iteration,
+        });
+
+        return { response: llmResponse, duration: llmDuration };
+    }
+
+    private async executeToolCall(
+        toolCall: ToolCall,
+        iteration: number,
+        options: { silent?: boolean } | undefined,
+        stats: ToolStats
+    ): Promise<ToolCallResult> {
+        const { id, function: fn } = toolCall;
+
+        await this.triggerHook(AgentHook.BEFORE_TOOL_CALL, {
+            toolName: fn.name,
+            params: fn.arguments,
+            toolCallId: id,
+            iteration,
+        });
+
+        const toolStartTime = Date.now();
+        await this.eventBus.emit('agent.tool.call.start', {
+            toolName: fn.name,
+            params: fn.arguments,
+            toolCallId: id,
+            iteration,
+        });
+
+        try {
+            await this.eventBus.emit('agent.tool.params.parse.start', {
+                toolName: fn.name,
+                rawArguments: fn.arguments,
+                toolCallId: id,
+            });
+
+            let args: unknown;
+            try {
+                args = JSON.parse(fn.arguments);
+                await this.eventBus.emit('agent.tool.params.parse.complete', {
+                    toolName: fn.name,
+                    parsedParams: args,
+                    toolCallId: id,
+                });
+            } catch (parseError) {
+                const truncatedArgs = fn.arguments.length > 200
+                    ? fn.arguments.slice(0, 200) + '...'
+                    : fn.arguments;
+                const parseErrorMsg = parseError instanceof Error ? parseError.message : String(parseError);
+                const errorMsg = `Invalid JSON in tool parameters: ${parseErrorMsg}\nReceived: ${truncatedArgs}`;
+
+                await this.eventBus.emit('agent.tool.params.parse.error', {
+                    toolName: fn.name,
+                    rawArguments: fn.arguments,
+                    error: new Error(errorMsg),
+                    toolCallId: id,
+                });
+
+                this.logger.error(errorMsg);
+                return {
+                    toolCall,
+                    result: `Error: Failed to parse tool arguments. The JSON was malformed. Please try again with properly formatted parameters.`,
+                    error: errorMsg,
+                };
+            }
+
+            const spinner = this.logger.spinner(`Tool ${fn.name}(...)`);
+
+            let result: string;
+            try {
+                result = await this.withTimeout(
+                    ToolRegistry.execute(fn.name, args),
+                    this.toolTimeoutMs,
+                    `Tool ${fn.name} timed out after ${this.toolTimeoutMs}ms`
+                );
+                spinner.succeed(`Tool ${fn.name} completed`);
+            } catch (error) {
+                spinner.fail(`Tool ${fn.name} failed`);
+                throw error;
+            }
+
+            if (!options?.silent) {
+                this.logger.info(`Tool ${fn.name} result: ${formatToolResult(fn.name, result)}`);
+            }
+
+            const toolDuration = Date.now() - toolStartTime;
+            stats.calls += 1;
+            stats.duration += toolDuration;
+
+            await this.triggerHook(AgentHook.AFTER_TOOL_CALL, {
+                toolName: fn.name,
+                result,
+                duration: toolDuration,
+                toolCallId: id,
+                iteration,
+            });
+
+            await this.eventBus.emit('agent.tool.call.complete', {
+                toolName: fn.name,
+                result,
+                duration: toolDuration,
+                toolCallId: id,
+                iteration,
+            });
+
+            return { toolCall, result, error: undefined };
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : String(error);
+
+            await this.triggerHook(AgentHook.ON_TOOL_ERROR, {
+                toolName: fn.name,
+                error: error instanceof Error ? error : new Error(errorMsg),
+                params: fn.arguments,
+                toolCallId: id,
+                iteration,
+            });
+
+            await this.eventBus.emit('agent.tool.call.error', {
+                toolName: fn.name,
+                error: error instanceof Error ? error : new Error(errorMsg),
+                params: fn.arguments,
+                toolCallId: id,
+                iteration,
+            });
+
+            this.logger.error(`Tool execution error: ${errorMsg}`);
+
+            return { toolCall, result: `Error: ${errorMsg}`, error: errorMsg };
+        }
+    }
+
+    private async handleToolCalls(params: {
+        toolCalls: ToolCall[];
+        content: string;
+        iteration: number;
+        options?: { silent?: boolean };
+        stats: ToolStats;
+        progress: { lastToolSignature: string | null; repeatedToolCalls: number };
+    }): Promise<{ lastToolSignature: string | null; repeatedToolCalls: number }> {
+        const { toolCalls, content, iteration, options, stats, progress } = params;
+
+        const toolSignature = this.buildToolSignature(toolCalls);
+        if (toolSignature && toolSignature === progress.lastToolSignature) {
+            progress.repeatedToolCalls += 1;
+        } else {
+            progress.repeatedToolCalls = 0;
+            progress.lastToolSignature = toolSignature;
+        }
+
+        if (this.noProgressLimit > 0 && progress.repeatedToolCalls >= this.noProgressLimit) {
+            throw new Error(
+                `Repeated tool_calls detected for ${this.noProgressLimit + 1} iterations, aborting to prevent loop.`
+            );
+        }
+
+        await this.recordMessage({
+            role: 'assistant',
+            content,
+            type: 'tool_call',
+            tool_calls: toolCalls,
+        });
+
+        this.logger.info(`Tool tips: ${content}`);
+
+        const toolsBatchStartTime = Date.now();
+        await this.eventBus.emit('agent.tools.batch.start', {
+            toolCalls,
+            iteration,
+        });
+
+        const toolConcurrency = Math.min(this.toolConcurrency, toolCalls.length);
+        const results = await this.runWithConcurrency(toolCalls, toolConcurrency, (toolCall) => (
+            this.executeToolCall(toolCall, iteration, options, stats)
+        ));
+
+        for (const { toolCall, result } of results) {
+            await this.recordMessage({
+                role: 'tool',
+                content: result,
+                type: 'tool',
+                tool_call_id: toolCall.id,
+            });
+        }
+
+        const toolsBatchDuration = Date.now() - toolsBatchStartTime;
+        await this.eventBus.emit('agent.tools.batch.complete', {
+            results: results.map(r => ({
+                toolName: r.toolCall.function.name,
+                result: r.result,
+                error: r.error,
+            })),
+            duration: toolsBatchDuration,
+            iteration,
+        });
+
+        await this.eventBus.emit('agent.loop.complete', {
+            iteration,
+            hasToolCalls: true,
+        });
+
+        await this.triggerHook(AgentHook.AFTER_LOOP_ITERATION, {
+            iteration,
+            hasToolCalls: true,
+        });
+
+        return { ...progress };
     }
 
     /**
@@ -203,30 +632,20 @@ export default class Agent extends EventEmitter {
             // 发布运行开始事件
             await this.eventBus.emit('agent.run.start', { query });
 
-            // 初始化统计变量
-            let totalToolCalls = 0;
-            let totalToolDuration = 0;
+            const model = this.model;
+            const toolSchemas = this.normalizeToolSchemas(this.resolveTools(options));
+            const toolStats: ToolStats = { calls: 0, duration: 0 };
 
-            // 1. 获取工具 schemas
-            const tools = options?.tools ?? this.defaultTools ?? ToolRegistry.getSchemas();
-
-            // 2. 添加用户消息
-            this.sessionManager.addMessage({
+            await this.recordMessage({
                 role: 'user',
                 type: 'text',
                 content: query,
-            });
-
-            // 发布消息添加事件
-            await this.eventBus.emit('agent.message.added', {
-                role: 'user',
-                content: query,
-                type: 'text',
             });
 
             // 3. LLM 调用循环
             let i = 0;
             let finalResponse: AgentResponse | null = null;
+            const progress = { lastToolSignature: null as string | null, repeatedToolCalls: 0 };
 
             while (i < this.maxLoop) {
                 i++;
@@ -246,290 +665,39 @@ export default class Agent extends EventEmitter {
                     iteration: i,
                 });
 
-                const spinner = this.logger.spinner(`Thinking-${i}...`);
-
-                // 触发 LLM 调用前钩子
-                await this.triggerHook(AgentHook.BEFORE_LLM_CALL, {
-                    prompt: query,
-                    model: 'deepseek-chat',
-                    tools: tools.length > 0 ? tools : undefined,
+                const { response: llmResponse } = await this.generateLLMResponse({
+                    query,
+                    llmMessages,
+                    toolSchemas,
                     iteration: i,
+                    model,
                 });
-
-                // 发布 LLM 调用开始事件
-                const llmStartTime = Date.now();
-                await this.eventBus.emit('agent.llm.call.start', {
-                    prompt: query,
-                    model: 'deepseek-chat',
-                    tools: tools.length > 0 ? tools : undefined,
-                    iteration: i,
-                });
-
-                // 调用 LLM
-                const llmResponse = await this.llmProvider.generate([
-                    {
-                        role: 'system',
-                        content: this.systemPrompt,
-                    },
-                    ...llmMessages,
-                ], {
-                    model: 'deepseek-chat',
-                    tools: tools.length > 0 ? tools : undefined,
-                    max_tokens: this.maxOutputTokens,
-                });
-
-                const llmDuration = Date.now() - llmStartTime;
-                spinner.succeed(`Thinking-${i} end`);
-
                 if (!llmResponse) {
-                    // 发布 LLM 错误事件
-                    await this.eventBus.emit('agent.llm.call.error', {
-                        error: new Error('LLM returned null response'),
-                        prompt: query,
-                        iteration: i,
-                    });
-
-                    this.logger.error("LLM error");
                     return null;
                 }
 
-                // 发布 LLM 调用完成事件
-                await this.eventBus.emit('agent.llm.call.complete', {
-                    response: llmResponse.content,
-                    hasToolCalls: !!(llmResponse.tool_calls && llmResponse.tool_calls.length > 0),
-                    duration: llmDuration,
-                    iteration: i,
-                });
-
-                // 触发 LLM 响应钩子
-                await this.triggerHook(AgentHook.ON_LLM_RESPONSE, {
-                    content: llmResponse.content,
-                    toolCalls: llmResponse.tool_calls,
-                    iteration: i,
-                });
-
-                // 发布 LLM 响应接收事件
-                await this.eventBus.emit('agent.llm.response.received', {
-                    content: llmResponse.content,
-                    toolCalls: llmResponse.tool_calls,
-                    iteration: i,
-                });
-
                 // 检查是否有工具调用
                 if (llmResponse.tool_calls && llmResponse.tool_calls.length > 0) {
-                    // 添加 assistant 消息
-                    this.sessionManager.addMessage({
-                        role: 'assistant',
-                        content: llmResponse.content,
-                        type: 'tool_call',
-                        tool_calls: llmResponse.tool_calls,
-                    });
-
-                    // 发布消息添加事件
-                    await this.eventBus.emit('agent.message.added', {
-                        role: 'assistant',
-                        content: llmResponse.content,
-                        type: 'tool_call',
-                    });
-
-                    this.logger.info(`Tool tips: ${llmResponse.content}`);
-
-                    // 发布工具批量开始事件
-                    const toolsBatchStartTime = Date.now();
-                    await this.eventBus.emit('agent.tools.batch.start', {
+                    const updatedProgress = await this.handleToolCalls({
                         toolCalls: llmResponse.tool_calls,
+                        content: llmResponse.content,
                         iteration: i,
+                        options,
+                        stats: toolStats,
+                        progress,
                     });
-
-                    // 并行执行所有工具调用
-                    const toolPromises = llmResponse.tool_calls.map(async (toolCall) => {
-                        const { id, function: fn } = toolCall;
-
-                        // 触发工具调用前钩子
-                        await this.triggerHook(AgentHook.BEFORE_TOOL_CALL, {
-                            toolName: fn.name,
-                            params: fn.arguments,
-                            toolCallId: id,
-                            iteration: i,
-                        });
-
-                        // 发布工具调用开始事件
-                        const toolStartTime = Date.now();
-                        await this.eventBus.emit('agent.tool.call.start', {
-                            toolName: fn.name,
-                            params: fn.arguments,
-                            toolCallId: id,
-                            iteration: i,
-                        });
-
-                        try {
-                            // 发布参数解析开始事件
-                            await this.eventBus.emit('agent.tool.params.parse.start', {
-                                toolName: fn.name,
-                                rawArguments: fn.arguments,
-                                toolCallId: id,
-                            });
-
-                            // 解析参数
-                            let args: unknown;
-                            try {
-                                args = JSON.parse(fn.arguments);
-                                
-                                // 发布参数解析完成事件
-                                await this.eventBus.emit('agent.tool.params.parse.complete', {
-                                    toolName: fn.name,
-                                    parsedParams: args,
-                                    toolCallId: id,
-                                });
-                            } catch (parseError) {
-                                const truncatedArgs = fn.arguments.length > 200
-                                    ? fn.arguments.slice(0, 200) + '...'
-                                    : fn.arguments;
-                                const parseErrorMsg = parseError instanceof Error ? parseError.message : String(parseError);
-                                const errorMsg = `Invalid JSON in tool parameters: ${parseErrorMsg}\nReceived: ${truncatedArgs}`;
-                                
-                                // 发布参数解析错误事件
-                                await this.eventBus.emit('agent.tool.params.parse.error', {
-                                    toolName: fn.name,
-                                    rawArguments: fn.arguments,
-                                    error: new Error(errorMsg),
-                                    toolCallId: id,
-                                });
-
-                                this.logger.error(errorMsg);
-                                return {
-                                    toolCall,
-                                    result: `Error: Failed to parse tool arguments. The JSON was malformed. Please try again with properly formatted parameters.`,
-                                    error: errorMsg,
-                                };
-                            }
-
-                            const spinner = this.logger.spinner(`Tool ${fn.name}(...)`);
-
-                            // 执行工具
-                            const result = await ToolRegistry.execute(fn.name, args);
-                            spinner.succeed(`Tool ${fn.name} completed`);
-
-                            if (!options?.silent) {
-                                this.logger.info(`Tool ${fn.name} result: ${formatToolResult(fn.name, result)}`);
-                            }
-
-                            const toolDuration = Date.now() - toolStartTime;
-                            
-                            // 更新统计
-                            totalToolCalls++;
-                            totalToolDuration += toolDuration;
-
-                            // 触发工具调用后钩子
-                            await this.triggerHook(AgentHook.AFTER_TOOL_CALL, {
-                                toolName: fn.name,
-                                result,
-                                duration: toolDuration,
-                                toolCallId: id,
-                                iteration: i,
-                            });
-
-                            // 发布工具调用完成事件
-                            await this.eventBus.emit('agent.tool.call.complete', {
-                                toolName: fn.name,
-                                result,
-                                duration: toolDuration,
-                                toolCallId: id,
-                                iteration: i,
-                            });
-
-                            return { toolCall, result, error: undefined };
-                        } catch (error) {
-                            const errorMsg = error instanceof Error ? error.message : String(error);
-                            // 工具执行时间（当前未使用）
-
-                            // 触发工具错误钩子
-                            await this.triggerHook(AgentHook.ON_TOOL_ERROR, {
-                                toolName: fn.name,
-                                error: error instanceof Error ? error : new Error(errorMsg),
-                                params: fn.arguments,
-                                toolCallId: id,
-                                iteration: i,
-                            });
-
-                            // 发布工具调用错误事件
-                            await this.eventBus.emit('agent.tool.call.error', {
-                                toolName: fn.name,
-                                error: error instanceof Error ? error : new Error(errorMsg),
-                                params: fn.arguments,
-                                toolCallId: id,
-                                iteration: i,
-                            });
-
-                            this.logger.error(`Tool execution error: ${errorMsg}`);
-
-                            return { toolCall, result: `Error: ${errorMsg}`, error: errorMsg };
-                        }
-                    });
-
-                    // 等待所有工具调用完成
-                    const results = await Promise.all(toolPromises);
-
-                    // 按原始顺序添加工具结果消息
-                    for (const { toolCall, result } of results) {
-                        const { id } = toolCall;
-
-                        this.sessionManager.addMessage({
-                            role: 'tool',
-                            content: result,
-                            type: 'tool',
-                            tool_call_id: id,
-                        });
-
-                        // 发布消息添加事件
-                        await this.eventBus.emit('agent.message.added', {
-                            role: 'tool',
-                            content: result,
-                            type: 'tool',
-                        });
-                    }
-
-                    const toolsBatchDuration = Date.now() - toolsBatchStartTime;
-
-                    // 发布工具批量完成事件
-                    await this.eventBus.emit('agent.tools.batch.complete', {
-                        results: results.map(r => ({
-                            toolName: r.toolCall.function.name,
-                            result: r.result,
-                            error: r.error,
-                        })),
-                        duration: toolsBatchDuration,
-                        iteration: i,
-                    });
-
-                    // 发布循环完成事件
-                    await this.eventBus.emit('agent.loop.complete', {
-                        iteration: i,
-                        hasToolCalls: true,
-                    });
-
-                    // 触发循环迭代后钩子
-                    await this.triggerHook(AgentHook.AFTER_LOOP_ITERATION, {
-                        iteration: i,
-                        hasToolCalls: true,
-                    });
+                    progress.lastToolSignature = updatedProgress.lastToolSignature;
+                    progress.repeatedToolCalls = updatedProgress.repeatedToolCalls;
 
                     // 继续循环
                     continue;
                 }
 
                 // 没有工具调用，这是最终响应
-                this.sessionManager.addMessage({
+                await this.recordMessage({
                     role: 'assistant',
                     type: 'text',
                     content: llmResponse.content,
-                });
-
-                // 发布消息添加事件
-                await this.eventBus.emit('agent.message.added', {
-                    role: 'assistant',
-                    content: llmResponse.content,
-                    type: 'text',
                 });
 
                 finalResponse = {
@@ -576,8 +744,8 @@ export default class Agent extends EventEmitter {
             await this.eventBus.emit('agent.performance.metrics', {
                 totalDuration,
                 llmCalls: i,
-                toolCalls: totalToolCalls,
-                avgToolDuration: totalToolCalls > 0 ? totalToolDuration / totalToolCalls : 0,
+                toolCalls: toolStats.calls,
+                avgToolDuration: toolStats.calls > 0 ? toolStats.duration / toolStats.calls : 0,
                 avgLLMDuration: totalDuration / i,
                 iteration: i,
             });
@@ -586,8 +754,8 @@ export default class Agent extends EventEmitter {
             await this.triggerHook(AgentHook.ON_PERFORMANCE_METRICS, {
                 totalDuration,
                 llmCalls: i,
-                toolCalls: totalToolCalls,
-                avgToolDuration: totalToolCalls > 0 ? totalToolDuration / totalToolCalls : 0,
+                toolCalls: toolStats.calls,
+                avgToolDuration: toolStats.calls > 0 ? toolStats.duration / toolStats.calls : 0,
                 avgLLMDuration: totalDuration / i,
                 iteration: i,
             });

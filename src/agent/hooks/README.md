@@ -97,10 +97,6 @@ cachePlugin.registerAllHooks(agent);
 - `AgentHook.AFTER_TOOL_CALL` - 工具调用后
 - `AgentHook.ON_TOOL_ERROR` - 工具调用错误时
 
-### 消息钩子
-- `AgentHook.BEFORE_MESSAGE_ADD` - 添加消息前
-- `AgentHook.AFTER_MESSAGE_ADD` - 添加消息后
-
 ### 循环钩子
 - `AgentHook.BEFORE_LOOP_ITERATION` - 循环迭代前
 - `AgentHook.AFTER_LOOP_ITERATION` - 循环迭代后

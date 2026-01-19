@@ -4,12 +4,13 @@
  */
 
 import { AgentHook } from "../../util/event-bus-agent";
+import type { HookAgent, HookPlugin, HookRegistration } from "./index";
 import { ScopedLogger } from "../../util/log";
 
 /**
  * 示例 1: 自定义钩子插件 - 请求限流
  */
-export class RateLimitHookPlugin {
+export class RateLimitHookPlugin implements HookPlugin {
     private logger: ScopedLogger;
     private requestCount = 0;
     private lastResetTime = Date.now();
@@ -20,15 +21,20 @@ export class RateLimitHookPlugin {
         this.limitPerMinute = limitPerMinute;
     }
 
-    registerAllHooks(agent: any): string[] {
-        const handlerIds: string[] = [];
+    registerAllHooks(agent: HookAgent): HookRegistration[] {
+        const registrations: HookRegistration[] = [];
+        const register = <T>(
+            hook: AgentHook,
+            handler: (_data: T) => void | Promise<void>
+        ) => {
+            const handlerId = agent.registerHook(hook, handler, { priority: 2 });
+            registrations.push({ hook, handlerId });
+        };
 
         // 运行前检查限流
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_RUN, (data: any) => {
-                this.checkRateLimit(data.query);
-            }, { priority: 2 })
-        );
+        register(AgentHook.BEFORE_RUN, (data: any) => {
+            this.checkRateLimit(data.query);
+        });
 
         // 每分钟重置计数器
         setInterval(() => {
@@ -37,7 +43,7 @@ export class RateLimitHookPlugin {
             this.logger.debug('Rate limit counter reset');
         }, 60 * 1000);
 
-        return handlerIds;
+        return registrations;
     }
 
     private checkRateLimit(_query: string): void {
@@ -71,37 +77,41 @@ export class RateLimitHookPlugin {
 /**
  * 示例 2: 自定义钩子插件 - 响应格式化
  */
-export class ResponseFormatHookPlugin {
+export class ResponseFormatHookPlugin implements HookPlugin {
     private logger: ScopedLogger;
 
     constructor(loggerName = 'ResponseFormatHook') {
         this.logger = new ScopedLogger(loggerName);
     }
 
-    registerAllHooks(agent: any): string[] {
-        const handlerIds: string[] = [];
+    registerAllHooks(agent: HookAgent): HookRegistration[] {
+        const registrations: HookRegistration[] = [];
+        const register = <T>(
+            hook: AgentHook,
+            handler: (_data: T) => void | Promise<void>,
+            priority: number
+        ) => {
+            const handlerId = agent.registerHook(hook, handler, { priority });
+            registrations.push({ hook, handlerId });
+        };
 
         // 格式化最终响应
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_RUN, (data: any) => {
-                if (data.response && data.response.content) {
-                    const formatted = this.formatResponse(data.response.content);
-                    data.response.content = formatted;
-                    this.logger.debug('Formatted response');
-                }
-            }, { priority: 80 })
-        );
+        register(AgentHook.AFTER_RUN, (data: any) => {
+            if (data.response && data.response.content) {
+                const formatted = this.formatResponse(data.response.content);
+                data.response.content = formatted;
+                this.logger.debug('Formatted response');
+            }
+        }, 80);
 
         // 格式化工具结果
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_TOOL_CALL, (data: any) => {
-                if (typeof data.result === 'string') {
-                    data.result = this.formatToolResult(data.result);
-                }
-            }, { priority: 75 })
-        );
+        register(AgentHook.AFTER_TOOL_CALL, (data: any) => {
+            if (typeof data.result === 'string') {
+                data.result = this.formatToolResult(data.result);
+            }
+        }, 75);
 
-        return handlerIds;
+        return registrations;
     }
 
     private formatResponse(content: string): string {
@@ -139,7 +149,7 @@ export class ResponseFormatHookPlugin {
 /**
  * 示例 3: 自定义钩子插件 - 安全检查
  */
-export class SecurityHookPlugin {
+export class SecurityHookPlugin implements HookPlugin {
     private logger: ScopedLogger;
     private blockedPatterns: RegExp[];
 
@@ -158,37 +168,39 @@ export class SecurityHookPlugin {
         ];
     }
 
-    registerAllHooks(agent: any): string[] {
-        const handlerIds: string[] = [];
+    registerAllHooks(agent: HookAgent): HookRegistration[] {
+        const registrations: HookRegistration[] = [];
+        const register = <T>(
+            hook: AgentHook,
+            handler: (_data: T) => void | Promise<void>,
+            priority: number
+        ) => {
+            const handlerId = agent.registerHook(hook, handler, { priority });
+            registrations.push({ hook, handlerId });
+        };
 
         // 检查用户输入
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_RUN, (data: any) => {
-                this.checkSecurity(data.query, 'user query');
-            }, { priority: 1 })
-        );
+        register(AgentHook.BEFORE_RUN, (data: any) => {
+            this.checkSecurity(data.query, 'user query');
+        }, 1);
 
         // 检查 LLM 响应
-        handlerIds.push(
-            agent.registerHook(AgentHook.ON_LLM_RESPONSE, (data: any) => {
-                if (data.content) {
-                    this.checkSecurity(data.content, 'LLM response');
-                }
-            }, { priority: 45 })
-        );
+        register(AgentHook.ON_LLM_RESPONSE, (data: any) => {
+            if (data.content) {
+                this.checkSecurity(data.content, 'LLM response');
+            }
+        }, 45);
 
         // 检查工具参数
-        handlerIds.push(
-            agent.registerHook(AgentHook.BEFORE_TOOL_CALL, (data: any) => {
-                if (typeof data.params === 'string') {
-                    this.checkSecurity(data.params, 'tool parameters');
-                } else if (data.params) {
-                    this.checkSecurity(JSON.stringify(data.params), 'tool parameters');
-                }
-            }, { priority: 20 })
-        );
+        register(AgentHook.BEFORE_TOOL_CALL, (data: any) => {
+            if (typeof data.params === 'string') {
+                this.checkSecurity(data.params, 'tool parameters');
+            } else if (data.params) {
+                this.checkSecurity(JSON.stringify(data.params), 'tool parameters');
+            }
+        }, 20);
 
-        return handlerIds;
+        return registrations;
     }
 
     private checkSecurity(text: string, context: string): void {
@@ -214,7 +226,7 @@ export class SecurityHookPlugin {
 /**
  * 示例 4: 自定义钩子插件 - 成本监控
  */
-export class CostMonitoringHookPlugin {
+export class CostMonitoringHookPlugin implements HookPlugin {
     private logger: ScopedLogger;
     private costs = {
         totalLLMCost: 0,
@@ -243,13 +255,20 @@ export class CostMonitoringHookPlugin {
         this.logger = new ScopedLogger(loggerName);
     }
 
-    registerAllHooks(agent: any): string[] {
-        const handlerIds: string[] = [];
+    registerAllHooks(agent: HookAgent): HookRegistration[] {
+        const registrations: HookRegistration[] = [];
+        const register = <T>(
+            hook: AgentHook,
+            handler: (_data: T) => void | Promise<void>,
+            priority: number
+        ) => {
+            const handlerId = agent.registerHook(hook, handler, { priority });
+            registrations.push({ hook, handlerId });
+        };
 
         // 监控 LLM 成本
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_LLM_CALL, (data: any) => {
-                const model = 'deepseek-chat'; // 假设的模型
+        register(AgentHook.AFTER_LLM_CALL, (data: any) => {
+                const model = data.model || 'deepseek-chat';
                 const modelCost = this.costModel[model];
                 
                 if (modelCost) {
@@ -262,12 +281,10 @@ export class CostMonitoringHookPlugin {
                     
                     this.logger.debug(`LLM cost: $${cost.toFixed(6)} (estimated ${estimatedTokens} tokens)`);
                 }
-            }, { priority: 85 })
-        );
+        }, 85);
 
         // 监控工具成本
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_TOOL_CALL, (data: any) => {
+        register(AgentHook.AFTER_TOOL_CALL, (data: any) => {
                 const toolCost = this.costModel[data.toolName];
                 
                 if (typeof toolCost === 'number') {
@@ -276,12 +293,10 @@ export class CostMonitoringHookPlugin {
                     
                     this.logger.debug(`Tool cost: $${toolCost.toFixed(4)} for ${data.toolName}`);
                 }
-            }, { priority: 65 })
-        );
+        }, 65);
 
         // 运行完成时汇总成本
-        handlerIds.push(
-            agent.registerHook(AgentHook.AFTER_RUN, (data: any) => {
+        register(AgentHook.AFTER_RUN, (data: any) => {
                 const totalCost = this.costs.totalLLMCost + this.costs.totalToolCost;
                 
                 this.logger.info(`Cost summary for run: $${totalCost.toFixed(6)} total`);
@@ -299,10 +314,9 @@ export class CostMonitoringHookPlugin {
                     duration: data.duration,
                     query: data.query,
                 });
-            }, { priority: 95 })
-        );
+        }, 95);
 
-        return handlerIds;
+        return registrations;
     }
 
     getCosts() {

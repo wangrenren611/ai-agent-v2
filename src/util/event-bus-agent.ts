@@ -237,9 +237,6 @@ export enum AgentHook {
   ON_TOOL_ERROR = 'on.tool.error',
   
   // 消息钩子
-  BEFORE_MESSAGE_ADD = 'before.message.add',
-  AFTER_MESSAGE_ADD = 'after.message.add',
-  
   // 循环钩子
   BEFORE_LOOP_ITERATION = 'before.loop.iteration',
   AFTER_LOOP_ITERATION = 'after.loop.iteration',
