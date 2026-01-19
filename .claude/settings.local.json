@@ -47,7 +47,8 @@
       "Bash(pnpm --filter web typecheck:*)",
       "mcp__zread__search_doc",
       "Bash(lsof:*)",
-      "Bash(xargs kill:*)"
+      "Bash(xargs kill:*)",
+      "Bash(pnpm exec tsc:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
