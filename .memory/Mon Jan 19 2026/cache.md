@@ -3668,3 +3668,88 @@
   "content": "LLM API error: API request failed: 402 Payment Required\n{\"error\":{\"message\":\"Insufficient Balance\",\"type\":\"unknown_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
 }
 ```
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "用技能git-commit，提交信息我需要中文"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "我将查看git-commit技能目录，然后使用它来提交代码。",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"command\":\"ls -la skills/git-commit/\"}",
+        "name": "bash"
+      },
+      "id": "call_-7965157276365057371",
+      "index": 0,
+      "type": "function"
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "total 8\ndrwxr-xr-x@ 3 wrr  staff    96 Jan 19 08:52 .\ndrwxr-xr-x@ 5 wrr  staff   160 Jan 19 19:26 ..\n-rw-r--r--@ 1 wrr  staff  1648 Jan 19 08:52 SKILL.md",
+  "type": "tool",
+  "tool_call_id": "call_-7965157276365057371"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"filePath\":\"skills/git-commit/SKILL.md\"}",
+        "name": "read_file"
+      },
+      "id": "call_-7965156279932705539",
+      "index": 0,
+      "type": "function"
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "--- FILE: skills/git-commit/SKILL.md ---\nRange: 1 - 61\n\n1 | ---\n2 | name: git-commit\n3 | description: Generate conventional commit messages following git-commit standards. Use this skill when creating git commits to ensure consistent, descriptive commit messages.\n4 | license: MIT\n5 | ---\n6 | \n7 | # Git Commit Skill\n8 | \n9 | Generate well-formatted git commit messages following conventional commit standards.\n10 | \n11 | ## Commit Message Format\n12 | \n13 | ```\n14 | <type>(<scope>): <subject>\n15 | \n16 | <body>\n17 | \n18 | <footer>\n19 | ```\n20 | \n21 | ## Commit Types\n22 | \n23 | - **feat**: A new feature\n24 | - **fix**: A bug fix\n25 | - **docs**: Documentation only changes\n26 | - **style**: Changes that do not affect the meaning of the code\n27 | - **refactor**: A code change that neither fixes a bug nor adds a feature\n28 | - **perf**: A code change that improves performance\n29 | - **test**: Adding missing tests or correcting existing tests\n30 | - **build**: Changes that affect the build system or external dependencies\n31 | - **ci**: Changes to CI configuration files and scripts\n32 | - **chore**: Other changes that don't modify src or test files\n33 | - **revert**: Reverts a previous commit\n34 | \n35 | ## Guidelines\n36 | \n37 | 1. **Subject line**: Use imperative mood (\"add\" not \"added\" or \"adds\")\n38 | 2. **Subject line**: Limit to 50 characters\n39 | 3. **Subject line**: Do not end with a period\n40 | 4. **Body**: Wrap at 72 characters\n41 | 5. **Body**: Explain what and why, not how\n42 | 6. **Footer**: Reference issues (#123)\n43 | \n44 | ## Output Examples\n45 | \n46 | ```\n47 | feat(session): add lazy-loading for message history\n48 | \n49 | Implement lazy-loading mechanism to load message history from\n50 | database only when needed, reducing memory usage.\n51 | \n52 | Fixes #45\n53 | ```\n54 | \n55 | ```\n56 | fix(auth): correct token validation in JWT middleware\n57 | \n58 | The previous implementation incorrectly validated expired tokens,\n59 | allowing unauthorized access.\n60 | ```\n61 | ",
+  "type": "tool",
+  "tool_call_id": "call_-7965156279932705539"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "现在查看当前的git状态，然后生成合适的中文commit message。",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"command\":\"git status\"}",
+        "name": "bash"
+      },
+      "id": "call_-7965161296454789259",
+      "index": 0,
+      "type": "function"
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "On branch feat/session-v3\nYour branch is up to date with 'origin/feat/session-v3'.\n\nChanges not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git restore <file>...\" to discard changes in working directory)\n\tmodified:   .memory/Mon Jan 19 2026/cache.md\n\tmodified:   .memory/Mon Jan 19 2026/messages.json\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")",
+  "type": "tool",
+  "tool_call_id": "call_-7965161296454789259"
+}
+```
