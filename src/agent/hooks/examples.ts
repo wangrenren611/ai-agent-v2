@@ -305,7 +305,7 @@ export class CostMonitoringHookPlugin implements HookPlugin {
                 this.logger.info(`  - Duration: ${data.duration}ms`);
                 
                 // 发布成本事件
-                agent.getEventBus()?.emit('agent.cost.summary', {
+                agent.getEventBus?.()?.emit('agent.cost.summary', {
                     totalCost,
                     llmCost: this.costs.totalLLMCost,
                     toolCost: this.costs.totalToolCost,

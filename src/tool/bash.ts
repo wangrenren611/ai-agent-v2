@@ -140,6 +140,11 @@ export default class BashTool extends BaseTool<typeof schema> {
             return `powershell -NoProfile -Command "Start-Sleep -Seconds ${safeSeconds}"`;
         }
 
+        const mkdirMatch = command.match(/^\s*mkdir\s+(-p|--parents)\s+(.+)\s*$/i);
+        if (mkdirMatch) {
+            return `mkdir ${mkdirMatch[2]}`;
+        }
+
         const { tokens, quoteTypes } = this.tokenize(command);
         const normalizedTokens = tokens.map((token, i) => {
             const quote = quoteTypes[i];

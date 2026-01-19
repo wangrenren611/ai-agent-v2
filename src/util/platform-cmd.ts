@@ -5,6 +5,18 @@
  */
 
 import { execaCommandSync, execaCommand } from 'execa';
+import iconv from 'iconv-lite';
+
+function decodeCommandOutput(data: unknown, platform: Platform): string {
+    if (data === undefined || data === null) {
+        return '';
+    }
+    if (Buffer.isBuffer(data)) {
+        return platform === 'windows' ? iconv.decode(data, 'gbk') : data.toString('utf8');
+    }
+    return String(data);
+}
+
 
 /**
  * 平台类型
@@ -173,20 +185,21 @@ export function getPlatformAdvice(): string {
  * 执行跨平台命令（同步）
  */
 export function execCommand(command: string): { stdout: string; stderr: string; exitCode: number } {
+    const platform = getPlatform();
     try {
         const result = execaCommandSync(command, {
             shell: true,
-            encoding: 'utf8' as any
+            encoding: 'buffer' as any
         });
         return {
-            stdout: String(result.stdout || ''),
-            stderr: String(result.stderr || ''),
+            stdout: decodeCommandOutput(result.stdout, platform),
+            stderr: decodeCommandOutput(result.stderr, platform),
             exitCode: result.exitCode ?? 0
         };
     } catch (error: any) {
         return {
-            stdout: String(error.stdout || ''),
-            stderr: String(error.stderr || error.message),
+            stdout: decodeCommandOutput(error.stdout, platform),
+            stderr: decodeCommandOutput(error.stderr || error.message, platform),
             exitCode: error.exitCode || 1
         };
     }
@@ -209,22 +222,23 @@ export async function execCommandAsync(
     stderr: string;
     exitCode: number;
 }> {
+    const platform = getPlatform();
     try {
         const result = await execaCommand(command, {
             shell: true,
-            encoding: 'utf8' as any,
+            encoding: 'buffer' as any,
             timeout: options?.timeout,
             cwd: options?.cwd,
         });
         return {
-            stdout: String(result.stdout || ''),
-            stderr: String(result.stderr || ''),
+            stdout: decodeCommandOutput(result.stdout, platform),
+            stderr: decodeCommandOutput(result.stderr, platform),
             exitCode: result.exitCode ?? 0
         };
     } catch (error: any) {
         return {
-            stdout: String(error.stdout || ''),
-            stderr: String(error.stderr || error.message),
+            stdout: decodeCommandOutput(error.stdout, platform),
+            stderr: decodeCommandOutput(error.stderr || error.message, platform),
             exitCode: error.exitCode || 1
         };
     }

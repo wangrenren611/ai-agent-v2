@@ -7,7 +7,7 @@ import { OpenAIProvider } from './providers/openai';
 import Agent from './agent';
 import { connectDB } from './storage/mongoose';
 import { CLI } from './cli';
-import { registerDefaultToolsAsync } from './tool';
+import { registerDefaultToolsAsync, ToolRegistry } from './tool';
 import { SessionManager } from './session-v2';
 
 const env = process.env.NODE_ENV || 'development';
@@ -40,11 +40,17 @@ async function initializeApp(config: AppConfig) {
       
 
    const sessionManager = new SessionManager({
-       sessionId:"1768827517165",//new Date().getTime().toString(),
+       sessionId:new Date().getTime().toString(),
        llmProvider,
    });
    
   await sessionManager.init();
+
+    ToolRegistry.setContext({
+        sessionId: sessionManager.id,
+        sessionPath: sessionManager.sessionPath,
+    });
+
     const agent = new Agent({
         llmProvider,
         sessionManager,

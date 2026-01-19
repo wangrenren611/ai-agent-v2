@@ -2,6 +2,7 @@
  * CLI - 交互式命令行界面
  * 使用 prompts 库实现稳定的交互
  */
+import { execSync } from 'node:child_process';
 import { ScopedLogger } from '../util/log';
 import Agent from '../agent';
 import { SessionManager } from '../session-v2';
@@ -41,6 +42,14 @@ export class CLI {
      */
     async start(): Promise<void> {
         this.running = true;
+
+        if (process.platform === 'win32') {
+            try {
+                execSync('chcp 65001>nul');
+            } catch (_error) {
+                // Ignore failures and keep default code page.
+            }
+        }
         this.printWelcome();
 
         while (this.running) {

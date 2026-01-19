@@ -8,6 +8,7 @@ import { BaseTool } from "./base";
 export class ToolRegistry {
     /** 已注册的工具映射 */
     private static tools: Map<string, BaseTool<any>> = new Map();
+    private static context: { sessionId?: string; sessionPath?: string } = {};
 
     /** 私有构造函数，防止外部实例化 */
     private constructor() {}
@@ -103,6 +104,14 @@ export class ToolRegistry {
      */
     static clear(): void {
         this.tools.clear();
+    }
+
+    static setContext(context: { sessionId?: string; sessionPath?: string }): void {
+        this.context = { ...this.context, ...context };
+    }
+
+    static getContext(): { sessionId?: string; sessionPath?: string } {
+        return this.context;
     }
 
     /**

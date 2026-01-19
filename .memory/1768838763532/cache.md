@@ -1,0 +1,33 @@
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "使用ui-ux-pro-max技能创建一个精美的个人博客网站，内容一定要丰富，你需要先创建一个工作目录我的博客目录，"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "我先加载ui-ux-pro-max技能来了解具体要求。",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"name\":\"ui-ux-pro-max\"}",
+        "name": "skill"
+      },
+      "id": "call_-7965143085792973939",
+      "index": 0,
+      "type": "function"
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "Error: Skill \"ui-ux-pro-max\" not found. Available skills: none",
+  "type": "tool",
+  "tool_call_id": "call_-7965143085792973939"
+}
+```

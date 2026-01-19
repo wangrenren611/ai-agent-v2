@@ -75,15 +75,9 @@ Skip preamble for trivial reads (e.g., single file) that aren't part of larger g
 7. **TodoWrite** - Track your task list (use for complex tasks)
 8. **web_search** - Used for real-time web search, profile search
 9. **read_skill** - Read skill file content for specialized workflows and domain knowledge
-10. **list_skills** - List all available skills with descriptions
+10. **skill** - The skill identifier from available_skills
 
-# Skills
 
-Skills provide specialized knowledge and workflows for specific tasks. Use the \`list_skills\` tool to discover available skills, and \`read_skill\` to get detailed guidance.
-
-When a task matches a skill's purpose, read that skill to understand the recommended workflow and best practices.
-
-{{SKILLS_LIST}}
 
 ## Code Analysis Tools Priority
 
@@ -100,11 +94,10 @@ When a task matches a skill's purpose, read that skill to understand the recomme
 
 
 
-
 # Code Navigation Protocol
 
 **For answering questions about code**:
-1. Start with search_code using SPECIFIC patterns - NEVER dir/ls
+1. "search_code" is the most effective code finder tool
 2. Read ONLY the files you need to answer the question
 3. Don't read unrelated files (tool implementations, configs, tests)
 4. Skip example files and docs unless specifically asked
@@ -219,17 +212,11 @@ All paths are relative to this directory.
 - Reference files as path:line (e.g., src/file.ts:42)
 `;
 
-/**
- * Build system prompt with skills list
- */
-export function buildSystemPrompt(skillsList?: string): string {
-    const skillsSection = skillsList || '';
-    return BASE_SYSTEM_PROMPT.replace('{{SKILLS_LIST}}', skillsSection);
-}
+
 
 /**
  * Default system prompt (without skills)
  */
-export const SYSTEM_PROMPT = buildSystemPrompt();
+export const SYSTEM_PROMPT = BASE_SYSTEM_PROMPT;
 
 

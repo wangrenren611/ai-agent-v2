@@ -154,7 +154,7 @@ export class PerformanceHookPlugin implements HookPlugin {
                     this.logger.warn(`Slow tool detected: ${data.toolName} took ${data.duration}ms (threshold: ${this.slowToolThreshold}ms)`);
                     
                     // 发布性能事件
-                    agent.getEventBus()?.emit('agent.performance.slow.tool', {
+                    agent.getEventBus?.()?.emit('agent.performance.slow.tool', {
                         toolName: data.toolName,
                         duration: data.duration,
                         threshold: this.slowToolThreshold,
@@ -169,7 +169,7 @@ export class PerformanceHookPlugin implements HookPlugin {
                     this.logger.warn(`Slow LLM call detected: iteration #${data.iteration} took ${data.duration}ms (threshold: ${this.slowLLMThreshold}ms)`);
                     
                     // 发布性能事件
-                    agent.getEventBus()?.emit('agent.performance.slow.llm', {
+                    agent.getEventBus?.()?.emit('agent.performance.slow.llm', {
                         duration: data.duration,
                         threshold: this.slowLLMThreshold,
                         iteration: data.iteration,
@@ -419,7 +419,9 @@ export class CacheHookPlugin implements HookPlugin {
     }
 
     private generateToolCacheKey(data: BeforeToolCallData | AfterToolCallData): string {
-        return `tool:${data.toolName}:${JSON.stringify(data.params)}`;
+        // AfterToolCallData 没有 params 属性，使用 toolName 和 result 生成键
+        const params = 'params' in data ? data.params : {};
+        return `tool:${data.toolName}:${JSON.stringify(params)}`;
     }
 
     /**

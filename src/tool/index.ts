@@ -28,10 +28,9 @@ import { SurgicalEditTool } from './surgical';
 import { BatchReplaceTool } from './batch-replace';
 import { TodoReadTool } from './todo';
 import { TodoWriteTool } from './todo';
-import {  ListBackupsTool, CleanBackupsTool } from './rollback';
 import { initializeMcp } from '../mcp/index';
 import { WebSearchTool } from './web-search';
-import { ReadSkillTool, ListSkillsTool } from '../skills/skill-tool';
+import { SkillTool, initializeSkills } from '../skills';
 
 // =============================================================================
 // Tool Registry
@@ -60,12 +59,8 @@ export function registerDefaultTools(): void {
         new BatchReplaceTool(),
         new TodoReadTool(),
         new TodoWriteTool(),
-        // new RollbackTool(),
-        new ListBackupsTool(),
-        new CleanBackupsTool(),
         new WebSearchTool(),
-        new ReadSkillTool(),
-        new ListSkillsTool()
+        new SkillTool()
     ]);
 }
 
@@ -89,6 +84,13 @@ export function registerDefaultTools(): void {
  * ```
  */
 export async function registerDefaultToolsAsync(configPath?: string) {
+    // 初始化技能加载器（在注册 SkillTool 之前）
+    try {
+        await initializeSkills();
+    } catch (error) {
+        console.warn('[Skills] Failed to initialize skills:', error);
+    }
+
     // 注册内置工具
     registerDefaultTools();
 
@@ -122,7 +124,5 @@ export { getBashParser } from './bash-parser';
 export type { CommandInfo, SecurityIssue, ParseResult } from './bash-parser';
 export { BatchReplaceTool } from './batch-replace';
 
-// Skill tools
-export { ReadSkillTool, ListSkillsTool } from '../skills/skill-tool';
 export { initializeSkills, getSkillLoader } from '../skills/loader';
 export type { Skill, SkillMetadata, SkillLoaderOptions } from '../skills/types';

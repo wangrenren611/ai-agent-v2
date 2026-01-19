@@ -1,0 +1,44 @@
+[
+  {
+    "content": "探索项目根目录结构和配置文件",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "分析项目的 package.json 和依赖关系",
+    "status": "completed",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "识别核心源代码目录和入口点",
+    "status": "completed",
+    "priority": "high",
+    "id": "3"
+  },
+  {
+    "content": "分析关键类、函数和模块",
+    "status": "completed",
+    "priority": "high",
+    "id": "4"
+  },
+  {
+    "content": "理解项目的架构设计和数据流",
+    "status": "completed",
+    "priority": "high",
+    "id": "5"
+  },
+  {
+    "content": "识别技术栈和框架选择",
+    "status": "completed",
+    "priority": "medium",
+    "id": "6"
+  },
+  {
+    "content": "生成综合分析报告",
+    "status": "completed",
+    "priority": "medium",
+    "id": "7"
+  }
+]

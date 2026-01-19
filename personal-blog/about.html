@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于我 | 林雨轩个人博客</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-feather-alt"></i>
+                <span>林雨轩</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="articles.html">文章</a></li>
+                <li><a href="categories.html">分类</a></li>
+                <li><a href="about.html" class="active">关于我</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="search-btn" aria-label="搜索">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="theme-toggle" aria-label="切换主题">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="mobile-menu-btn" aria-label="菜单">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 -->
+    <section class="hero hero-about">
+        <div class="container">
+            <div class="hero-about-content">
+                <div class="hero-about-avatar">
+                    <div class="avatar-frame">
+                        <div class="avatar-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                                <circle cx="50" cy="35" r="25" fill="#6366F1"/>
+                                <path d="M50 65c-20 0-35 10-35 25v10h70V90c0-15-15-25-35-25z" fill="#6366F1"/>
+                            </svg>
+                        </div>
+                        <div class="avatar-status online"></div>
+                    </div>
+                </div>
+                <div class="hero-about-info">
+                    <h1 class="hero-about-name">林雨轩</h1>
+                    <p class="hero-about-title">全栈开发者 / UI 设计师 / 技术博主</p>
+                    <p class="hero-about-bio">
+                        热爱编程，痴迷设计。5年+ 开发经验，专注于构建优雅、高效的 Web 应用。
+                        相信技术可以改变世界，而好的设计能让世界更美好。
+                    </p>
+                    <div class="hero-about-social">
+                        <a href="#" class="social-btn" aria-label="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="social-btn" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-btn" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="social-btn" aria-label="Dribbble">
+                            <i class="fab fa-dribbble"></i>
+                        </a>
+                        <a href="#" class="social-btn" aria-label="Email">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                    <div class="hero-about-cta">
+                        <a href="mailto:hello@example.com" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            联系我
+                        </a>
+                        <a href="#" class="btn btn-outline">
+                            <i class="fas fa-download"></i>
+                            下载简历
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-bg-gradient"></div>
+    </section>
+
+    <!-- 技能专长 -->
+    <section class="section section-skills">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">
+                    <i class="fas fa-cogs"></i>
+                    <span>技能专长</span>
+                </div>
+                <h2 class="section-title">我的技术栈</h2>
+                <p class="section-description">持续学习，不断成长的技术旅程</p>
+            </div>
+
+            <div class="skills-container">
+                <div class="skill-category">
+                    <h3 class="skill-category-title">
+                        <i class="fas fa-code"></i>
+                        前端开发
+                    </h3>
+                    <div class="skills-grid">
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fab fa-react"></i>
+                            </div>
+                            <span class="skill-name">React</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fab fa-vuejs"></i>
+                            </div>
+                            <span class="skill-name">Vue.js</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fab fa-js"></i>
+                            </div>
+                            <span class="skill-name">TypeScript</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fab fa-css3-alt"></i>
+                            </div>
+                            <span class="skill-name">Tailwind CSS</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 88%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3 class="skill-category-title">
+                        <i class="fas fa-server"></i>
+                        后端开发
+                    </h3>
+                    <div class="skills-grid">
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fab fa-node-js"></i>
+                            </div>
+                            <span class="skill-name">Node.js</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 88%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fab fa-python"></i>
+                            </div>
+                            <span class="skill-name">Python</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 82%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <span class="skill-name">PostgreSQL</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fab fa-docker"></i>
+                            </div>
+                            <span class="skill-name">Docker</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3 class="skill-category-title">
+                        <i class="fas fa-palette"></i>
+                        设计工具
+                    </h3>
+                    <div class="skills-grid">
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fab fa-figma"></i>
+                            </div>
+                            <span class="skill-name">Figma</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fas fa-vector-square"></i>
+                            </div>
+                            <span class="skill-name">Adobe XD</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 78%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fas fa-paint-brush"></i>
+                            </div>
+                            <span class="skill-name">Photoshop</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 72%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-icon">
+                                <i class="fas fa-pen-nib"></i>
+                            </div>
+                            <span class="skill-name">Illustrator</span>
+                            <div class="skill-level">
+                                <div class="skill-bar" style="width: 68%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 工作经历 -->
+    <section class="section section-experience">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">
+                    <i class="fas fa-briefcase"></i>
+                    <span>工作经历</span>
+                </div>
+                <h2 class="section-title">我的职业历程</h2>
+                <p class="section-description">每一步都是成长的印记</p>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">2022 - 至今</span>
+                        <h3 class="timeline-title">高级全栈工程师</h3>
+                        <p class="timeline-company">TechStar 科技有限公司</p>
+                        <p class="timeline-description">
+                            负责公司核心产品的前后端架构设计与开发。带领 5 人团队完成多个重要项目，
+                            引入微服务架构，将系统性能提升 40%。参与技术决策，推动团队技术栈升级。
+                        </p>
+                        <div class="timeline-tags">
+                            <span class="tag">微服务</span>
+                            <span class="tag">React</span>
+                            <span class="tag">Node.js</span>
+                            <span class="tag">团队管理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">2020 - 2022</span>
+                        <h3 class="timeline-title">前端开发工程师</h3>
+                        <p class="timeline-company">CloudNine 创新科技</p>
+                        <p class="timeline-description">
+                            负责企业级 SaaS 平台的前端开发工作。使用 React 和 TypeScript 构建复杂的数据可视化应用，
+                            设计并实现公司内部组件库，提升开发效率 30%。
+                        </p>
+                        <div class="timeline-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">TypeScript</span>
+                            <span class="tag">数据可视化</span>
+                            <span class="tag">组件库</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">2019 - 2020</span>
+                        <h3 class="timeline-title">UI/UX 设计师</h3>
+                        <p class="timeline-company">PixelPerfect 设计工作室</p>
+                        <p class="timeline-description">
+                            负责多个 Web 和移动应用产品的 UI/UX 设计。主导设计系统的搭建，
+                            与开发团队紧密合作确保设计的准确实现。客户满意度达到 98%。
+                        </p>
+                        <div class="timeline-tags">
+                            <span class="tag">UI/UX</span>
+                            <span class="tag">设计系统</span>
+                            <span class="tag">Figma</span>
+                            <span class="tag">用户研究</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">2018 - 2019</span>
+                        <h3 class="timeline-title">前端开发实习生</h3>
+                        <p class="timeline-company">StartUp 孵化器</p>
+                        <p class="timeline-description">
+                            协助开发团队完成多个初创项目的前端实现。学习并掌握现代前端技术栈，
+                            参与代码评审，快速成长成为一名合格的前端开发者。
+                        </p>
+                        <div class="timeline-tags">
+                            <span class="tag">Vue.js</span>
+                            <span class="tag">CSS</span>
+                            <span class="tag">JavaScript</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 个人成就 -->
+    <section class="section section-achievements">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">
+                    <i class="fas fa-trophy"></i>
+                    <span>个人成就</span>
+                </div>
+                <h2 class="section-title">值得骄傲的时刻</h2>
+                <p class="section-description">每一个成就都是努力的见证</p>
+            </div>
+
+            <div class="achievements-grid">
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-blog"></i>
+                    </div>
+                    <h3 class="achievement-title">128 篇技术博客</h3>
+                    <p class="achievement-description">在各大平台发布技术文章，累计获得 50000+ 次阅读，帮助众多开发者解决问题</p>
+                    <div class="achievement-stats">
+                        <span><i class="fas fa-eye"></i> 52K 阅读</span>
+                        <span><i class="fas fa-heart"></i> 3.2K 喜欢</span>
+                    </div>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-code-branch"></i>
+                    </div>
+                    <h3 class="achievement-title">50+ 开源贡献</h3>
+                    <p class="achievement-description">积极参与开源社区，向多个知名项目提交 PR，累计获得 2000+ GitHub Stars</p>
+                    <div class="achievement-stats">
+                        <span><i class="fas fa-star"></i> 2K Stars</span>
+                        <span><i class="fas fa-users"></i> 500 Forks</span>
+                    </div>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="achievement-title">10+ 技术演讲</h3>
+                    <p class="achievement-description">在各种技术会议和 meetup 上分享经验，累计听众超过 2000 人</p>
+                    <div class="achievement-stats">
+                        <span><i class="fas fa-microphone"></i> 12 次演讲</span>
+                        <span><i class="fas fa-user-friends"></i> 2K 听众</span>
+                    </div>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <h3 class="achievement-title">5 年行业经验</h3>
+                    <p class="achievement-description">从实习生到高级工程师，5 年间不断成长，参与并主导多个大型项目</p>
+                    <div class="achievement-stats">
+                        <span><i class="fas fa-project-diagram"></i> 20+ 项目</span>
+                        <span><i class="fas fa-handshake"></i> 15+ 客户</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 兴趣爱好 -->
+    <section class="section section-interests">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">
+                    <i class="fas fa-heart"></i>
+                    <span>兴趣爱好</span>
+                </div>
+                <h2 class="section-title">工作之外的我</h2>
+                <p class="section-description">生活不只有代码</p>
+            </div>
+
+            <div class="interests-grid">
+                <div class="interest-card">
+                    <div class="interest-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3 class="interest-name">摄影</h3>
+                    <p class="interest-description">记录生活中的美好瞬间，尤其喜欢城市夜景和人文摄影</p>
+                </div>
+
+                <div class="interest-card">
+                    <div class="interest-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="interest-name">阅读</h3>
+                    <p class="interest-description">每月至少读两本书，涵盖技术、设计和人文社科多个领域</p>
+                </div>
+
+                <div class="interest-card">
+                    <div class="interest-icon">
+                        <i class="fas fa-hiking"></i>
+                    </div>
+                    <h3 class="interest-name">徒步旅行</h3>
+                    <p class="interest-description">每年至少两次长途徒步，探索自然，挑战自我</p>
+                </div>
+
+                <div class="interest-card">
+                    <div class="interest-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3 class="interest-name">音乐</h3>
+                    <p class="interest-description">喜欢古典音乐和爵士乐，偶尔也会弹吉他放松心情</p>
+                </div>
+
+                <div class="interest-card">
+                    <div class="interest-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3 class="interest-name">游戏</h3>
+                    <p class="interest-description">适度游戏，享受独立游戏的艺术性和独特的故事体验</p>
+                </div>
+
+                <div class="interest-card">
+                    <div class="interest-icon">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <h3 class="interest-name">咖啡</h3>
+                    <p class="interest-description">咖啡爱好者，手冲咖啡是每天的必修课</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系方式 -->
+    <section class="section section-contact">
+        <div class="container">
+            <div class="contact-card">
+                <div class="contact-content">
+                    <div class="contact-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h2 class="contact-title">有话想说？</h2>
+                    <p class="contact-description">
+                        无论是技术交流、项目合作，还是只是想打个招呼，
+                        都欢迎随时联系我。我会尽快回复！
+                    </p>
+                    <div class="contact-info">
+                        <a href="mailto:hello@example.com" class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>hello@example.com</span>
+                        </a>
+                        <a href="#" class="contact-item">
+                            <i class="fab fa-twitter"></i>
+                            <span>@linyuxuan</span>
+                        </a>
+                        <a href="#" class="contact-item">
+                            <i class="fab fa-github"></i>
+                            <span>github.com/linyuxuan</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="index.html" class="footer-logo">
+                        <i class="fas fa-feather-alt"></i>
+                        <span>林雨轩</span>
+                    </a>
+                    <p class="footer-description">
+                        全栈开发者 / 设计师 / 终身学习者<br>
+                        热爱分享技术见解与生活思考
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="GitHub" class="social-link">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" aria-label="Twitter" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" aria-label="LinkedIn" class="social-link">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" aria-label="Email" class="social-link">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4 class="footer-column-title">导航</h4>
+                        <ul class="footer-nav">
+                            <li><a href="index.html">首页</a></li>
+                            <li><a href="articles.html">文章</a></li>
+                            <li><a href="categories.html">分类</a></li>
+                            <li><a href="about.html">关于我</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4 class="footer-column-title">分类</h4>
+                        <ul class="footer-nav">
+                            <li><a href="categories.html">人工智能</a></li>
+                            <li><a href="categories.html">前端开发</a></li>
+                            <li><a href="categories.html">后端开发</a></li>
+                            <li><a href="categories.html">UI/UX 设计</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4 class="footer-column-title">资源</h4>
+                        <ul class="footer-nav">
+                            <li><a href="#">学习资源</a></li>
+                            <li><a href="#">开源项目</a></li>
+                            <li><a href="#">工具推荐</a></li>
+                            <li><a href="#">RSS 订阅</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="copyright">
+                    &copy; 2024 林雨轩. All rights reserved. 用 <i class="fas fa-heart"></i> 制作
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <button class="back-to-top" aria-label="回到顶部">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>
