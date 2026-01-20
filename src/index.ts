@@ -10,6 +10,8 @@ import { CLI } from './cli';
 import { registerDefaultToolsAsync, ToolRegistry } from './tool';
 import { SessionManager } from './session-v2';
 import { operatorPrompt } from './prompts/operator';
+import path from 'path';
+import fs from 'fs';
 
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}`, override: true });
@@ -59,7 +61,7 @@ async function initializeApp(config: AppConfig) {
         vcs: "git",
         tools,
     });
-    
+    fs.writeFileSync(path.resolve(process.cwd(), 'customPrompt.md'), customPrompt);
     const agent = new Agent({
         llmProvider,
         sessionManager,

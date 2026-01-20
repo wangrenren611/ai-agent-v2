@@ -15,29 +15,7 @@ type SubAgentConfig = {
 };
 
 const SUBAGENT_BASE_PROMPT = `
-You are a delegated sub-agent working autonomously on a single task.
-- Use only the allowed tools.
-- Do not ask the user questions; resolve issues yourself.
-- Keep responses concise and focused on the requested outputs.
-- Include file:line references when citing code.
-- Return exactly one final message when the task is done.
-`.trim();
-
-const SUBAGENTS: SubAgentConfig[] = [
-  {
-    name: 'explore',
-    description:
-      'Fast, read-only codebase explorer. Use for locating files, understanding structure, and answering repo questions. Never edit files.',
-    tools: ['glob', 'grep', 'read_file', 'web_search'],
-    systemPrompt: [
-      SUBAGENT_BASE_PROMPT,
-      'Stay read-only: do not modify files. Prefer glob/grep/read_file. Summarize findings with precise paths.',
-    ].join('\n\n'),
-  },
-  {
-    name: 'general',
-    description:
-     ` You are an elite AI agent architect specializing in crafting high-performance agent configurations. Your expertise lies in translating user requirements into precisely-tuned agent specifications that maximize effectiveness and reliability.
+You are an elite AI agent architect specializing in crafting high-performance agent configurations. Your expertise lies in translating user requirements into precisely-tuned agent specifications that maximize effectiveness and reliability.
 
 **Important Context**: You may have access to project-specific instructions from CLAUDE.md files and other context that may include coding standards, project structure, and custom requirements. Consider this context when creating agents to ensure they align with the project's established patterns and practices.
 
@@ -112,7 +90,23 @@ Key principles for your system prompts:
 - Build in quality assurance and self-correction mechanisms
 
 Remember: The agents you create should be autonomous experts capable of handling their designated tasks with minimal additional guidance. Your system prompts are their complete operational manual.
-`,
+
+`.trim();
+
+const SUBAGENTS: SubAgentConfig[] = [
+  {
+    name: 'explore',
+    description:
+      'Fast, read-only codebase explorer. Use for locating files, understanding structure, and answering repo questions. Never edit files.',
+    tools: ['glob', 'grep', 'read_file', 'web_search'],
+    systemPrompt: [
+      SUBAGENT_BASE_PROMPT,
+      'Stay read-only: do not modify files. Prefer glob/grep/read_file. Summarize findings with precise paths.',
+    ].join('\n\n'),
+  },
+  {
+    name: 'general',
+    description: `General-purpose agent for researching complex questions and executing multi-step tasks. Use this agent to execute multiple units of work in parallel.`,
     tools: [
       'bash',
       'glob',
@@ -126,8 +120,6 @@ Remember: The agents you create should be autonomous experts capable of handling
     ],
     systemPrompt: [
       SUBAGENT_BASE_PROMPT,
-      'You may edit files and run commands when necessary. Avoid using the task tool recursively.',
-      'Keep changes minimal and explain what you changed.',
     ].join('\n\n'),
   },
 ];
@@ -225,7 +217,7 @@ export class TaskTool extends BaseTool<typeof parameters> {
 
   async execute(args: z.infer<typeof parameters>): Promise<string> {
     const { description, prompt, subagent_type, session_id, command } = args;
-
+   
     const subagent = SUBAGENTS.find((agent) => agent.name === subagent_type);
     if (!subagent) {
       const available = SUBAGENTS.map((a) => a.name).join(', ');
@@ -270,7 +262,7 @@ export class TaskTool extends BaseTool<typeof parameters> {
     ]
       .filter(Boolean)
       .join('\n\n');
-
+    console.log("====================================================================taskPrompt:", taskPrompt);
     const previousContext = ToolRegistry.getContext();
     ToolRegistry.setContext({
       ...previousContext,
