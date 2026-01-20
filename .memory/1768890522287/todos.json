@@ -1,0 +1,32 @@
+[
+  {
+    "content": "探索项目结构和主要文件",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "分析技术栈和依赖",
+    "status": "completed",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "分析核心代码架构",
+    "status": "completed",
+    "priority": "high",
+    "id": "3"
+  },
+  {
+    "content": "深度思考项目特点和设计模式",
+    "status": "completed",
+    "priority": "medium",
+    "id": "4"
+  },
+  {
+    "content": "生成完整的分析 MD 文档",
+    "status": "completed",
+    "priority": "high",
+    "id": "5"
+  }
+]

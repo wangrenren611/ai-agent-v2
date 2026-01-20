@@ -16,7 +16,7 @@ import { ToolRegistry } from "../tool/registry";
 export interface AgentConfig {
     llmProvider: LLMProvider;
     sessionManager: SessionManager;
-    systemPrompt?: string;
+    systemPrompt: string;
     /** 默认工具列表（可选），不传则使用 ToolRegistry 中所有工具 */
     defaultTools?: ToolSchema[];
     /** 最大循环次数，防止无限循环，默认 10 */
@@ -54,7 +54,7 @@ export default class Agent extends EventEmitter {
         super();
         this.llmProvider = config.llmProvider;
         this.sessionManager = config.sessionManager;
-        this.systemPrompt = config.systemPrompt || SYSTEM_PROMPT;
+        this.systemPrompt = config.systemPrompt;
         this.defaultTools = config.defaultTools;
         this.logger = new ScopedLogger('Agent');
         this.maxLoop = config.maxLoop ?? 1024;
@@ -186,6 +186,7 @@ export default class Agent extends EventEmitter {
                         tools: tools.length > 0 ? tools : undefined,
                         max_tokens: this.maxOutputTokens,
                     });
+                    // console.log( this.systemPrompt)
                 } catch (error) {
                     const errorMsg = error instanceof Error ? error.message : String(error);
                     spinner.fail(`Thinking-${i} failed`);
