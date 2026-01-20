@@ -151,7 +151,7 @@ export default class Agent extends EventEmitter {
         try {
 
             // 3. 获取工具 schemas（优先级：传入参数 > 默认配置 > ToolRegistry 全部）
-            const tools = options?.tools ?? this.defaultTools ?? ToolRegistry.getSchemas();
+            const tools = options?.tools ?? this.defaultTools ?? [];
 
             // 4. LLM 调用循环（处理工具调用）
             let i = 0; // 防止无限循环
@@ -189,17 +189,37 @@ export default class Agent extends EventEmitter {
                     // console.log( this.systemPrompt)
                 } catch (error) {
                     const errorMsg = error instanceof Error ? error.message : String(error);
+
                     spinner.fail(`Thinking-${i} failed`);
-                    this.emit('failure', { error: errorMsg });
+
                     this.logger.error(`LLM error: ${errorMsg}`);
-                    return null;
+                      this.sessionManager.addMessage({
+                        role: 'assistant',
+                        type: 'text',
+                        content: errorMsg
+                    });
+
+                    return {
+                        content: errorMsg,
+                        role: 'assistant',
+                    };
                 }
 
                 if (!llmResponse) {
-                    this.emit('failure', {error: 'LLM returned null response' });
-                    this.logger.error("LLM error")
+                    const errorMsg = 'LLM returned null response';
+                    this.logger.error(errorMsg);
                     spinner.fail(`Thinking-${i} failed`);
-                    return null;
+
+                   this.sessionManager.addMessage({
+                        role: 'assistant',
+                        type: 'text',
+                        content: errorMsg
+                    });
+
+                    return {
+                        content: errorMsg,
+                        role: 'assistant',
+                    };
                 }
                 spinner.succeed(`Thinking-${i} end`);
 
@@ -216,8 +236,16 @@ export default class Agent extends EventEmitter {
                     if (this.noProgressLimit > 0 && repeatedToolCalls >= this.noProgressLimit) {
                         const errorMsg = `Repeated tool_calls detected for ${this.noProgressLimit + 1} iterations, aborting to prevent loop.`;
                         this.logger.error(errorMsg);
-                        this.emit('failure', { error: errorMsg });
-                        return null;
+                        this.sessionManager.addMessage({
+                                role: 'assistant',
+                                type: 'text',
+                                content: errorMsg
+                         });
+
+                        return {
+                            content: errorMsg,
+                            role: 'assistant',
+                        };
                     }
 
                     // 添加 assistant 消息（包含 tool_calls）
@@ -319,7 +347,16 @@ export default class Agent extends EventEmitter {
 
             if (i >= this.maxLoop) {
                 this.logger.error('Max iterations reached, possible infinite loop');
-                return null;
+                this.sessionManager.addMessage({
+                        role: 'assistant',
+                        type: 'text',
+                        content: 'Max iterations reached, possible infinite loop'
+                 });
+
+                return {
+                    content: 'Max iterations reached, possible infinite loop',
+                    role: 'assistant',
+                };
             }
 
     
@@ -329,7 +366,15 @@ export default class Agent extends EventEmitter {
         } catch (error) {
             const errorMsg = error instanceof Error ? error.message : String(error);
             this.logger.error(`Agent error: ${errorMsg}`);
-            return null;
+             this.sessionManager.addMessage({
+                        role: 'assistant',
+                        type: 'text',
+                        content: errorMsg
+           });
+            return {
+                content: errorMsg,
+                role: 'assistant',
+            };
         }
     }
 

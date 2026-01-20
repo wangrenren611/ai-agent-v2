@@ -8,7 +8,7 @@ import { BaseTool } from "./base";
 export class ToolRegistry {
     /** 已注册的工具映射 */
     private static tools: Map<string, BaseTool<any>> = new Map();
-    private static context: { sessionId?: string; sessionPath?: string } = {};
+    private static context: { sessionId?: string; sessionPath?: string; allowedTools?: string[] } = {};
 
     /** 私有构造函数，防止外部实例化 */
     private constructor() {}
@@ -106,11 +106,15 @@ export class ToolRegistry {
         this.tools.clear();
     }
 
-    static setContext(context: { sessionId?: string; sessionPath?: string }): void {
-        this.context = { ...this.context, ...context };
+    static setContext(context: { sessionId?: string; sessionPath?: string; allowedTools?: string[] }): void {
+        const next = { ...this.context, ...context };
+        if ('allowedTools' in context && context.allowedTools === undefined) {
+            delete (next as any).allowedTools;
+        }
+        this.context = next;
     }
 
-    static getContext(): { sessionId?: string; sessionPath?: string } {
+    static getContext(): { sessionId?: string; sessionPath?: string; allowedTools?: string[] } {
         return this.context;
     }
 
@@ -126,6 +130,10 @@ export class ToolRegistry {
         const tool = this.get(name);
         if (!tool) {
             return `Tool "${name}" not found`;
+        }
+        const allowed = this.context.allowedTools;
+        if (allowed && !allowed.includes(name)) {
+            return `Tool "${name}" is not allowed in this context`;
         }
 
         // 验证参数

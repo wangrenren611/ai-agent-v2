@@ -31,6 +31,7 @@ import { TodoWriteTool } from './todo';
 import { initializeMcp } from '../mcp/index';
 import { WebSearchTool } from './web-search';
 import { SkillTool, initializeSkills } from '../skills';
+import TaskTool from './task';
 
 // =============================================================================
 // Tool Registry
@@ -60,7 +61,8 @@ export function registerDefaultTools(): void {
         new TodoReadTool(),
         new TodoWriteTool(),
         new WebSearchTool(),
-        new SkillTool()
+        new SkillTool(),
+        new TaskTool()
     ]);
 }
 
@@ -123,6 +125,7 @@ export { default as BashTool } from './bash';
 export { getBashParser } from './bash-parser';
 export type { CommandInfo, SecurityIssue, ParseResult } from './bash-parser';
 export { BatchReplaceTool } from './batch-replace';
+export { default as TaskTool } from './task';
 
 export { initializeSkills, getSkillLoader } from '../skills/loader';
 export type { Skill, SkillMetadata, SkillLoaderOptions } from '../skills/types';

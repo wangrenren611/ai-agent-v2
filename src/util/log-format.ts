@@ -24,7 +24,7 @@ export function formatToolResult(toolName: string, result: string): string {
 
     // 根据工具类型进行智能格式化
     switch (toolName) {
-        case 'search_code':
+        case 'grep':
             return formatSearchResults(result);
 
         case 'read_file':
