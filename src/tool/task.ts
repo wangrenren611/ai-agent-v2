@@ -105,6 +105,18 @@ const SUBAGENTS: SubAgentConfig[] = [
     ].join('\n\n'),
   },
   {
+    name: 'plan',
+    description: 'Planning specialist that breaks broad work into ordered, actionable steps with dependencies.',
+    tools: ['glob', 'grep', 'read_file', 'web_search'],
+    systemPrompt: [
+      SUBAGENT_BASE_PROMPT,
+      'Your goal is to deliver a concise, ordered plan (5-12 steps) with clear ownership, dependencies, and expected outputs.',
+      'Stay read-only: do not modify files or run commands that mutate state.',
+      'Prefer glob/grep/read_file to gather just enough context; avoid exhaustive scans.',
+      'End with risks/assumptions and note any info gaps that need confirmation.',
+    ].join('\n\n'),
+  },
+  {
     name: 'general',
     description: `General-purpose agent for researching complex questions and executing multi-step tasks. Use this agent to execute multiple units of work in parallel.`,
     tools: [
@@ -272,7 +284,8 @@ export class TaskTool extends BaseTool<typeof parameters> {
     });
 
     const response = await agent.run(taskPrompt, { silent: true, tools: toolSchemas }).finally(() => {
-      ToolRegistry.setContext(previousContext);
+      // 清理子代理的工具白名单，恢复主 Agent 上下文
+      ToolRegistry.setContext({ ...previousContext, allowedTools: undefined });
     });
 
     if (!response?.content) {

@@ -63,7 +63,7 @@ export default class Agent extends EventEmitter {
         this.maxOutputTokens = Math.min(config.maxOutputTokens ?? providerMaxOutput, providerMaxOutput);
         this.maxTokens = Math.min(config.maxTokens ?? providerMaxTokens, providerMaxTokens);
         this.toolConcurrency = Math.max(1, config.toolConcurrency ?? 4);
-        this.toolTimeoutMs = config.toolTimeoutMs ?? 120000;
+        this.toolTimeoutMs = config.toolTimeoutMs ?? 1000*60*5;
         this.noProgressLimit = Math.max(0, config.noProgressLimit ?? 2);
         this.sessionManager.maxOutputTokens = this.maxOutputTokens;
         this.sessionManager.maxTokens = this.maxTokens;
