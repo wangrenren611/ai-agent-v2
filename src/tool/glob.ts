@@ -4,7 +4,8 @@
  * 用于通过通配符模式查找文件，替代 bash find/dir 命令
  */
 import { z } from 'zod';
-import { glob as fg } from 'fast-glob';
+import fg from 'fast-glob';
+import { resolve } from 'path';
 import { BaseTool } from './base';
 
 const schema = z.object({
@@ -37,8 +38,11 @@ Returns array of relative file paths.`;
 
     async execute({ pattern, path = '.', limit = 100 }: z.infer<typeof schema>): Promise<string> {
         try {
+            // 解析为绝对路径
+            const searchPath = resolve(process.cwd(), path);
+
             const files = await fg(pattern, {
-                cwd: process.cwd(),
+                cwd: searchPath,
                 absolute: false,
                 ignore: [
                     '**/node_modules/**',
@@ -57,7 +61,7 @@ Returns array of relative file paths.`;
             const limitedFiles = files.slice(0, limit);
 
             if (limitedFiles.length === 0) {
-                return `No files found matching pattern: ${pattern}`;
+                return `No files found matching pattern: ${pattern} in ${path}`;
             }
 
             const result = limitedFiles.join('\n');
@@ -68,8 +72,8 @@ Returns array of relative file paths.`;
             }
 
             return result;
-        } catch (error) {
-            const errorMsg = error instanceof Error ? error.message : String(error);
+        } catch (_error) {
+            const errorMsg = _error instanceof Error ? _error.message : String(_error);
             return `Error: ${errorMsg}`;
         }
     }

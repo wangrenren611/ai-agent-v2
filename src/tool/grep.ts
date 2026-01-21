@@ -9,7 +9,7 @@ const schema = z.object({
 
 export default class GrepTool extends BaseTool<typeof schema> {
 
-  name = "search_code";
+  name = "grep";
 
   description = `Fast content search tool for finding code patterns.
 

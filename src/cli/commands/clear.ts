@@ -9,7 +9,7 @@ export const handler: CommandHandler = {
     usage: '/clear',
 
     async execute(context) {
-        await context.agent.clearSession(context.sessionId.value);
+        await context.sessionManager.clearAll();
         console.log('✅ Session cleared.\n');
     },
 };

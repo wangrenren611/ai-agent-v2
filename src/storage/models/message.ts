@@ -16,10 +16,6 @@ const messageSchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        required: function (this: { type?: string }) {
-            return this.type !== 'tool_call';
-        },
-        default: '',
     },
     role: {
         type: String,
@@ -28,7 +24,7 @@ const messageSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['text', 'tool', 'tool_call'],
+        enum: ['text', 'tool', 'tool_call','summary'],
         default: 'text',
     },
     /** Tool call ID (required for tool response messages) */
@@ -53,4 +49,4 @@ const messageSchema = new mongoose.Schema({
 // 复合索引优化查询
 messageSchema.index({ sessionId: 1, createdAt: 1 });
 
-export const Message = mongoose.model('Message', messageSchema);
+export const MessageData = mongoose.model('Message', messageSchema);

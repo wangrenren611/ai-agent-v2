@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import Log from '../util/log';
 
 export const connectDB = async () => {
    if(!process.env.MONGODB_URI){
@@ -11,7 +12,7 @@ export const connectDB = async () => {
       socketTimeoutMS: 45000,           // 45秒socket超时
       connectTimeoutMS: 30000,          // 30秒连接超时
     });
-
+    Log.info("mongoose success!!!")
     // 监听连接事件
     mongoose.connection.on('error', (err) => {
       console.error('MongoDB connection error:', err);

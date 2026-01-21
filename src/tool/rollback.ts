@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { z } from 'zod';
 import { BaseTool } from './base';
-import { getBackupManager, type BackupInfo } from '../util/backup-manager';
+import { getBackupManager } from '../util/backup-manager';
 import chalk from 'chalk';
 
 /**

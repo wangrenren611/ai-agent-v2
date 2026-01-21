@@ -1,11 +1,11 @@
-import { message } from "../providers/base";
+import { Message } from "../providers/base";
 import { ScopedLogger } from "../util/log";
 import { connectDB } from "./mongoose";
-import { Message } from "./models/message";
+import { MessageData } from "./models/message";
 
 export default class Memory {
     private logger: ScopedLogger;
-    messages: message[];
+    messages: Message[];
     db: unknown;
 
     constructor() {
@@ -21,13 +21,13 @@ export default class Memory {
         spinner.succeed('Memory init success');
     }
 
-    async addMessage(msg: message) {
+    async addMessage(msg: Message) {
        this.messages.push(msg);
 
        if (this.db) {
            // 持久化到数据库
            try {
-               await Message.create({
+               await MessageData.create({
                    userId: 'default',
                    content: msg.role==='tool'? "":msg.content,
                    role: msg.role,

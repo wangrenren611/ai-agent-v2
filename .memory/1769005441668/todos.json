@@ -1,0 +1,32 @@
+[
+  {
+    "content": "探索项目结构，定位所有tool实现代码",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "分析每个tool的实现逻辑和依赖关系",
+    "status": "completed",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "检查tool实现的潜在bug：错误处理、边界条件、竞态条件",
+    "status": "completed",
+    "priority": "high",
+    "id": "3"
+  },
+  {
+    "content": "检查tool与LLM交互的逻辑正确性",
+    "status": "completed",
+    "priority": "high",
+    "id": "4"
+  },
+  {
+    "content": "总结发现的问题并生成详细报告",
+    "status": "completed",
+    "priority": "medium",
+    "id": "5"
+  }
+]

@@ -7,6 +7,17 @@
 import { execaCommandSync, execaCommand } from 'execa';
 import iconv from 'iconv-lite';
 
+function decodeCommandOutput(data: unknown, platform: Platform): string {
+    if (data === undefined || data === null) {
+        return '';
+    }
+    if (Buffer.isBuffer(data)) {
+        return platform === 'windows' ? iconv.decode(data, 'gbk') : data.toString('utf8');
+    }
+    return String(data);
+}
+
+
 /**
  * 平台类型
  */
@@ -86,10 +97,11 @@ export function buildFindCommand(pattern: string, directory?: string): string {
     const dir = directory || '.';
 
     switch (platform) {
-        case 'windows':
+        case 'windows': {
             // Windows: dir /s /b src\*.ts
             const normDir = dir.replace(/\//g, '\\');
             return `dir /s /b "${normDir}\\${pattern}"`;
+        }
 
         case 'mac':
         case 'linux':
@@ -111,9 +123,10 @@ export function buildListCommand(directory: string = '.'): string {
     const platform = getPlatform();
 
     switch (platform) {
-        case 'windows':
+        case 'windows': {
             const normDir = directory.replace(/\//g, '\\');
             return `dir /a "${normDir}"`;
+        }
 
         case 'mac':
         case 'linux':
@@ -172,21 +185,21 @@ export function getPlatformAdvice(): string {
  * 执行跨平台命令（同步）
  */
 export function execCommand(command: string): { stdout: string; stderr: string; exitCode: number } {
+    const platform = getPlatform();
     try {
         const result = execaCommandSync(command, {
             shell: true,
-            encoding: 'buffer' as any,
+            encoding: 'buffer' as any
         });
         return {
-            stdout: decodeShellOutput(result.stdout),
-            stderr: decodeShellOutput(result.stderr),
+            stdout: decodeCommandOutput(result.stdout, platform),
+            stderr: decodeCommandOutput(result.stderr, platform),
             exitCode: result.exitCode ?? 0
         };
     } catch (error: any) {
-        const stderr = normalizeTimeoutText(decodeShellOutput(error.stderr) || String(error.message || ''));
         return {
-            stdout: decodeShellOutput(error.stdout),
-            stderr,
+            stdout: decodeCommandOutput(error.stdout, platform),
+            stderr: decodeCommandOutput(error.stderr || error.message, platform),
             exitCode: error.exitCode || 1
         };
     }
@@ -198,51 +211,35 @@ export function execCommand(command: string): { stdout: string; stderr: string; 
  * @param command - 要执行的命令
  * @param options - 可选配置
  * @param options.timeout - 超时时间（毫秒）
+ * @param options.cwd - 工作目录
  * @returns 执行结果
  */
 export async function execCommandAsync(
     command: string,
-    options?: { timeout?: number; cwd?: string; env?: NodeJS.ProcessEnv }
+    options?: { timeout?: number; cwd?: string }
 ): Promise<{
     stdout: string;
     stderr: string;
     exitCode: number;
 }> {
+    const platform = getPlatform();
     try {
         const result = await execaCommand(command, {
             shell: true,
             encoding: 'buffer' as any,
             timeout: options?.timeout,
             cwd: options?.cwd,
-            env: options?.env,
         });
         return {
-            stdout: decodeShellOutput(result.stdout),
-            stderr: decodeShellOutput(result.stderr),
+            stdout: decodeCommandOutput(result.stdout, platform),
+            stderr: decodeCommandOutput(result.stderr, platform),
             exitCode: result.exitCode ?? 0
         };
     } catch (error: any) {
-        const stderr = normalizeTimeoutText(decodeShellOutput(error.stderr) || String(error.message || ''));
         return {
-            stdout: decodeShellOutput(error.stdout),
-            stderr,
+            stdout: decodeCommandOutput(error.stdout, platform),
+            stderr: decodeCommandOutput(error.stderr || error.message, platform),
             exitCode: error.exitCode || 1
         };
     }
-}
-
-function decodeShellOutput(output: unknown): string {
-    if (output === undefined || output === null) return '';
-    if (typeof output === 'string') return output;
-    if (Buffer.isBuffer(output)) {
-        if (getPlatform() !== 'windows') return output.toString('utf8');
-        const utf8 = output.toString('utf8');
-        if (!utf8.includes('\uFFFD')) return utf8;
-        return iconv.decode(output, 'cp936');
-    }
-    return String(output);
-}
-
-function normalizeTimeoutText(text: string): string {
-    return text.replace(/timed out after (\d+) milliseconds/gi, 'timed out after $1ms');
 }

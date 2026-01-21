@@ -46,7 +46,7 @@ export async function smartInput(options: SmartInputOptions): Promise<SmartInput
             tabSize: 2,
         });
 
-        let currentLine = '';
+        const _currentLine = '';
 
         rl.prompt();
 

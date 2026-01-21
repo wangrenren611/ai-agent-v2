@@ -23,10 +23,10 @@
 // =============================================================================
 
 // @ts-ignore - tree-sitter 是 CommonJS 模块，需要使用 require
-const Parser = require('tree-sitter');
+import Parser from 'tree-sitter'
 // @ts-ignore - tree-sitter-bash 是 CommonJS 模块
-const Bash = require('tree-sitter-bash');
 
+import Bash from 'tree-sitter-bash'
 // =============================================================================
 // Security Pattern Constants
 // =============================================================================

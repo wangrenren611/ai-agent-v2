@@ -2,24 +2,26 @@
  * CLI - 交互式命令行界面
  * 使用 prompts 库实现稳定的交互
  */
+import { execSync } from 'node:child_process';
 import { ScopedLogger } from '../util/log';
 import Agent from '../agent';
+import { SessionManager } from '../session-v2';
 import { executeCommand } from './commands';
-import { formatSessionId, InputHistory } from './utils';
+import {  InputHistory } from './utils';
 import { readWithHistory } from './utils/reader';
 import type { CommandContext } from './commands/types';
 
 export interface CLIConfig {
     agent: Agent;
-    sessionId: string;
-    userId: string;
+    sessionManager: SessionManager;
+    sessionId?: string;
     prompt?: string;
 }
 
 export class CLI {
     private agent: Agent;
-    private sessionId: string;
-    private userId: string;
+    private sessionManager: SessionManager;
+    private sessionId: { value: string };
     private promptText: string;
     private running: boolean;
     private logger: ScopedLogger;
@@ -27,8 +29,8 @@ export class CLI {
 
     constructor(config: CLIConfig) {
         this.agent = config.agent;
-        this.sessionId = config.sessionId;
-        this.userId = config.userId;
+        this.sessionManager = config.sessionManager;
+        this.sessionId = { value: config.sessionId || 'session_10001' };
         this.promptText = config.prompt || 'You';
         this.running = false;
         this.logger = new ScopedLogger('CLI');
@@ -40,6 +42,14 @@ export class CLI {
      */
     async start(): Promise<void> {
         this.running = true;
+
+        if (process.platform === 'win32') {
+            try {
+                execSync('chcp 65001>nul');
+            } catch (_error) {
+                // Ignore failures and keep default code page.
+            }
+        }
         this.printWelcome();
 
         while (this.running) {
@@ -77,15 +87,15 @@ export class CLI {
     private async handleInput(input: string): Promise<void> {
         const context: CommandContext = {
             agent: this.agent,
-            sessionId: { value: this.sessionId },
             running: { value: this.running },
+            sessionId: this.sessionId,
+            sessionManager: this.sessionManager,
         };
 
         const isCommand = await executeCommand(input, context);
 
         // 更新运行状态
         this.running = context.running.value;
-        this.sessionId = context.sessionId.value;
 
         if (!isCommand) {
             await this.handleChat(input);
@@ -97,7 +107,7 @@ export class CLI {
      */
     private async handleChat(input: string): Promise<void> {
         try {
-            const response = await this.agent.run(this.sessionId, this.userId, input, { silent: true });
+            const response = await this.agent.run(input, { silent: true });
             if (response) {
                 this.logger.info(`\n🤖 Agent:\n${response.content}\n`);
             } else {
@@ -116,7 +126,6 @@ export class CLI {
         console.log('\n╔════════════════════════════════════════════════╗');
         console.log('║       AI Agent - Interactive Mode              ║');
         console.log('╚════════════════════════════════════════════════╝');
-        console.log(`Session: ${formatSessionId(this.sessionId)}`);
         console.log('Type /help for available commands\n');
     }
 

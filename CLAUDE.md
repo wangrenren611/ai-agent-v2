@@ -94,3 +94,8 @@ To add a new LLM provider, extend `LLMProvider` abstract class from `src/provide
 - **Session**: `{ sessionId, userId, createdAt, updatedAt }`
 
 Compound index on `{ sessionId: 1, createdAt: 1 }` optimizes history queries.
+
+
+### Code File Index
+Quickly locate key functions and files
+./ai-agent-v2/projectMap.md

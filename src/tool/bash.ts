@@ -93,7 +93,7 @@ export default class BashTool extends BaseTool<typeof schema> {
     private async runCommand(command: string): Promise<string> {
         const normalizedCommand = this.normalizeCommand(command);
         const cdOutput = this.tryHandleCd(normalizedCommand);
-        if (cdOutput !== null) return cdOutput;
+        if (cdOutput !== null) return this.truncateOutput( `ERROR: Command failed: ${cdOutput}`);
 
         const result = await execCommandAsync(normalizedCommand, {
             timeout: this.timeout,
@@ -110,7 +110,12 @@ export default class BashTool extends BaseTool<typeof schema> {
 
     private tryHandleCd(command: string): string | null {
         const platform = getPlatform();
-        const cdMatch = command.match(/^\s*cd(?:\s+\/d)?\s+(.+?)\s*$/i);
+        // 检测复杂命令（包含管道、重定向、命令连接符等），不做 cd 特殊处理
+        if (/[|;&<>]|\|\||&&/.test(command)) {
+            return null;
+        }
+
+        const cdMatch = command.match(/^\s*cd(?:\s+\/d)?\s+(.+)\s*$/i);
         if (!cdMatch) return null;
 
         const rawTarget = cdMatch[1]?.trim();
@@ -133,6 +138,11 @@ export default class BashTool extends BaseTool<typeof schema> {
             const seconds = Number(timeoutMatch[1]);
             const safeSeconds = Number.isFinite(seconds) ? Math.max(0, seconds) : 0;
             return `powershell -NoProfile -Command "Start-Sleep -Seconds ${safeSeconds}"`;
+        }
+
+        const mkdirMatch = command.match(/^\s*mkdir\s+(-p|--parents)\s+(.+)\s*$/i);
+        if (mkdirMatch) {
+            return `mkdir ${mkdirMatch[2]}`;
         }
 
         const { tokens, quoteTypes } = this.tokenize(command);
