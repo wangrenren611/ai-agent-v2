@@ -1,0 +1,44 @@
+[
+  {
+    "content": "探索项目整体结构和文件组织",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "分析核心架构模式（DDD、Repository等）",
+    "status": "completed",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "深入分析 CLI 层实现逻辑",
+    "status": "completed",
+    "priority": "high",
+    "id": "3"
+  },
+  {
+    "content": "分析 Agent 层和会话管理机制",
+    "status": "completed",
+    "priority": "high",
+    "id": "4"
+  },
+  {
+    "content": "分析领域模型和数据流",
+    "status": "completed",
+    "priority": "medium",
+    "id": "5"
+  },
+  {
+    "content": "分析基础设施层和持久化机制",
+    "status": "completed",
+    "priority": "medium",
+    "id": "6"
+  },
+  {
+    "content": "总结项目架构和关键设计决策",
+    "status": "completed",
+    "priority": "high",
+    "id": "7"
+  }
+]
