@@ -139,55 +139,46 @@ const SUBAGENTS: SubAgentConfig[] = [
 const DESCRIPTION_TEMPLATE = `
 Launch a specialized sub-agent to handle complex, multi-step tasks autonomously.
 
+DEFAULT: Use this tool first for any non-trivial request (multi-file, global analysis, planning, refactors, audits, tests, or executions). Skip only for tiny single-file read/answer tasks with no actions.
+
+Trigger this tool when:
+- Scope spans multiple files/directories, needs global search, or has unclear boundaries
+- Work requires planning, refactoring, running commands/tests, or parallel subtasks
+- User asks for reviews/audits/reports or invokes a slash command; pass the entire command as the prompt
+- You are unsure whether write access is needed (default to this tool)
+
 Available agent types and their tools:
 {agents}
 
 # Agent Selection Guide
 
-Choose the appropriate subagent based on your task requirements:
-
 ## explore (Read-only, Fast)
-- **Purpose**: Quick codebase exploration and searching
-- **Use when**: You ONLY need to find/read/search files WITHOUT making changes
-- **Tools**: glob, grep, read_file, web_search (NO write access)
-- **Examples**:
-  - "Find all TypeScript files in src/components"
-  - "Search for all API endpoint definitions"
-  - "How is authentication implemented?"
-  - "Locate the configuration file"
+- Purpose: Quick codebase exploration and searching
+- Use when: ONLY need to find/read/search without any edits
+- Tools: glob, grep, read_file, web_search (NO write)
+- Examples: "Find all API endpoints", "Where is auth implemented?"
 
 ## plan (Read-only, Planning)
-- **Purpose**: Break down broad work into ordered, actionable steps
-- **Use when**: You need to create a structured plan before executing
-- **Tools**: glob, grep, read_file, web_search (NO write access)
-- **Examples**:
-  - "Create a plan for implementing a new feature"
-  - "Break down this refactoring task into steps"
+- Purpose: Produce a concise ordered plan before executing
+- Use when: Need structured steps, dependencies, and risks/assumptions
+- Tools: glob, grep, read_file, web_search (NO write)
+- Examples: "Plan a new feature", "Break down this refactor"
 
 ## general (Full Access, Multi-step)
-- **Purpose**: Complex tasks requiring code modifications
-- **Use when**: You need to WRITE/MODIFY code, run builds/tests, or execute multi-step workflows
-- **Tools**: bash, glob, grep, read_file, write_file, precise_replace, batch_replace, web_search, skill (FULL read/write access)
-- **Examples**:
-  - "Implement a new feature with code changes"
-  - "Refactor the API layer across multiple files"
-  - "Fix failing tests and update related code"
-  - "Run build commands and fix any errors"
+- Purpose: Tasks that WRITE/MODIFY code, run builds/tests, or execute workflows
+- Use when: Any edits, commands, migrations, refactors, or fixes are needed
+- Tools: bash, glob, grep, read_file, write_file, precise_replace, batch_replace, web_search, skill (FULL access)
+- Examples: "Implement feature", "Refactor API layer", "Fix failing tests"
 
-**Decision Flow**:
-1. Does the task involve ONLY reading/searching/exploring? → Use **explore**
-2. Does the task involve creating a plan? → Use **plan**
-3. Does the task involve writing/modifying code OR executing commands? → Use **general**
-4. Default to **general** if uncertain about whether write access is needed
-
-When to use:
-- Broad codebase exploration or research that would consume too much context
-- Tasks that can run in parallel with your main work
-- When the user invokes custom slash commands; pass the entire command as the prompt
+Decision flow:
+1) Trivial single-file Q&A only? -> skip this tool
+2) Read/search only? -> explore
+3) Planning only? -> plan
+4) Any edits/commands/tests OR uncertain? -> general
 
 Usage notes:
-1) Always set subagent_type based on the agent selection guide above
-2) Provide a clear prompt with expected outputs and whether code edits are allowed
+1) Always set subagent_type using the guide above
+2) Provide a clear prompt, expected outputs, and whether edits are allowed
 3) Each call creates its own session; reuse session_id to continue a prior run
 `.trim();
 

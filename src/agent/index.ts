@@ -62,7 +62,7 @@ export default class Agent extends EventEmitter {
         const providerMaxTokens = this.llmProvider.maxTokens;
         this.maxOutputTokens = Math.min(config.maxOutputTokens ?? providerMaxOutput, providerMaxOutput);
         this.maxTokens = Math.min(config.maxTokens ?? providerMaxTokens, providerMaxTokens);
-        this.toolConcurrency = Math.max(1, config.toolConcurrency ?? 4);
+        this.toolConcurrency = Math.max(1, config.toolConcurrency ?? 1);
         this.toolTimeoutMs = config.toolTimeoutMs ?? 1000*60*5;
         this.noProgressLimit = Math.max(0, config.noProgressLimit ?? 2);
         this.sessionManager.maxOutputTokens = this.maxOutputTokens;
@@ -317,19 +317,27 @@ export default class Agent extends EventEmitter {
                     // 按原始顺序添加工具结果消息
                     for (const { toolCall, result, error: _error } of results) {
                         const { id } = toolCall;
-
+                       
+                         
                         this.sessionManager.addMessage({
                             role: 'tool',
                             content: result,
                             type: 'tool',
                             tool_call_id: id,
                         });
+
+                        if (toolCall.function.name === 'complete_task') {
+                            return {
+                                content: result,
+                                role: 'assistant',
+                            };
+                        }
                     }
 
                     // 继续循环，让 LLM 基于工具结果生成响应
-                    continue;
+                   continue;
                 }
-
+   
                 // 没有工具调用，这是最终响应
                 this.sessionManager.addMessage({
                     role: 'assistant',
@@ -342,7 +350,7 @@ export default class Agent extends EventEmitter {
                     role: 'assistant',
                 };
 
-                break;
+                // break;
             }
 
             if (i >= this.maxLoop) {
