@@ -15,6 +15,19 @@ export type { AgentConfig as EventBusAgentConfig, AgentResponse as EventBusAgent
 export { default } from './index-eventbus';
 export type { AgentConfig, AgentResponse } from './index-eventbus';
 
+// AgentManager
+export { AgentManager } from './manager';
+export type {
+    AgentDefinition,
+    AgentFilters,
+    AgentInstance,
+    AgentManagerOptions,
+    AgentMode,
+    AgentStorage,
+    AgentType,
+    GenerationContext
+} from './manager';
+
 // 导出钩子系统
 export * from './hooks';
 export * from './hooks/examples';
