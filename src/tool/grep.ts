@@ -1,26 +1,24 @@
-import { search, type SearchMatch } from '@mcpc-tech/ripgrep-napi';
+import { search, type SearchMatch,validatePattern } from '@mcpc-tech/ripgrep-napi';
 import { z } from 'zod';
 import { BaseTool } from './base';
 
 const schema = z.object({
   pattern: z.string().describe('The regex pattern to search for in file contents'),
-  filePattern: z.string().nullable().describe("Glob pattern, e.g. *.ts")
+  filePattern: z.string().nullable().describe('Glob pattern, e.g. *.ts'),
 });
 
 export default class GrepTool extends BaseTool<typeof schema> {
-
-  name = "grep";
+  name = 'grep';
 
   description = `- Fast content search tool that works with any codebase size
 - Searches file contents using regular expressions
-- Supports full regex syntax (eg. "log.*Error", "function\s+\w+", etc.)
+- Supports full regex syntax (eg. "log.*Error", "function\\s+\\w+", etc.)
 - Filter files by pattern with the include parameter (eg. "*.js", "*.{ts,tsx}")
 - Returns file paths and line numbers with at least one match sorted by modification time
 - Use this tool when you need to find files containing specific patterns
 - If you need to identify/count the number of matches within files, use the Bash tool with 'rg' (ripgrep) directly. Do NOT use 'grep'.
 - When you are doing an open-ended search that may require multiple rounds of globbing and grepping, use the Task tool instead
 `;
-
   schema = schema;
 
   async execute({ pattern, filePattern }: any): Promise<string> {
@@ -46,6 +44,10 @@ export default class GrepTool extends BaseTool<typeof schema> {
     };
 
     try {
+      if (!validatePattern(pattern)) {
+        return 'Invalid pattern format';
+      }
+      
       // 使用 ripgrep-napi 进行搜索
       const result = search(pattern, ['.'], options);
 
@@ -53,6 +55,8 @@ export default class GrepTool extends BaseTool<typeof schema> {
       if (!result.success) {
         return `Search Error: ${result.error || 'Unknown error'}`;
       }
+
+
 
       // 过滤结果（如果指定了 filePattern）
       let matches = result.matches;

@@ -32,7 +32,6 @@ import { initializeMcp } from '../mcp/index';
 import { WebSearchTool } from './web-search';
 import { SkillTool, initializeSkills } from '../skills';
 import TaskTool from './task';
-import CompleteTaskTool from './complete-task';
 
 // =============================================================================
 // Tool Registry
@@ -64,7 +63,6 @@ export function registerDefaultTools(): void {
         new WebSearchTool(),
         new SkillTool(),
         new TaskTool(),
-        new CompleteTaskTool()
     ]);
 }
 

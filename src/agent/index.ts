@@ -325,13 +325,6 @@ export default class Agent extends EventEmitter {
                             type: 'tool',
                             tool_call_id: id,
                         });
-
-                        if (toolCall.function.name === 'complete_task') {
-                            return {
-                                content: result,
-                                role: 'assistant',
-                            };
-                        }
                     }
 
                     // 继续循环，让 LLM 基于工具结果生成响应
@@ -350,7 +343,7 @@ export default class Agent extends EventEmitter {
                     role: 'assistant',
                 };
 
-                // break;
+                break;
             }
 
             if (i >= this.maxLoop) {
