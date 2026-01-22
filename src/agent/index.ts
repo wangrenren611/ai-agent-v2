@@ -379,6 +379,7 @@ export default class Agent extends EventEmitter {
                         type: 'text',
                         content: errorMsg
            });
+                       
             return {
                 content: errorMsg,
                 role: 'assistant',

@@ -23,7 +23,8 @@
     "dev:cli": "cross-env NODE_ENV=development  tsx src/index.ts cli",
     "test": "vitest run src/tool/bash.test.ts",
     "codeCompressor": "cross-env NODE_ENV=development  tsx src/codeCompressor.ts",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "langfuse:demo": "cross-env NODE_ENV=development tsx src/examples/langfuse-demo.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
@@ -41,7 +42,11 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
+    "langfuse": "^3.38.6",
+    "@langfuse/otel": "^4.5.1",
+    "@langfuse/tracing": "^4.5.1",
     "@mcpc-tech/ripgrep-napi": "^0.0.4",
+    "@opentelemetry/sdk-node": "^0.211.0",
     "@tavily/core": "^0.7.1",
     "chalk": "^5.6.2",
     "dockerode": "^4.0.9",

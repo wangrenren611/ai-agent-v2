@@ -5,7 +5,6 @@
 import dotenv from 'dotenv';
 import { OpenAIProvider } from './providers/openai';
 import Agent from './agent';
-import { connectDB } from './storage/mongoose';
 import { CLI } from './cli';
 import { registerDefaultToolsAsync, ToolRegistry } from './tool';
 import { SessionManager } from './session-v2';
