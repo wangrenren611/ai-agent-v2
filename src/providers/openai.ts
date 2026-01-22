@@ -328,7 +328,7 @@ interface ChatCompletionResponse {
 /**
  * OpenAI API provider
  *
- * Uses the OpenAI Chat Completions API.
+ * Uses OpenAI Chat Completions API.
  */
 export class OpenAIProvider extends LLMProvider {
   baseURL: string
@@ -360,7 +360,25 @@ export class OpenAIProvider extends LLMProvider {
       total_tokens: 0,
     };
 
-    let currentMessages = [...messages];
+    // 🔧 清理消息格式，只保留 OpenAI/DeepSeek API 支持的字段
+    // 过滤掉内部使用的 type 字段（如 "summary"）等不兼容的字段
+    const cleanMessage = (msg: Message) => {
+      const cleaned: Record<string, unknown> = {
+        role: msg.role,
+        content: msg.content
+      };
+      // 保留 tool_call_id（tool 回复必需）
+      if (msg.tool_call_id) {
+        cleaned.tool_call_id = msg.tool_call_id;
+      }
+      // 保留 tool_calls（assistant 调用工具必需）
+      if (msg.tool_calls) {
+        cleaned.tool_calls = msg.tool_calls;
+      }
+      return cleaned;
+    };
+
+    let currentMessages = messages.map(cleanMessage);
     let continueRound = 0;
 
     while (continueRound <= MAX_CONTINUE_ROUNDS) {
