@@ -17,22 +17,13 @@ const schema = z.object({
 export default class GlobTool extends BaseTool<typeof schema> {
     name = 'glob';
 
-    description = `Fast file pattern matching tool.
-
-BEST PRACTICES:
-- Use for finding files by extension or naming pattern
-- Prefer over bash find/dir commands for speed
-- Supports patterns: *.ts, **/*.test.ts, src/**/*.tsx
-- Automatically excludes node_modules, dist, .git, coverage
-- Returns files sorted by path
-
-WHEN TO USE:
-- Finding all TypeScript files: *.ts
-- Finding test files: **/*.test.ts
-- Finding files in specific directory: src/**/*.ts
-- Avoid excessive wildcards: **/*.* is too broad
-
-Returns array of relative file paths.`;
+    description = `- Fast file pattern matching tool that works with any codebase size
+- Supports glob patterns like "**/*.js" or "src/**/*.ts"
+- Returns matching file paths sorted by modification time
+- Use this tool when you need to find files by name patterns
+- When you are doing an open-ended search that may require multiple rounds of globbing and grepping, use the Task tool instead
+- You have the capability to call multiple tools in a single response. It is always better to speculatively perform multiple searches as a batch that are potentially useful.
+`;
 
     schema = schema;
 

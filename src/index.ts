@@ -42,7 +42,7 @@ async function initializeApp(config: AppConfig) {
       
 
    const sessionManager = new SessionManager({
-       sessionId:"1769055456060",//new Date().getTime().toString(),
+       sessionId:new Date().getTime().toString(),
        llmProvider,
    });
    

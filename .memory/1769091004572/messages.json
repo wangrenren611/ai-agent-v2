@@ -1,0 +1,23 @@
+[
+  {
+    "role": "user",
+    "type": "text",
+    "content": "如何实现多agent管理"
+  },
+  {
+    "role": "assistant",
+    "content": "我来帮你理解如何在这个项目中实现多agent管理。让我先探索一下现有的代码结构。",
+    "type": "tool_call",
+    "tool_calls": [
+      {
+        "function": {
+          "arguments": "{\"description\":\"探索现有agent架构和代码结构\",\"prompt\":\"探索这个AI agent项目的代码结构，重点关注：\\n1. Agent相关的实现（src/agent目录）\\n2. Session管理机制\\n3. 当前的架构设计模式\\n4. Provider接口和实现\\n\\n请详细分析当前如何管理单个agent和会话，以便我提供多agent管理的实现建议。\",\"subagent_type\":\"explore\"}",
+          "name": "task"
+        },
+        "id": "call_-7953238089259638071",
+        "index": 0,
+        "type": "function"
+      }
+    ]
+  }
+]

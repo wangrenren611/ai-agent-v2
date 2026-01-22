@@ -11,25 +11,15 @@ export default class GrepTool extends BaseTool<typeof schema> {
 
   name = "grep";
 
-  description = `Fast content search tool for finding code patterns.
-
-BEST PRACTICES:
-1. Use this tool FIRST to locate relevant files fast
-2. Use specific search patterns: "class_name", "function_name", or "import.*module"
-3. Prefer narrowing with filePattern like "*.ts" when possible
-4. Avoid broad patterns like "http|request|fetch" unless needed
-5. After you find the right file, read it fully instead of searching again
-
-WHEN TO USE:
-- Finding specific function/class definitions
-- Locating import statements or usage patterns
-- Searching for specific error messages or constants
-
-WHEN NOT TO USE:
-- After already reading a file (don't search for patterns you've already seen)
-- For listing files/directories (use Bash only when necessary)
-
-Returns JSON with file paths, line numbers, and matched content.`;
+  description = `- Fast content search tool that works with any codebase size
+- Searches file contents using regular expressions
+- Supports full regex syntax (eg. "log.*Error", "function\s+\w+", etc.)
+- Filter files by pattern with the include parameter (eg. "*.js", "*.{ts,tsx}")
+- Returns file paths and line numbers with at least one match sorted by modification time
+- Use this tool when you need to find files containing specific patterns
+- If you need to identify/count the number of matches within files, use the Bash tool with 'rg' (ripgrep) directly. Do NOT use 'grep'.
+- When you are doing an open-ended search that may require multiple rounds of globbing and grepping, use the Task tool instead
+`;
 
   schema = schema;
 
@@ -78,7 +68,7 @@ Returns JSON with file paths, line numbers, and matched content.`;
       }
 
       // 限制返回数量，防止 Token 爆炸
-      const preview = matches.slice(0, 20);
+      const preview = matches.slice(0, 200);
       const formatted = preview.map((m: SearchMatch) => ({
         file: m.path,
         line: m.lineNumber,
@@ -86,9 +76,7 @@ Returns JSON with file paths, line numbers, and matched content.`;
       }));
 
       const summary = JSON.stringify(formatted, null, 2);
-      return matches.length > 20
-        ? `${summary}\n... (${matches.length - 20} more matches)`
-        : summary;
+      return summary
     } catch (error: any) {
       return `Ripgrep Error: ${error?.message || String(error)}`;
     }

@@ -126,9 +126,9 @@ assistant: Clients are marked as failed in the "connectToServer" function in src
     
 Here is some useful information about the environment you are running in:
 <env>
-  Working directory: /Users/wrr/work/ai-agent-v2
+  Working directory: D:\work\ai-agent-v2
   Is directory a git repo: yes
-  Platform: darwin
+  Platform: win32
   Today's date: Thu Jan 22 2026
 </env>
 # CLAUDE.md

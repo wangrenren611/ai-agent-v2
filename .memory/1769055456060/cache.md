@@ -5944,3 +5944,69 @@
   "tool_call_id": "call_-7958546565763583535"
 }
 ```
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "你好"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"finalAnswer\":\"你好！我可以帮助你处理什么问题呢？\"}",
+        "name": "complete_task"
+      },
+      "id": "call_-7958444998375449431",
+      "index": 0,
+      "type": "function"
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "你好！我可以帮助你处理什么问题呢？",
+  "type": "tool",
+  "tool_call_id": "call_-7958444998375449431"
+}
+```
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "你是谁"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"finalAnswer\":\"我是 QPSCode，一个交互式 CLI 编程助手。\\n\\n我可以帮助你：\\n- 阅读和编辑代码文件\\n- 运行 bash 命令\\n- 搜索代码模式\\n- 管理项目任务\\n- 调试和修复代码问题\\n- 解释代码和架构\\n\\n你现在需要我帮忙做什么吗？\"}",
+        "name": "complete_task"
+      },
+      "id": "call_-7958471661533075284",
+      "index": 0,
+      "type": "function"
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "我是 QPSCode，一个交互式 CLI 编程助手。\n\n我可以帮助你：\n- 阅读和编辑代码文件\n- 运行 bash 命令\n- 搜索代码模式\n- 管理项目任务\n- 调试和修复代码问题\n- 解释代码和架构\n\n你现在需要我帮忙做什么吗？",
+  "type": "tool",
+  "tool_call_id": "call_-7958471661533075284"
+}
+```

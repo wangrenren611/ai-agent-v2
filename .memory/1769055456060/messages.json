@@ -1734,5 +1734,59 @@
     "content": "## 问题分析和修复总结\n\n您遇到的错误：\n```\nAPI Error Response: {\"error\":{\"code\":\"1214\",\"message\":\"messages 参数非法。请检查文档。\"}}\n```\n\n### 根本原因\n\nDeepSeek API 不支持 OpenAI 消息格式中的某些字段。您的 `src/session-v2/compaction.ts` 中的代码创建了带自定义 `type` 字段的消息（如 `type: \"summary\"`），这些字段在发送给 DeepSeek API 时会导致参数非法错误。\n\n### 已实施的修复\n\n在 `src/providers/openai.ts` 中添加了消息格式清理逻辑：\n\n```typescript\n// 🔧 清理消息格式，只保留 OpenAI/DeepSeek API 支持的字段\nconst cleanMessage = (msg: Message) => {\n  const cleaned: Record<string, unknown> = {\n    role: msg.role,\n    content: msg.content\n  };\n  // 保留 tool_call_id（tool 回复必需）\n  if (msg.tool_call_id) {\n    cleaned.tool_call_id = msg.tool_call_id;\n  }\n  // 保留 tool_calls（assistant 调用工具必需）\n  if (msg.tool_calls) {\n    cleaned.tool_calls = msg.tool_calls;\n  }\n  return cleaned;\n};\n\nlet currentMessages = messages.map(cleanMessage);\n```\n\n### 当前状态\n\n✅ `openai.ts` - 已修复（添加消息清理）\n✅ `manager.ts` - 已清理（移除了有语法错误的代码）\n❌ `export.ts` - 仍有导出类型错误\n\n### 后续修复步骤\n\n由于构建仍有类型错误，需要继续修复：\n\n1. **修复 `src/agent/export.ts`**\n   - 移除不存在的类型导出\n   - 更新为正确的类型引用\n\n2. **验证修复**\n   - 运行 `pnpm build` 确保编译通过\n   - 测试 Agent 调用验证 API 错误是否修复\n\n3. **临时解决方案（如需立即使用）**\n   ```bash\n   # 跳过类型检查直接运行\n   pnpm dev\n   ```\n\n### 建议\n\n如果您需要立即解决这个 API 错误，可以手动测试修改：\n\n```typescript\n// 在发送 API 请求前打印消息\nconsole.log('Sending messages:', JSON.stringify(messages, null, 2));\n```\n\n检查输出中是否有 DeepSeek 不支持的字段（如 `type`, `metadata` 等），然后手动过滤这些字段。\n\n如果您想让我继续完成所有构建错误的修复，请告诉我继续。",
     "type": "tool",
     "tool_call_id": "call_-7958546565763583535"
+  },
+  {
+    "role": "user",
+    "type": "text",
+    "content": "你好"
+  },
+  {
+    "role": "assistant",
+    "content": "",
+    "type": "tool_call",
+    "tool_calls": [
+      {
+        "function": {
+          "arguments": "{\"finalAnswer\":\"你好！我可以帮助你处理什么问题呢？\"}",
+          "name": "complete_task"
+        },
+        "id": "call_-7958444998375449431",
+        "index": 0,
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "content": "你好！我可以帮助你处理什么问题呢？",
+    "type": "tool",
+    "tool_call_id": "call_-7958444998375449431"
+  },
+  {
+    "role": "user",
+    "type": "text",
+    "content": "你是谁"
+  },
+  {
+    "role": "assistant",
+    "content": "",
+    "type": "tool_call",
+    "tool_calls": [
+      {
+        "function": {
+          "arguments": "{\"finalAnswer\":\"我是 QPSCode，一个交互式 CLI 编程助手。\\n\\n我可以帮助你：\\n- 阅读和编辑代码文件\\n- 运行 bash 命令\\n- 搜索代码模式\\n- 管理项目任务\\n- 调试和修复代码问题\\n- 解释代码和架构\\n\\n你现在需要我帮忙做什么吗？\"}",
+          "name": "complete_task"
+        },
+        "id": "call_-7958471661533075284",
+        "index": 0,
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "content": "我是 QPSCode，一个交互式 CLI 编程助手。\n\n我可以帮助你：\n- 阅读和编辑代码文件\n- 运行 bash 命令\n- 搜索代码模式\n- 管理项目任务\n- 调试和修复代码问题\n- 解释代码和架构\n\n你现在需要我帮忙做什么吗？",
+    "type": "tool",
+    "tool_call_id": "call_-7958471661533075284"
   }
 ]
