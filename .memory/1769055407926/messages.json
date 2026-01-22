@@ -1,0 +1,29 @@
+[
+  {
+    "role": "user",
+    "type": "text",
+    "content": "你好"
+  },
+  {
+    "role": "assistant",
+    "content": "",
+    "type": "tool_call",
+    "tool_calls": [
+      {
+        "function": {
+          "arguments": "{\"finalAnswer\":\"你好！我是 QPSCode，一个可以帮助你完成软件开发任务的 AI 代码助手。\\n\\n我可以帮助你：\\n- 编写、修改和重构代码\\n- 调试和修复问题\\n- 解释代码功能\\n- 运行命令和测试\\n- 搜索和分析代码库\\n\\n你需要什么帮助吗？\"}",
+          "name": "complete_task"
+        },
+        "id": "call_-7958567765722605289",
+        "index": 0,
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "content": "你好！我是 QPSCode，一个可以帮助你完成软件开发任务的 AI 代码助手。\n\n我可以帮助你：\n- 编写、修改和重构代码\n- 调试和修复问题\n- 解释代码功能\n- 运行命令和测试\n- 搜索和分析代码库\n\n你需要什么帮助吗？",
+    "type": "tool",
+    "tool_call_id": "call_-7958567765722605289"
+  }
+]

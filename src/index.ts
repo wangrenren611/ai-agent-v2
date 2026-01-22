@@ -43,7 +43,7 @@ async function initializeApp(config: AppConfig) {
       
 
    const sessionManager = new SessionManager({
-       sessionId:new Date().getTime().toString(),
+       sessionId:"1769055456060",//new Date().getTime().toString(),
        llmProvider,
    });
    
@@ -54,19 +54,20 @@ async function initializeApp(config: AppConfig) {
         sessionPath: sessionManager.sessionPath,
     });
 
-    const tools = ToolRegistry.getSchemas();
 
     const customPrompt = operatorPrompt({
         directory: process.cwd(),
         vcs: "git",
-        tools,
     });
+
+    console.log(`Available tools:\n${ToolRegistry.getSchemas().map(tool => `'${tool.function.name}'`).join("\n")}`);
+
     fs.writeFileSync(path.resolve(process.cwd(), 'customPrompt.md'), customPrompt);
     const agent = new Agent({
         llmProvider,
         sessionManager,
         systemPrompt: customPrompt,
-        defaultTools: tools,
+        defaultTools: ToolRegistry.getSchemas(),
     });
 
     return { agent, sessionManager };

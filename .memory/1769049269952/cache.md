@@ -1,0 +1,154 @@
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "你好"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你完成软件工程任务。\n\n我能帮你做什么？比如：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你做什么？比如：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n我能帮你：\n- 查找和分析代码\n- 修复 bug 或添加新功能\n- 重构和优化代码\n- 解释代码逻辑\n- 运行构建和测试\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，一个交互式 CLI 工具，可以帮助你处理软件工程任务。\n\n有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！我是 QPSCode，有什么我可以帮你的吗？"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "你好！有什么我可以帮你的吗？"
+}
+```

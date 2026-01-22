@@ -1,0 +1,22 @@
+[
+  {
+    "role": "user",
+    "type": "text",
+    "content": "你好"
+  },
+  {
+    "role": "assistant",
+    "type": "text",
+    "content": "你好！很高兴见到你。我可以帮助你进行软件工程任务，比如编写代码、调试问题、重构代码、解释代码等。有什么我可以帮助你的吗？"
+  },
+  {
+    "role": "assistant",
+    "type": "text",
+    "content": "你好！我是 QPSCode，一个专业的编码助手。我可以帮助你：\n\n- 编写和优化代码\n- 调试和修复问题\n- 重构和改进代码结构\n- 解释代码逻辑\n- 运行测试和构建\n- 以及其他软件开发任务\n\n有什么我可以帮助你的吗？"
+  },
+  {
+    "role": "assistant",
+    "type": "text",
+    "content": "你好！我准备好帮助你处理各种软件工程任务。我可以看到这是一个 AI agent 项目，使用了 TypeScript、DDD 架构和 Repository Pattern。\n\n有什么我可以帮助你的吗？"
+  }
+]
