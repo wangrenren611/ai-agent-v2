@@ -23,7 +23,7 @@
  * @module skills
  */
 
-// Types
+// 类型
 export type {
     Skill,
     SkillFile,
@@ -32,14 +32,14 @@ export type {
     SkillFrontmatter
 } from './types';
 
-// Loader
+// 加载器
 export {
     SkillLoader,
     getSkillLoader,
     initializeSkills
 } from './loader';
 
-// Parser
+// 解析器
 export {
     parseSkillMarkdown,
     parseSkillMarkdownFull,
@@ -48,7 +48,7 @@ export {
     formatSkillContent
 } from './parser';
 
-// Tools - 新的 API
+// 工具 - 新的 API
 export {
     SkillTool,
     createSkillTool,

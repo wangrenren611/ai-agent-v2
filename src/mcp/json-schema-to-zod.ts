@@ -1,5 +1,5 @@
 /**
- * JSON Schema to Zod Converter
+ * JSON Schema 到 Zod 转换器
  *
  * 将 JSON Schema 转换为 Zod schema
  * 用于将 MCP 工具的输入参数定义适配到本地的 BaseTool 接口
@@ -8,7 +8,7 @@
 import { z } from 'zod';
 
 // =============================================================================
-// JSON Schema to Zod Conversion
+// JSON Schema 到 Zod 转换
 // =============================================================================
 
 /**

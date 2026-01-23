@@ -1,12 +1,12 @@
 /**
- * MCP Module
+ * MCP 模块
  *
  * Model Context Protocol (MCP) 客户端模块
  * 支持连接第三方 MCP 服务器并使用其工具
  */
 
 // =============================================================================
-// Public API
+// 公共 API
 // =============================================================================
 
 export * from './types';
@@ -17,7 +17,7 @@ export * from './config-loader';
 export * from './json-schema-to-zod';
 
 // =============================================================================
-// Convenience Exports
+// 便捷导出
 // =============================================================================
 
 export { initializeMcp, getMcpManager } from './manager';
@@ -27,7 +27,7 @@ export { McpToolAdapter, createToolAdapters } from './tool-adapter';
 export { jsonSchemaToZod } from './json-schema-to-zod';
 
 // =============================================================================
-// Types
+// 类型
 // =============================================================================
 
 export type {

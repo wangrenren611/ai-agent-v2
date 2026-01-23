@@ -14,7 +14,7 @@ export class BatchReplaceTool extends BaseTool<any> {
 
   name = "batch_replace";
 
-  description = "Replace multiple text segments in a file in a single call. Use for batch modifications like translating multiple comments or updating related JSDoc.";
+  description = "在单个调用中替换文件的多个文本段。用于批量修改，如翻译多个注释或更新相关的 JSDoc。";
 
   schema = z.object({
     filePath: z.string().describe("Path to the file to modify"),
@@ -44,8 +44,8 @@ export class BatchReplaceTool extends BaseTool<any> {
     const results: string[] = [];
     let modifiedCount = 0;
 
-    // Sort replacements by line number (descending) to avoid line number shifting issues
-    // Actually, for line-based replacement without shifting, we can process in any order
+    // 按行号（降序）排序替换项，避免行号偏移问题
+    // 实际上，对于基于行的替换且无偏移，我们可以按任意顺序处理
     // since we're replacing text within lines, not adding/removing lines
 
     for (const repl of replacements) {
@@ -73,7 +73,7 @@ export class BatchReplaceTool extends BaseTool<any> {
       console.log(chalk.green(`+ ${newLine.trim()}`));
     }
 
-    // Write all changes at once
+    // 一次性写入所有更改
     if (modifiedCount > 0) {
       fs.writeFileSync(fullPath, lines.join('\n'));
     }

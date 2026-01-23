@@ -165,7 +165,7 @@ function countBraces(json: string) {
 export interface OpenAIConfig extends ProviderConfig {
   /** OpenAI API key */
   apiKey: string
-  /** Base URL (default: https://api.openai.com/v1) */
+  /** 基础 URL（默认: https://api.openai.com/v1） */
   baseURL?: string
   /** Model name (default: gpt-4o-mini) */
   model?: string

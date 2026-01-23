@@ -47,7 +47,7 @@ export class CLI {
             try {
                 execSync('chcp 65001>nul');
             } catch (_error) {
-                // Ignore failures and keep default code page.
+                // 忽略失败并保持默认代码页。
             }
         }
         this.printWelcome();

@@ -1,0 +1,32 @@
+[
+  {
+    "content": "查看 Desktop 目录下的所有文件和文件夹",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "分析文件类型并制定归档方案",
+    "status": "completed",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "创建合理的目录结构",
+    "status": "completed",
+    "priority": "high",
+    "id": "3"
+  },
+  {
+    "content": "移动文件到对应目录",
+    "status": "completed",
+    "priority": "high",
+    "id": "4"
+  },
+  {
+    "content": "验证整理结果",
+    "status": "completed",
+    "priority": "medium",
+    "id": "5"
+  }
+]

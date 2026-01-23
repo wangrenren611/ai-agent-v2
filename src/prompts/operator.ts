@@ -130,8 +130,8 @@ assistant: Clients are marked as failed in the "connectToServer" function in src
     ].join("\n");
 
     const custom = fs.readFileSync(path.resolve(process.cwd(), directory, 'CLAUDE.md'), 'utf-8');
-    // console.log(`Available tools:\n${tools.map(tool => `'${tool.function.name}'`).join("\n")}`);
-    // ## Available tools:\n${tools.map(tool => `'${tool.function.name}': ${tool.function.description}`).join("\n")}
+    // console.log(`可用工具:\n${tools.map(tool => `'${tool.function.name}'`).join("\n")}`);
+    // ## 可用工具:\n${tools.map(tool => `'${tool.function.name}': ${tool.function.description}`).join("\n")}
     return `${provider}\n${environment}\n${custom}\n`
 
 }

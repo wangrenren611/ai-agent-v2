@@ -51,7 +51,7 @@ export class SessionManager {
 
   addMessage(message: Message) {
     this.messageList.push(message);
-    // Fire-and-forget：加入保存队列，不阻塞调用方
+    // 即发即忘：加入保存队列，不阻塞调用方
     this.save(message);
   }
 

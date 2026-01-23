@@ -15,7 +15,7 @@ export type { AgentConfig as EventBusAgentConfig, AgentResponse as EventBusAgent
 export { default } from './index-eventbus';
 export type { AgentConfig, AgentResponse } from './index-eventbus';
 
-// AgentManager
+// Agent 管理器
 export { AgentManager } from './manager';
 export type {
     AgentDefinition,
