@@ -14,7 +14,7 @@ export class BatchReplaceTool extends BaseTool<any> {
 
   name = "batch_replace";
 
-  description = "在单个调用中替换文件的多个文本段。用于批量修改，如翻译多个注释或更新相关的 JSDoc。";
+  description = "Replace multiple text segments in a single file call. Ideal for batch edits such as translating multiple comments, updating related JSDoc blocks, or performing coordinated changes across several lines without multiple tool invocations.";
 
   schema = z.object({
     filePath: z.string().describe("Path to the file to modify"),

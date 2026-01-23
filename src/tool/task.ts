@@ -14,17 +14,8 @@ type SubAgentConfig = {
   systemPrompt?: string;
 };
 
-  const SUBAGENT_BASE_PROMPT = `                                                                                                                                                                                                                         
-  You are a specialized sub-agent working under a higher-level orchestrator. Treat the caller's instructions and the system prompt as hard constraints.                                                                                                  
-  Core rules:                                                                                                                                                                                                                                            
-  - Operate autonomously; do not ask the user questions or wait for confirmation.                                                                                                                                                                        
-  - Use only the tools granted to this sub-agent; if a tool is unavailable or an action would violate read-only scope, state the limitation and continue with alternatives. Never fabricate tool output.                                                 
-  - Keep work focused and efficient: search narrowly, avoid repo-wide scans unless explicitly required, and minimize redundant reads. Prefer glob/grep/read_file over shell listings; run the fewest commands needed.                                    
-  - If writing is allowed by your toolset, make deliberate, minimal edits that align with existing style; otherwise stay strictly read-only.                                                                                                             
-  - Handle errors gracefully: retry with safer parameters when reasonable, and report blockers clearly.                                                                                                                                                  
-  - Paths are repository-relative. When citing findings or edits, include file:line references.                                                                                                                                                          
-  - Final response: concise, actionable bullets covering findings/changes, commands/files touched, and remaining gaps or follow-ups. Exclude tool-call chatter and questions.                                                                            
-  `.trim();   
+                                                                                                                                                                                                                     
+
 
 const SUBAGENTS: SubAgentConfig[] = [
   {
@@ -33,16 +24,32 @@ const SUBAGENTS: SubAgentConfig[] = [
       'Fast READ-ONLY explorer for searching and understanding codebases. Use this ONLY when you need to find/read files WITHOUT making any changes.',
     tools: ['grep', 'glob', 'read_file', 'web_search'],
     systemPrompt: [
-      SUBAGENT_BASE_PROMPT,
-      'Stay read-only: do not modify files. Prefer glob/grep/read_file. Summarize findings with precise paths.',
+  `You are a file search specialist. You excel at thoroughly navigating and exploring codebases.
+
+Your strengths:
+- Rapidly finding files using glob patterns
+- Searching code and text with powerful regex patterns
+- Reading and analyzing file contents
+
+Guidelines:
+- Use Glob for broad file pattern matching
+- Use Grep for searching file contents with regex
+- Use Read when you know the specific file path you need to read
+- Use Bash for file operations like copying, moving, or listing directory contents
+- Adapt your search approach based on the thoroughness level specified by the caller
+- Return file paths as absolute paths in your final response
+- For clear communication, avoid using emojis
+- Do not create any files, or run bash commands that modify the user's system state in any way
+
+Complete the user's search request efficiently and report your findings clearly.
+`,
     ].join('\n\n'),
   },
   {
     name: 'plan',
     description: 'Planning specialist that breaks broad work into ordered, actionable steps with dependencies.',
-    tools: ['glob', 'grep', 'read_file', 'web_search'],
+    tools: ['batch_replace', 'write_file', 'read_file'],
     systemPrompt: [
-      SUBAGENT_BASE_PROMPT,
       'Your goal is to deliver a concise, ordered plan (5-12 steps) with clear ownership, dependencies, and expected outputs.',
       'Stay read-only: do not modify files or run commands that mutate state.',
       'Prefer glob/grep/read_file to gather just enough context; avoid exhaustive scans.',
@@ -51,7 +58,7 @@ const SUBAGENTS: SubAgentConfig[] = [
   },
   {
     name: 'general',
-    description: [SUBAGENT_BASE_PROMPT,`Full-access agent for tasks that require code modifications. Use this when you need to WRITE, EDIT, or EXECUTE commands - not just reading.`].join('\n\n'),
+    description: [`Full-access agent for tasks that require code modifications. Use this when you need to WRITE, EDIT, or EXECUTE commands - not just reading.`].join('\n\n'),
     tools: [
       'bash',
       'glob',
@@ -63,9 +70,7 @@ const SUBAGENTS: SubAgentConfig[] = [
       'web_search',
       'skill',
     ],
-    systemPrompt: [
-      SUBAGENT_BASE_PROMPT,
-    ].join('\n\n'),
+    systemPrompt: [ ].join('\n\n'),
   },
 ];
 
@@ -160,7 +165,6 @@ function buildToolSchemas(allowed: string[]): ToolSchema[] {
 function buildSubagentPrompt(config: SubAgentConfig): string {
   if (config.systemPrompt) return config.systemPrompt;
   return [
-    SUBAGENT_BASE_PROMPT,
     `You are the "${config.name}" sub-agent: ${config.description}`,
     `Allowed tools: ${config.tools.join(', ')}`,
   ].join('\n\n');
@@ -216,7 +220,7 @@ export class TaskTool extends BaseTool<typeof parameters> {
     await sessionManager.init();
 
     const toolSchemas = buildToolSchemas(subagent.tools);
-    const systemPrompt = [SYSTEM_PROMPT, buildSubagentPrompt(subagent)].join('\n\n');
+    const systemPrompt = [buildSubagentPrompt(subagent)].join('\n\n');
 
     const agent = new Agent({
       llmProvider: provider,
@@ -236,7 +240,7 @@ export class TaskTool extends BaseTool<typeof parameters> {
     ]
       .filter(Boolean)
       .join('\n\n');
-    console.log("====================================================================taskPrompt:", taskPrompt);
+
     const previousContext = ToolRegistry.getContext();
     ToolRegistry.setContext({
       ...previousContext,
