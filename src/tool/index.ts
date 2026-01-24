@@ -30,6 +30,7 @@ import TodoTools from './todo';
 import { initializeMcp } from '../mcp/index';
 import { WebSearchTool } from './web-search';
 import { SkillTool, initializeSkills } from '../skills';
+import ExploreTool from './explore';
 import TaskTool from './task';
 
 // =============================================================================
@@ -59,6 +60,7 @@ export function registerDefaultTools(): void {
         new BatchReplaceTool(),
         new WebSearchTool(),
         new SkillTool(),
+        new ExploreTool(),
         new TaskTool(),
         ...TodoTools(),
     ]);

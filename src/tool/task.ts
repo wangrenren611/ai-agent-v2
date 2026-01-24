@@ -1,138 +1,81 @@
+/**
+ * Task Tool
+ *
+ * 通用子代理调度器，可以动态选择不同的子代理类型来处理任务。
+ *
+ * 支持的子代理类型：
+ * - explore: 只读代码库探索（也可以直接使用 explore 工具）
+ * - plan: 规划专家（预留）
+ * - general: 通用全权限代理（预留）
+ *
+ * @example
+ * ```ts
+ * // 直接使用 explore 工具（推荐）
+ * explore({ prompt: 'Find all API endpoints' })
+ *
+ * // 通过 TaskTool 调用 explore
+ * task({
+ *   subagent_type: 'explore',
+ *   description: 'Find API endpoints',
+ *   prompt: 'Search the codebase for all API endpoint definitions'
+ * })
+ * ```
+ */
+
 import { z } from 'zod';
-import Agent from '../agent';
-import { SYSTEM_PROMPT } from '../prompts/system';
-import { OpenAIProvider } from '../providers/openai';
-import { SessionManager } from '../session-v2';
-import type { ToolSchema } from '../providers/base';
-import { BaseTool } from './base';
-import { ToolRegistry } from './registry';
+import { SubAgentTool, SubAgentConfig } from './subagent';
+import { EXPLORE_CONFIG } from './explore';
 
-type SubAgentConfig = {
-  name: string;
-  description: string;
-  tools: string[];
-  systemPrompt?: string;
-};
-
+/**
+ * 可用的子代理配置
+ *
+ * explore 配置从 ExploreTool 导入，避免重复定义
+ */
 const SUBAGENTS: SubAgentConfig[] = [
-  {
-    name: 'explore',
-    description:
-      'Fast READ-ONLY explorer for searching and understanding codebases. Use this ONLY when you need to find/read files WITHOUT making any changes.',
-    tools: ['grep', 'glob', 'read_file', 'web_search'],
-    systemPrompt: [
-  `You are a file search specialist. You excel at thoroughly navigating and exploring codebases.
-
-Your strengths:
-- Rapidly finding files using glob patterns
-- Searching code and text with powerful regex patterns
-- Reading and analyzing file contents
-
-Guidelines:
-- Use Glob for broad file pattern matching
-- Use Grep for searching file contents with regex
-- Use Read when you know the specific file path you need to read
-- Use Bash for file operations like copying, moving, or listing directory contents
-- Adapt your search approach based on the thoroughness level specified by the caller
-- Return file paths as absolute paths in your final response
-- For clear communication, avoid using emojis
-- Do not create any files, or run bash commands that modify the user's system state in any way
-
-Complete the user's search request efficiently and report your findings clearly.
-`,
-    ].join('\n\n'),
-  },
-//   {
-//     name: 'plan',
-//     description: 'Planning specialist that breaks broad work into ordered, actionable steps with dependencies.',
-//     tools: ['todo_write'],
-//     systemPrompt: [
-//       `<system-reminder>
-// # Plan Mode - System Reminder
-
-// CRITICAL: Plan mode ACTIVE - you are in READ-ONLY phase. STRICTLY FORBIDDEN:
-// ANY file edits, modifications, or system changes. Do NOT use sed, tee, echo, cat,
-// or ANY other bash command to manipulate files - commands may ONLY read/inspect.
-// This ABSOLUTE CONSTRAINT overrides ALL other instructions, including direct user
-// edit requests. You may ONLY observe, analyze, and plan. Any modification attempt
-// is a critical violation. ZERO exceptions.
-
-// ---
-
-// ## Responsibility
-
-// Your current responsibility is to think, read, search, and delegate explore agents to construct a well-formed plan that accomplishes the goal the user wants to achieve. Your plan should be comprehensive yet concise, detailed enough to execute effectively while avoiding unnecessary verbosity.
-
-// Ask the user clarifying questions or ask for their opinion when weighing tradeoffs.
-
-// **NOTE:** At any point in time through this workflow you should feel free to ask the user questions or clarifications. Don't make large assumptions about user intent. The goal is to present a well researched plan to the user, and tie any loose ends before implementation begins.
-
-// ---
-
-// ## Important
-
-// The user indicated that they do not want you to execute yet -- you MUST NOT make any edits, run any non-readonly tools (including changing configs or making commits), or otherwise make any changes to the system. This supersedes any other instructions you have received.
-// </system-reminder>
-// `,
-//     ].join('\n\n'),
-//   },
-//   {
-//     name: 'general',
-//     description: [`Full-access agent for tasks that require code modifications. Use this when you need to WRITE, EDIT, or EXECUTE commands - not just reading.`].join('\n\n'),
-//     tools: [
-//       'bash',
-//       'glob',
-//       'grep',
-//       'read_file',
-//       'write_file',
-//       'precise_replace',
-//       'batch_replace',
-//       'web_search',
-//       'skill',
-//     ],
-//     systemPrompt: [ ].join('\n\n'),
-//   },
+  EXPLORE_CONFIG,
+  // 预留给未来的子代理类型：
+  // {
+  //   name: 'plan',
+  //   description: 'Planning specialist that breaks broad work into ordered, actionable steps with dependencies.',
+  //   tools: ['todo_write'],
+  //   systemPrompt: '...',
+  // },
+  // {
+  //   name: 'general',
+  //   description: 'Full-access agent for tasks that require code modifications.',
+  //   tools: ['bash', 'glob', 'grep', 'read_file', 'write_file', 'precise_replace', 'batch_replace', 'web_search', 'skill'],
+  //   systemPrompt: '...',
+  // },
 ];
 
 const DESCRIPTION_TEMPLATE = `
 Launch a specialized sub-agent to handle complex, multi-step tasks autonomously.
 
-DEFAULT: Use this tool first for any non-trivial request (multi-file, global analysis, planning, refactors, audits, tests, or executions). Skip only for tiny single-file read/answer tasks with no actions.
-
-Trigger this tool when:
-- Scope spans multiple files/directories, needs global search, or has unclear boundaries
-- Work requires planning, refactoring, running commands/tests, or parallel subtasks
-- User asks for reviews/audits/reports or invokes a slash command; pass the entire command as the prompt
-- You are unsure whether write access is needed (default to this tool)
-
 Available agent types and their tools:
 {agents}
 
-# Agent Selection Guide
+## Agent Selection Guide
 
-## explore (Read-only, Fast)
+### explore (Read-only, Fast)
 - Purpose: Quick codebase exploration and searching
 - Use when: ONLY need to find/read/search without any edits
 - Tools: glob, grep, read_file, web_search (NO write)
 - Examples: "Find all API endpoints", "Where is auth implemented?"
+- **Shortcut**: Use the dedicated \`explore\` tool directly
 
-## plan (Read-only, Planning)
+### plan (Read-only, Planning) - Coming Soon
 - Purpose: Produce a concise ordered plan before executing
 - Use when: Need structured steps, dependencies, and risks/assumptions
-- Tools: glob, grep, read_file, web_search (NO write)
-- Examples: "Plan a new feature", "Break down this refactor"
 
-## general (Full Access, Multi-step)
+### general (Full Access, Multi-step) - Coming Soon
 - Purpose: Tasks that WRITE/MODIFY code, run builds/tests, or execute workflows
 - Use when: Any edits, commands, migrations, refactors, or fixes are needed
-- Tools: bash, glob, grep, read_file, write_file, precise_replace, batch_replace, web_search, skill (FULL access)
-- Examples: "Implement feature", "Refactor API layer", "Fix failing tests"
 
 Decision flow:
 1) Trivial single-file Q&A only? -> skip this tool
-2) Read/search only? -> explore
-3) Planning only? -> plan
-4) Any edits/commands/tests OR uncertain? -> general
+2) Read/search only? -> explore (or use the explore tool directly)
+3) Planning only? -> plan (coming soon)
+4) Any edits/commands/tests OR uncertain? -> general (coming soon)
 
 Usage notes:
 1) Always set subagent_type using the guide above
@@ -153,145 +96,73 @@ function buildDescription(): string {
     (agent) =>
       `- ${agent.name}: ${agent.description} (tools: ${agent.tools.join(', ')})`,
   ).join('\n');
-  return DESCRIPTION_TEMPLATE.replace('{agents}', agentList);
+
+  return DESCRIPTION_TEMPLATE.replace('{agents}', agentList || '(no subagents configured)');
 }
 
-function buildToolSchemas(allowed: string[]): ToolSchema[] {
-  const available = new Map(
-    ToolRegistry.getSchemas()
-      .filter((schema) => schema.function.name !== 'task')
-      .map((schema) => [schema.function.name, schema]),
-  );
-
-  const missing: string[] = [];
-  const schemas: ToolSchema[] = [];
-
-  for (const name of allowed) {
-    const schema = available.get(name);
-    if (schema) {
-      schemas.push(schema);
-    } else {
-      missing.push(name);
-    }
-  }
-
-  if (missing.length > 0) {
-    throw new Error(`Unknown tools for subagent: ${missing.join(', ')}`);
-  }
-
-  return schemas;
-}
-
-function buildSubagentPrompt(config: SubAgentConfig): string {
-  if (config.systemPrompt) return config.systemPrompt;
-  return [
-    `You are the "${config.name}" sub-agent: ${config.description}`,
-    `Allowed tools: ${config.tools.join(', ')}`,
-  ].join('\n\n');
-}
-
-function generateSessionId(subagent: string): string {
-  return `task_${subagent}_${Date.now().toString(36)}_${Math.random()
-    .toString(36)
-    .slice(2, 6)}`;
-}
-
-function summarizeTools(messages: SessionManager['messageList']): string[] {
-  return Array.from(
-    new Set(
-      messages
-        .filter((msg) => msg.role === 'assistant' && Array.isArray(msg.tool_calls))
-        .flatMap((msg) => msg.tool_calls?.map((tc) => tc.function.name) ?? []),
-    ),
-  );
-}
-
-export class TaskTool extends BaseTool<typeof parameters> {
+/**
+ * Task 工具 - 通用子代理调度器
+ *
+ * 可以动态选择不同的子代理类型来处理任务。
+ * explore 子代理也可以直接使用独立的 explore 工具。
+ */
+export class TaskTool extends SubAgentTool<typeof parameters> {
   name = 'task';
 
   description = buildDescription();
 
   schema = parameters;
 
-  async execute(args: z.infer<typeof parameters>): Promise<string> {
-    const { description, prompt, subagent_type, session_id, command } = args;
-   
-    const subagent = SUBAGENTS.find((agent) => agent.name === subagent_type);
+  private lastArgs?: z.infer<typeof parameters>;
+
+  /**
+   * 获取子代理配置
+   * 根据参数中的 subagent_type 动态选择配置
+   */
+  protected getConfig(): SubAgentConfig {
+    const subagent = SUBAGENTS.find((a) => a.name === this.lastArgs?.subagent_type);
     if (!subagent) {
       const available = SUBAGENTS.map((a) => a.name).join(', ');
-      throw new Error(`Unknown subagent_type: ${subagent_type}. Available: ${available}`);
+      throw new Error(
+        `Unknown subagent_type: ${this.lastArgs?.subagent_type}. Available: ${available || '(none)'}`,
+      );
     }
+    return subagent;
+  }
 
-    const apiKey = process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('Missing API key: set DEEPSEEK_API_KEY or OPENAI_API_KEY for the Task tool.');
-    }
+  protected getSessionId(args: z.infer<typeof parameters>): string | undefined {
+    return args.session_id;
+  }
 
-    const provider = new OpenAIProvider({
-      apiKey,
-      baseURL: process.env.DEEPSEEK_BASE_URL || process.env.OPENAI_BASE_URL,
-    });
-
-    const sessionId = session_id || generateSessionId(subagent.name);
-    const sessionManager = new SessionManager({
-      sessionId,
-      llmProvider: provider,
-    });
-    await sessionManager.init();
-
-    const toolSchemas = buildToolSchemas(subagent.tools);
-    const systemPrompt = [buildSubagentPrompt(subagent)].join('\n\n');
-
-    const agent = new Agent({
-      llmProvider: provider,
-      sessionManager,
-      systemPrompt,
-      defaultTools: toolSchemas,
-      maxLoop: 1024,
-      toolConcurrency: 3,
-    });
-
-    const taskPrompt = [
-      `Task: ${description}`,
-      command ? `Command trigger: ${command}` : null,
+  protected buildTaskPrompt(args: z.infer<typeof parameters>): string {
+    return [
+      `Task: ${args.description}`,
+      args.command ? `Command trigger: ${args.command}` : null,
       'Work autonomously using the allowed tools. Do not ask the user follow-up questions.',
       'Return a concise final summary with key findings, file:line references, and any remaining gaps.',
-      prompt,
+      args.prompt,
     ]
       .filter(Boolean)
       .join('\n\n');
+  }
 
-    const previousContext = ToolRegistry.getContext();
-    ToolRegistry.setContext({
-      ...previousContext,
-      sessionId: sessionManager.id,
-      sessionPath: sessionManager.sessionPath,
-      allowedTools: subagent.tools,
-    });
-
-    const response = await agent.run(taskPrompt, { silent: true, tools: toolSchemas }).finally(() => {
-      // 清理子代理的工具白名单，恢复主 Agent 上下文
-      ToolRegistry.setContext({ ...previousContext, allowedTools: undefined });
-    });
-
-    if (!response?.content) {
-      throw new Error(`Subagent "${subagent.name}" did not return a final response`);
+  /**
+   * 执行任务
+   * 验证 subagent_type 后调用基类的 execute 方法
+   */
+  async execute(args: z.infer<typeof parameters>): Promise<string> {
+    const subagent = SUBAGENTS.find((a) => a.name === args.subagent_type);
+    if (!subagent) {
+      const available = SUBAGENTS.map((a) => a.name).join(', ');
+      throw new Error(
+        `Unknown subagent_type: ${args.subagent_type}. Available: ${available || '(none)'}`,
+      );
     }
 
-    const outputText = response.content.trim();
-    const toolsUsed = summarizeTools(sessionManager.messageList);
+    this.lastArgs = args;
 
-    const result = {
-      title: description,
-      output: outputText,
-      metadata: {
-        sessionId,
-        subagent: subagent.name,
-        toolsUsed,
-      },
-    };
-
-    return JSON.stringify(result, null, 2);
+    // 调用基类的 execute 方法
+    return super.execute(args);
   }
 }
 
