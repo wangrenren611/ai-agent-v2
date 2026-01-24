@@ -212,11 +212,12 @@ export function execCommand(command: string): { stdout: string; stderr: string; 
  * @param options - 可选配置
  * @param options.timeout - 超时时间（毫秒）
  * @param options.cwd - 工作目录
+ * @param options.input - 标准输入内容
  * @returns 执行结果
  */
 export async function execCommandAsync(
     command: string,
-    options?: { timeout?: number; cwd?: string }
+    options?: { timeout?: number; cwd?: string; input?: string }
 ): Promise<{
     stdout: string;
     stderr: string;
@@ -229,6 +230,7 @@ export async function execCommandAsync(
             encoding: 'buffer' as any,
             timeout: options?.timeout,
             cwd: options?.cwd,
+            input: options?.input,
         });
         return {
             stdout: decodeCommandOutput(result.stdout, platform),

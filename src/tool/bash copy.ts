@@ -4,7 +4,7 @@
  * 执行 bash 命令的工具，提供：
  * - 语法验证和解析
  * - 安全分析
- * - 命令执行
+ * - 沙箱隔离执行（可选 Docker 容器）
  *
  * @example
  * ```ts
@@ -17,20 +17,15 @@ import { BaseTool } from './base';
 import { z } from 'zod';
 import { getBashParser } from './bash-parser';
 import { getPlatform, execCommandAsync } from '../util/platform-cmd';
+import { createSandboxFactory } from '../sandbox/base';
+import type { SandboxConfig, SandboxExecutionResult } from '../sandbox/types';
 
 // =============================================================================
 // 模式定义
 // =============================================================================
 
-const scriptLanguages = ['node', 'python', 'python3'] as const;
-type ScriptLanguage = typeof scriptLanguages[number];
-
 const schema = z.object({
-    command: z.string().min(1).describe('The bash command to run').optional(),
-    language: z.enum(scriptLanguages).describe('Inline script language (node/python)').optional(),
-    code: z.string().min(1).describe('Inline script to execute').optional(),
-    args: z.array(z.string()).describe('Arguments for inline scripts').optional(),
-    stdin: z.string().describe('Optional stdin for the command').optional(),
+    command: z.string().describe('The bash command to run'),
 });
 
 
@@ -42,19 +37,42 @@ const schema = z.object({
  * Bash 命令执行工具
  *
  * 在执行前对命令进行解析和安全分析
+ * 支持可选的 Docker 沙箱隔离
  */
 export default class BashTool extends BaseTool<typeof schema> {
     name = 'bash';
     private cwd = process.cwd();
+    
+    /** 沙箱执行器工厂 */
+    private sandboxFactory: ReturnType<typeof createSandboxFactory>;
+    private sandboxMode: 'none' | 'docker' | 'auto';
 
     get description(): string {
-        return 'Run bash commands, with optional inline node/python scripts';
+        const mode = this.sandboxMode === 'docker' ? ' (Docker sandboxed)' : '';
+        return `Run bash commands${mode}`;
     }
 
     schema = schema;
 
     /** 命令执行超时时间（毫秒），默认 60 秒 */
     timeout: number = 60000;
+
+    constructor() {
+        // 读取环境变量配置
+        this.sandboxMode = (process.env.SANDBOX_MODE as 'none' | 'docker' | 'auto') || 'auto';
+        
+        // 初始化沙箱执行器工厂
+        this.sandboxFactory = createSandboxFactory({
+            defaultMode: this.sandboxMode,
+            docker: {
+                image: process.env.DOCKER_IMAGE,
+                network: process.env.SANDBOX_NETWORK as 'none' | 'bridge' | 'host',
+                readonlyMounts: process.env.SANDBOX_READONLY_MOUNTS?.split(','),
+            },
+        });
+        
+        super();
+    }
 
     /**
      * 执行 bash 命令
@@ -63,36 +81,113 @@ export default class BashTool extends BaseTool<typeof schema> {
      * @returns 执行结果
      */
     async execute(args: z.infer<typeof this.schema>): Promise<string> {
-        const { command, language, code, args: scriptArgs, stdin } = args;
-        const validationError = this.validateArgs({ command, language, code, args: scriptArgs, stdin });
-        if (validationError) {
-            return validationError;
+        const { command } = args;
+        const platform = getPlatform();
+        
+        // 1. 安全检查（语法验证 + 危险命令检测）
+        const securityCheck = await this.performSecurityCheck(command, platform);
+        if (!securityCheck.safe) {
+            return securityCheck.message;
         }
 
-        const hasCode = Boolean(code?.trim());
-        const execution = hasCode
-            ? { command: this.buildInlineCommand(language as ScriptLanguage, scriptArgs), input: code }
-            : { command: command as string, input: stdin };
+        // 2. 决定执行方式（沙箱 vs 直接）
+        const sandboxConfig: SandboxConfig = {
+            workdir: this.cwd,
+            timeout: this.timeout,
+        };
 
-        const platform = getPlatform();
+        // 3. 执行命令
+        const executor = await this.sandboxFactory.create();
+        const result = await executor.execute(command, sandboxConfig);
+
+        // 4. 格式化并返回结果
+        return this.formatResult(result, sandboxConfig);
+    }
+
+    /**
+     * 执行安全检查
+     *
+     * @param command - 要执行的命令
+     * @param platform - 当前平台
+     * @returns 安全检查结果
+     */
+    private async performSecurityCheck(
+        command: string,
+        platform: 'windows' | 'mac' | 'linux'
+    ): Promise<{ safe: boolean; message: string }> {
+        // 非平台使用 Tree-sitter AST 解析
         if (platform !== 'windows') {
             const parser = await getBashParser();
-            const result = parser.parse(execution.command);
+            const result = parser.parse(command);
+            
             if (!result.valid) {
-                return 'Command not executed due to syntax error';
+                return {
+                    safe: false,
+                    message: `Syntax error: ${result.error}`,
+                };
+            }
+
+            // 检查安全问题
+            if (result.security && result.security.length > 0) {
+                const critical = result.security.filter(s => s.level === 'critical');
+                if (critical.length > 0) {
+                    return {
+                        safe: false,
+                        message: `Command blocked: ${critical.map(s => s.message).join('; ')}`,
+                    };
+                }
             }
         } else {
-            const maybeDangerous = /(^|\s)(format|shutdown|reg\s+delete|rmdir\s+\/s|rd\s+\/s|del\s+\/f)(\s|$)/i;
-            if (maybeDangerous.test(execution.command)) {
-                return 'Command not executed due to safety policy';
+            // Windows 平台使用正则检测危险命令
+            const maybeDangerous = /(^|\s)(format|shutdown|reg\s+delete|rmdir\s+\/s|rd\s+\/s|del\s+\/f|rm\s+-rf|rm\s+-fr|rm\s+\/s|systemctl\s+stop|systemctl\s+reboot|systemctl\s+poweroff|reboot|shutdown|poweroff|format\s+\w:|fdisk|mkfs|dd\s+if=)(\s|$)/i;
+            if (maybeDangerous.test(command)) {
+                return {
+                    safe: false,
+                    message: 'Command not executed due to safety policy',
+                };
             }
         }
 
-        // 执行命令
-        return await this.runCommand(execution.command, execution.input);
+        return { safe: true, message: '' };
     }
+
     /**
-     * 执行 bash 命令
+     * 格式化执行结果
+     *
+     * @param result - 沙箱执行结果
+     * @param config - 使用的沙箱配置
+     * @returns 格式化后的结果
+     */
+    private formatResult(
+        result: SandboxExecutionResult,
+        config: SandboxConfig
+    ): string {
+        // 基本结果
+        let output = '';
+
+        if (result.exitCode === 0) {
+            const stdout = result.stdout || 'Command completed successfully';
+            output = this.truncateOutput(stdout);
+        } else {
+            const stderr = result.stderr || `Command failed with exit code ${result.exitCode}`;
+            output = this.truncateOutput(stderr);
+        }
+
+        // 添加沙箱信息（如果是 Docker）
+        if (result.sandbox?.containerId) {
+            const sandboxInfo = `\n[Sandbox: Docker container ${result.sandbox.containerId.substring(0, 12)}]`;
+            output += sandboxInfo;
+        }
+
+        // 添加执行时间
+        const durationInfo = `\nDuration: ${result.duration}ms`;
+        output += durationInfo;
+
+        return output;
+    }
+
+    /**
+     * 执行命令（直接在宿主机）
      *
      * 使用 platform-cmd 模块的跨平台执行函数
      * 自动处理编码差异（Windows GBK / Unix UTF-8）
@@ -101,15 +196,14 @@ export default class BashTool extends BaseTool<typeof schema> {
      * @param command - 要执行的命令
      * @returns Promise<string> - 执行结果
      */
-    private async runCommand(command: string, input?: string): Promise<string> {
+    private async runCommand(command: string): Promise<string> {
         const normalizedCommand = this.normalizeCommand(command);
         const cdOutput = this.tryHandleCd(normalizedCommand);
-        if (cdOutput !== null) return this.truncateOutput( `ERROR: Command failed: ${cdOutput}`);
+        if (cdOutput !== null) return this.truncateOutput(`ERROR: Command failed: ${cdOutput}`);
 
         const result = await execCommandAsync(normalizedCommand, {
             timeout: this.timeout,
             cwd: this.cwd,
-            input,
         });
 
         if (result.exitCode === 0) {
@@ -223,72 +317,9 @@ export default class BashTool extends BaseTool<typeof schema> {
         return { tokens, quoteTypes };
     }
 
-    private validateArgs(input: {
-        command?: string;
-        language?: ScriptLanguage;
-        code?: string;
-        args?: string[];
-        stdin?: string;
-    }): string | null {
-        const hasCommand = Boolean(input.command?.trim());
-        const hasCode = Boolean(input.code?.trim());
-        if (!hasCommand && !hasCode) {
-            return 'Command not executed: missing "command" or "code".';
-        }
-        if (hasCommand && hasCode) {
-            return 'Command not executed: provide either "command" or "code", not both.';
-        }
-        if (hasCode && !input.language) {
-            return 'Command not executed: "language" is required when using "code".';
-        }
-        if (!hasCode && input.language) {
-            return 'Command not executed: "language" is only valid with "code".';
-        }
-        if (!hasCode && input.args?.length) {
-            return 'Command not executed: "args" is only valid with "code".';
-        }
-        if (hasCode && input.stdin !== undefined) {
-            return 'Command not executed: "stdin" cannot be used with "code".';
-        }
-        return null;
-    }
-
-    private buildInlineCommand(language: ScriptLanguage, scriptArgs?: string[]): string {
-        const interpreter = this.resolveInterpreter(language);
-        const args = scriptArgs ?? [];
-        const parts = [interpreter, '-'];
-        if (language === 'node' && args.some((arg) => arg.startsWith('-'))) {
-            parts.push('--');
-        }
-        if (args.length > 0) {
-            parts.push(...args.map((arg) => this.quoteArg(arg)));
-        }
-        return parts.join(' ');
-    }
-
-    private resolveInterpreter(language: ScriptLanguage): string {
-        if (language === 'node') return 'node';
-        if (language === 'python3') return 'python3';
-        return getPlatform() === 'windows' ? 'python' : 'python3';
-    }
-
-    private quoteArg(arg: string): string {
-        const safe = /^[A-Za-z0-9_./:=+-]+$/.test(arg);
-        if (safe) return arg;
-
-        if (getPlatform() === 'windows') {
-            const escaped = arg.replace(/"/g, '\\"');
-            return `"${escaped}"`;
-        }
-
-        const escaped = arg.replace(/'/g, "'\\''");
-        return `'${escaped}'`;
-    }
-
     private truncateOutput(output: string): string {
         const maxChars = 12000;
         if (output.length <= maxChars) return output;
         return `${output.slice(0, maxChars)}\n... (truncated, ${output.length - maxChars} more chars)`;
     }
- 
 }

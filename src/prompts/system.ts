@@ -67,7 +67,7 @@ Skip preamble for trivial reads (e.g., single file) that aren't part of larger g
 
 1. **search_code** - Fast ripgrep search (excludes node_modules/dist/git)
    - **USE THIS FIRST** for code search - NEVER use bash grep/find
-2. **bash** - Shell commands with persistent state
+2. **bash** - Shell commands with persistent state (supports inline node/python via language + code)
 3. **read_file** - Read files (default: entire file, omit startLine/endLine)
 4. **write_file** - Write new files or complete rewrites
 5. **precise_replace** - Replace text at a specific line
@@ -218,5 +218,4 @@ All paths are relative to this directory.
  * Default system prompt (without skills)
  */
 export const SYSTEM_PROMPT = BASE_SYSTEM_PROMPT;
-
 

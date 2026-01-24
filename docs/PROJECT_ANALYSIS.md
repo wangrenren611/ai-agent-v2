@@ -339,7 +339,7 @@ classDiagram
 
 | 工具名称 | 功能描述 | 输入 |
 |---------|----------|-----|
-| `bash` | 执行 Shell 命令 | command: string |
+| `bash` | 执行 Shell 命令 | command?: string, language?: "node"|"python"|"python3", code?: string, args?: string[], stdin?: string |
 | `glob` | 文件模式匹配 | pattern: string |
 | `grep` | 代码内容搜索 | pattern, path, glob |
 | `read_file` | 读取文件内容 | file_path: string |
@@ -351,6 +351,8 @@ classDiagram
 | `list_backups` | 列出备份 | - |
 | `clean_backups` | 清理备份 | - |
 | `web_search` | 网络搜索 | query: string |
+
+Note: `bash` supports inline node/python via `language` + `code`. Use `stdin` to pipe data when using `command`.
 
 #### MCP 协议集成
 

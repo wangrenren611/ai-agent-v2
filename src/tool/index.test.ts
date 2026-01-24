@@ -107,8 +107,24 @@ describe('ToolRegistry', () => {
                 command: {
                     type: 'string',
                 },
+                language: {
+                    type: 'string',
+                    enum: ['node', 'python', 'python3'],
+                },
+                code: {
+                    type: 'string',
+                },
+                args: {
+                    type: 'array',
+                    items: {
+                        type: 'string',
+                    },
+                },
+                stdin: {
+                    type: 'string',
+                },
             },
-            required: ['command'],
+            required: undefined,
             additionalProperties: false,
         });
     });

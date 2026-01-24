@@ -48,7 +48,9 @@
       "mcp__zread__search_doc",
       "Bash(lsof:*)",
       "Bash(xargs kill:*)",
-      "Bash(pnpm exec tsc:*)"
+      "Bash(pnpm exec tsc:*)",
+      "Bash(python3 -m json.tool:*)",
+      "Bash(pnpm vitest:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
