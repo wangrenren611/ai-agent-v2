@@ -73,7 +73,6 @@ export class TodoCreateTool extends BaseTool<any> {
     return {
        metadata:{
           count: todos.length,
-          todos,
           ok: true,
        },
        output: JSON.stringify(todos,null,2),
@@ -202,7 +201,7 @@ export class TodoApplyOpsTool extends BaseTool<any> {
   description = 'Apply todo operations (add/update/delete).';
 
   schema = z.object({
-    ops: z.array(TodoOp).min(1).max(20),
+    ops: z.array(TodoOp).describe('The list of todo operations to perform'),
   }).strict();
 
   async execute({ ops }: { ops: TodoOpType[] }) {

@@ -1,16 +1,14 @@
 /**
  * Agent - AI 代理
  * 负责编排 LLM 调用和会话管理
- * 
+ *
  * 注意：此文件是旧版 Agent，建议使用 index-eventbus.ts 以获得 EventBus 集成
  * 要启用 EventBus 功能，请导入 './index-eventbus' 而不是此文件
  */
 import EventEmitter from "events";
-import { LLMProvider, LLMResponse, ToolSchema } from "../providers/base";
+import { LLMProvider, LLMResponse, Message, ToolCall, ToolSchema } from "../providers/base";
 import { ScopedLogger } from "../util/log";
-import { formatToolResult } from "../util/log-format";
 import { SessionManager } from "../session-v2";
-import { SYSTEM_PROMPT } from "../prompts/system";
 import { ToolRegistry } from "../tool/registry";
 
 export interface AgentConfig {
@@ -19,23 +17,24 @@ export interface AgentConfig {
     systemPrompt: string;
     /** 默认工具列表（可选），不传则使用 ToolRegistry 中所有工具 */
     defaultTools?: ToolSchema[];
-    /** 最大循环次数，防止无限循环，默认 10 */
-    maxLoop?: number;
+    /** 最大循环次数，0 或 null 表示无限制，默认 1024 */
+    maxLoop?: number | null;
     /** 最大 token 数，默认 8000 */
     maxTokens?: number;
     /** 最大输出 token 数，默认 8000 */
     maxOutputTokens?: number;
-    /** 工具并发上限，默认 4 */
+    /** 工具并发上限，默认 1 */
     toolConcurrency?: number;
-    /** 单次工具调用超时（毫秒），默认 120000 */
+    /** 单次工具调用超时（毫秒），默认 300000 (5分钟) */
     toolTimeoutMs?: number;
-    /** 连续重复的工具调用轮次上限，默认 2 */
+    /** 连续错误次数上限，默认 2 */
     noProgressLimit?: number;
 }
 
 export interface AgentResponse {
     content: string;
-    role: 'assistant';
+    role: Message['role'];
+    type?: Message['type'];
 }
 
 export default class Agent extends EventEmitter {
@@ -44,12 +43,11 @@ export default class Agent extends EventEmitter {
     private sessionManager: SessionManager;
     private systemPrompt: string;
     private defaultTools: ToolSchema[] | undefined;
-    private maxLoop: number;
-    maxOutputTokens: number;
-    maxTokens: number;
-    private toolConcurrency: number;
-    private toolTimeoutMs: number;
+    private maxLoop: number | null | undefined;
+    private maxOutputTokens: number;
+    private maxTokens: number;
     private noProgressLimit: number;
+
     constructor(config: AgentConfig) {
         super();
         this.llmProvider = config.llmProvider;
@@ -57,87 +55,80 @@ export default class Agent extends EventEmitter {
         this.systemPrompt = config.systemPrompt;
         this.defaultTools = config.defaultTools;
         this.logger = new ScopedLogger('Agent');
-        this.maxLoop = config.maxLoop ?? 1024;
+        this.maxLoop = config.maxLoop;
+
         const providerMaxOutput = this.llmProvider.maxOutputTokens;
         const providerMaxTokens = this.llmProvider.maxTokens;
         this.maxOutputTokens = Math.min(config.maxOutputTokens ?? providerMaxOutput, providerMaxOutput);
         this.maxTokens = Math.min(config.maxTokens ?? providerMaxTokens, providerMaxTokens);
-        this.toolConcurrency = Math.max(1, config.toolConcurrency ?? 1);
-        this.toolTimeoutMs = config.toolTimeoutMs ?? 1000*60*5;
         this.noProgressLimit = Math.max(0, config.noProgressLimit ?? 2);
+
         this.sessionManager.maxOutputTokens = this.maxOutputTokens;
         this.sessionManager.maxTokens = this.maxTokens;
     }
 
-    private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
-        if (!timeoutMs || timeoutMs <= 0) {
-            return promise;
+    /**
+     * 执行单个工具调用
+     */
+    private async executeToolCall(toolCall: ToolCall): Promise<Message> {
+        const { name, arguments: args } = toolCall.function;
+        if (!name) {
+            return {
+                role: 'tool',
+                type: 'text',
+                content: 'Error: Tool name is empty',
+                tool_call_id: toolCall.id,
+            };
         }
 
-        let timeoutId: ReturnType<typeof setTimeout> | undefined;
-        const timeoutPromise = new Promise<never>((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
-        });
+        const result = await ToolRegistry.execute(name, args);
 
-        return Promise.race([promise, timeoutPromise]).finally(() => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        });
+        let content: string;
+        if (typeof result === 'string') {
+            content = result;
+        } else {
+            content = JSON.stringify(result?.metadata ?? result ?? {});
+        }
+
+        return {
+            role: 'tool',
+            type: 'text',
+            content,
+            tool_call_id: toolCall.id,
+        };
     }
 
-    private async runWithConcurrency<T, R>(
-        items: T[],
-        limit: number,
-        task: (item: T, index: number) => Promise<R>
-    ): Promise<R[]> {
-        if (items.length === 0) {
-            return [];
+    /**
+     * 处理工具调用，返回是否有工具被调用
+     */
+    private async handleToolCalls(
+        llmResponse: LLMResponse,
+        spinner: ReturnType<ScopedLogger['spinner']>
+    ): Promise<boolean> {
+        if (!llmResponse.tool_calls || llmResponse.tool_calls.length === 0) {
+            return false;
         }
 
-        if (limit <= 1) {
-            const results: R[] = [];
-            for (let i = 0; i < items.length; i++) {
-                results.push(await task(items[i], i));
-            }
-            return results;
-        }
+        const toolResults = await Promise.all(
+            llmResponse.tool_calls.map(call => this.executeToolCall(call))
+        );
 
-        const results = new Array<R>(items.length);
-        let nextIndex = 0;
-        const workerCount = Math.min(limit, items.length);
+        this.sessionManager.addMessage(toolResults);
 
-        const workers = Array.from({ length: workerCount }, async () => {
-            while (true) {
-                const currentIndex = nextIndex++;
-                if (currentIndex >= items.length) {
-                    break;
-                }
-                results[currentIndex] = await task(items[currentIndex], currentIndex);
-            }
-        });
+        // Bug修复：提取content字段进行拼接，而非直接join对象数组
+        const summaries = toolResults
+            .map(r => {
+                const content = r.content ?? '';
+                return content.length > 50 ? content.slice(0, 47) + '...' : content;
+            })
+            .join(', ');
 
-        await Promise.all(workers);
-        return results;
-    }
-
-    private buildToolSignature(toolCalls: NonNullable<LLMResponse['tool_calls']>): string {
-        try {
-            return JSON.stringify(
-                toolCalls.map((call) => ({
-                    name: call.function.name,
-                    arguments: call.function.arguments,
-                }))
-            );
-        } catch (_) {
-            return '';
-        }
+        spinner.succeed(`Tool calls: ${summaries}`);
+        return true;
     }
 
     /**
      * 运行 Agent 处理用户查询
-     * @param sessionId 会话 ID
-     * @param userId 用户 ID
      * @param query 用户查询
      * @param options 选项
      * @returns Agent 响应
@@ -146,246 +137,95 @@ export default class Agent extends EventEmitter {
         query: string,
         options?: { silent?: boolean; tools?: ToolSchema[] }
     ): Promise<AgentResponse | null> {
+        const tools = options?.tools ?? this.defaultTools ?? [];
+        let consecutiveErrorCount = 0;
+        let i = 0;
+        // 添加用户消息
+        this.sessionManager.addMessage({
+            role: 'user',
+            type: 'text',
+            content: query,
+        });
 
-     
-        try {
+        while (true) {
+            i++;
 
-            // 3. 获取工具 schemas（优先级：传入参数 > 默认配置 > ToolRegistry 全部）
-            const tools = options?.tools ?? this.defaultTools ?? [];
+            // maxLoop 为 0 或 null 表示无限制
+            if (this.maxLoop && this.maxLoop > 0 && i > this.maxLoop) {
+                return {
+                    content: `Max loop limit reached (${this.maxLoop})`,
+                    role: 'assistant',
+                };
+            }
 
-            // 4. LLM 调用循环（处理工具调用）
-            let i = 0; // 防止无限循环
-            let finalResponse: AgentResponse | null = null;
-            let lastToolSignature: string | null = null;
-            let repeatedToolCalls = 0;
-  
-  
-            this.sessionManager.addMessage({
-                role: 'user',
-                type: 'text',
-                content: query
-            });
+            const llmMessages = await this.sessionManager.getMessages();
+            const spinner = this.logger.spinner(`Thinking-${i + 1}...`);
 
-            while (i < this.maxLoop) {
-                i++; // 在循环开始时递增计数器
-
-                const llmMessages = await this.sessionManager.getMessages();
-
-                const spinner = this.logger.spinner(`Thinking-${i}...`);
-                let llmResponse: Awaited<ReturnType<LLMProvider['generate']>> = null;
-                try {
-                    // 调用 LLM
-                    llmResponse = await this.llmProvider.generate([
-                        {
-                            role: 'system',
-                            content: this.systemPrompt,
-                        },
-                        ...llmMessages
-                    ], {
+            try {
+                const llmResponse = await this.llmProvider.generate(
+                    [
+                        { role: 'system', content: this.systemPrompt },
+                        ...llmMessages,
+                    ],
+                    {
                         model: process.env.AI_MODEL,
                         tools: tools.length > 0 ? tools : undefined,
                         max_tokens: this.maxOutputTokens,
-                    });
-                    // console.log( this.systemPrompt)
-                } catch (error) {
-                    const errorMsg = error instanceof Error ? error.message : String(error);
-
-                    spinner.fail(`Thinking-${i} failed`);
-
-                    this.logger.error(`LLM error: ${errorMsg}`);
-                      this.sessionManager.addMessage({
-                        role: 'assistant',
-                        type: 'text',
-                        content: errorMsg
-                    });
-
-                    return {
-                        content: errorMsg,
-                        role: 'assistant',
-                    };
-                }
+                    }
+                );
 
                 if (!llmResponse) {
-                    const errorMsg = 'LLM returned null response';
-                    this.logger.error(errorMsg);
-                    spinner.fail(`Thinking-${i} failed`);
-
-                   this.sessionManager.addMessage({
-                        role: 'assistant',
-                        type: 'text',
-                        content: errorMsg
-                    });
-
-                    return {
-                        content: errorMsg,
-                        role: 'assistant',
-                    };
+                     throw new Error('LLM response is null');
                 }
-                spinner.succeed(`Thinking-${i} end`);
 
-                // 检查是否有工具调用
-                if (llmResponse.tool_calls && llmResponse.tool_calls.length > 0) {
-                    const toolSignature = this.buildToolSignature(llmResponse.tool_calls);
-                    if (toolSignature && toolSignature === lastToolSignature) {
-                        repeatedToolCalls += 1;
-                    } else {
-                        repeatedToolCalls = 0;
-                        lastToolSignature = toolSignature;
-                    }
+                this.sessionManager.addMessage(llmResponse);
 
-                    if (this.noProgressLimit > 0 && repeatedToolCalls >= this.noProgressLimit) {
-                        const errorMsg = `Repeated tool_calls detected for ${this.noProgressLimit + 1} iterations, aborting to prevent loop.`;
-                        this.logger.error(errorMsg);
-                        this.sessionManager.addMessage({
-                                role: 'assistant',
-                                type: 'text',
-                                content: errorMsg
-                         });
+                const hasToolCalls = await this.handleToolCalls(llmResponse, spinner);
 
+                if (!hasToolCalls) {
+                    // 单次无工具调用即返回，无需继续循环
+                    // 正常结束状态：'stop'、'eos'、undefined；其他值可能是异常
+                    const validEnd = ['stop', 'eos', undefined].includes(llmResponse.finishReason as string);
+
+                    if (!validEnd) {
+                        spinner.fail(`Unexpected finishReason: ${llmResponse.finishReason}`);
                         return {
-                            content: errorMsg,
+                            content: `Unexpected finishReason: ${llmResponse.finishReason}`,
                             role: 'assistant',
                         };
                     }
 
-                    // 添加 assistant 消息（包含 tool_calls）
-                    this.sessionManager.addMessage({
+                    spinner.succeed(llmResponse?.content ?? '');
+                    return {
+                        content: llmResponse?.content ?? '',
                         role: 'assistant',
-                        content: llmResponse.content,
-                        type: 'tool_call',
-                        tool_calls: llmResponse.tool_calls,
-                    });
-
-                    this.logger.info(`Tool tips: ${llmResponse.content}`);
-
-                    const toolCalls = llmResponse.tool_calls;
-                    const toolConcurrency = Math.min(this.toolConcurrency, toolCalls.length);
-
-                    const results = await this.runWithConcurrency(toolCalls, toolConcurrency, async (toolCall) => {
-                        const { id,function: fn } = toolCall;
-                        try {
-                            // 解析参数（带容错处理）
-                            let args: unknown;
-                            try {
-                                args = JSON.parse(fn.arguments);
-                            } catch (parseError) {
-                                // JSON 解析失败 - 记录详细信息并返回友好的错误信息
-                                const truncatedArgs = fn.arguments.length > 200
-                                    ? fn.arguments.slice(0, 200) + '...'
-                                    : fn.arguments;
-                                const parseErrorMsg = parseError instanceof Error ? parseError.message : String(parseError);
-                                const errorMsg = `Invalid JSON in tool parameters: ${parseErrorMsg}\nReceived: ${truncatedArgs}`;
-                                this.logger.error(errorMsg);
-                                return {
-                                    toolCall,
-                                    result: `Error: Failed to parse tool arguments. The JSON was malformed. Please try again with properly formatted parameters.`,
-                                    error: errorMsg,
-                                    id,
-                                };
-                            }
-
-                            const spinner = this.logger.spinner(`Tool ${fn.name}(...)`);
-                            // 执行工具
-                            let result: any;
-                            try {
-                                result = await this.withTimeout(
-                                    ToolRegistry.execute(fn.name, args),
-                                    this.toolTimeoutMs,
-                                    `Tool ${fn.name} timed out after ${this.toolTimeoutMs}ms`
-                                );
-                                spinner.succeed(`Tool ${fn.name} completed`);
-                            } catch (error) {
-                                spinner.fail(`Tool ${fn.name} failed`);
-                                throw error;
-                            } 
-
-                            
-                            if(typeof result !== 'string'){
-                                result=JSON.stringify(result.metadata);
-                            }  
-
-                            if (!options?.silent) {
-                                this.logger.info(`Tool ${fn.name} result: ${formatToolResult(fn.name, result)}`);
-                            }
-
-                            
-                         
-                          
-                            // 返回成功结果
-                            return { toolCall, result, error: undefined ,id};
-                        } catch (error) {
-                            const errorMsg = error instanceof Error ? error.message : String(error);
-                            this.logger.error(`Tool execution error: ${errorMsg}`);
-
-                            // 返回错误结果
-                            return { toolCall, result: `Error: ${errorMsg}`, error: errorMsg,id };
-                        }
-                    });
-
-                    // 按原始顺序添加工具结果消息
-                    for (const { toolCall, result, error: _error } of results) {
-                        const { id } = toolCall;
-                       
-                         
-                        this.sessionManager.addMessage({
-                            role: 'tool',
-                            content: result,
-                            type: 'tool',
-                            tool_call_id: id,
-                        });
-                    }
-
-                    // 继续循环，让 LLM 基于工具结果生成响应
-                   continue;
+                        type: 'text',
+                    };
                 }
-   
-                // 没有工具调用，这是最终响应
+
+                // 工具调用成功，重置连续错误计数
+                consecutiveErrorCount = 0;
+
+            } catch (error) {
+                const errorMsg = error instanceof Error ? error.message : String(error);
+                spinner.fail(errorMsg);
+                this.logger.error(`LLM call failed: ${errorMsg}`);
+
                 this.sessionManager.addMessage({
                     role: 'assistant',
                     type: 'text',
-                    content: llmResponse.content,
+                    content: `LLM error: ${errorMsg}`,
                 });
 
-                finalResponse = {
-                    content: llmResponse.content,
-                    role: 'assistant',
-                };
+                consecutiveErrorCount++;
 
-                break;
-            }
-
-            if (i >= this.maxLoop) {
-                this.logger.error('Max iterations reached, possible infinite loop');
-                this.sessionManager.addMessage({
+                if (consecutiveErrorCount > this.noProgressLimit) {
+                    return {
+                        content: `Max error limit reached: ${errorMsg}`,
                         role: 'assistant',
-                        type: 'text',
-                        content: 'Max iterations reached, possible infinite loop'
-                 });
-
-                return {
-                    content: 'Max iterations reached, possible infinite loop',
-                    role: 'assistant',
-                };
+                    };
+                }
             }
-
-    
-
-            return finalResponse;
-
-        } catch (error) {
-            const errorMsg = error instanceof Error ? error.message : String(error);
-            this.logger.error(`Agent error: ${errorMsg}`);
-             this.sessionManager.addMessage({
-                        role: 'assistant',
-                        type: 'text',
-                        content: errorMsg
-           });
-                       
-            return {
-                content: errorMsg,
-                role: 'assistant',
-            };
         }
     }
-
 }

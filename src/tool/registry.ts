@@ -126,25 +126,33 @@ export class ToolRegistry {
      * @returns 执行结果
      * @throws 如果工具不存在或参数无效
      */
-    static async execute(name: string, args: unknown): Promise<ToolOutput> {
+    static async execute(name: string, args: string): Promise<ToolOutput> {
         const tool = this.get(name);
+
         if (!tool) {
-            return `Tool "${name}" not found`;
+            throw new Error(`Tool "${name}" not found`);
         }
+
         const allowed = this.context.allowedTools;
         if (allowed && !allowed.includes(name)) {
-            return `Tool "${name}" is not allowed in this context`;
+           throw new Error(`Tool "${name}" is not allowed in this context`);
         }
-
+        
+        
+        
+       
+        const argsObj = JSON.parse(args);
+        
         // 验证参数
-        const parsed = tool.schema.safeParse(args);
-
+        const parsed = tool.schema.safeParse(argsObj);
+       
         if (!parsed.success) {
-            return `Invalid arguments for tool "${name}": ${parsed.error.errors.map((e: { message: string }) => e.message).join(', ')}`;
+             throw new Error(`Invalid arguments  ${parsed.error.errors.map((e: { message: string }) => e.message).join(', ')}`);
         }
-
-        return await tool.execute(parsed.data);
+        
+       return await tool.execute(parsed.data);
     }
+
 
     /**
      * 获取工具的 schema（用于 LLM 函数调用）
@@ -301,4 +309,6 @@ export class ToolRegistry {
                 return {};
         }
     }
+
+
 }

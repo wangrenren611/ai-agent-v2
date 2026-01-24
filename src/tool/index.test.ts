@@ -133,19 +133,19 @@ describe('ToolRegistry', () => {
         const tool = new TestToolClass();
         ToolRegistry.register(tool);
 
-        const result = await ToolRegistry.execute('test', { message: 'hello' });
+        const result = await ToolRegistry.execute('test', '{ message: "hello" }');
         expect(result).toBe('Test: hello');
     });
 
     it('should throw when executing non-existent tool', async () => {
-        await expect(ToolRegistry.execute('nonexistent', {})).rejects.toThrow('not found');
+        await expect(ToolRegistry.execute('nonexistent', '{}')).rejects.toThrow('not found');
     });
 
     it('should throw when executing with invalid args', async () => {
         const tool = new TestToolClass();
         ToolRegistry.register(tool);
 
-        await expect(ToolRegistry.execute('test', { message: 123 })).rejects.toThrow('Invalid arguments');
+        await expect(ToolRegistry.execute('test', JSON.stringify({ message: 123 }))).rejects.toThrow('Invalid arguments');
     });
 
     it('should report correct size', () => {

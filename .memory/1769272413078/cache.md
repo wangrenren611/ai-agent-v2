@@ -1,0 +1,147 @@
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "当前目录有什么"
+}
+```
+```
+{
+  "content": "我来帮你查看当前目录的结构。",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"prompt\":\"What is the structure of the current directory? List all main directories and important files.\"}",
+        "name": "explore"
+      },
+      "id": "call_-7947998263492398336",
+      "index": 0,
+      "type": "function"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 6407,
+    "completion_tokens": 87,
+    "total_tokens": 6494
+  }
+}
+```
+```
+{
+  "role": "tool",
+  "type": "text",
+  "content": "{\"ok\":true,\"sessionId\":\"task_explore_mksj4ci8_n7di\",\"subagent\":\"explore\",\"result\":\"## Codebase Structure Summary\\n\\n### Project Overview\\n**ai-agent-v2** - A multi-session AI agent system built with TypeScript, featuring Domain-Driven Design (DDD), Repository Pattern, and comprehensive tool integration.\\n\\n### Main Directories\\n\\n```\\nai-agent-v2/\\n├── src/                    # Main source code (70+ files)\\n│   ├── agent/             # Agent orchestration and LLM coordination\\n│   ├── cli/               # Command-line interface with readline\\n│   ├── mcp/               # MCP (Model Context Protocol) integration\\n│   ├── observability/     # Langfuse observability integration\\n│   ├── prompts/           # System and operator prompts\\n│   ├── sandbox/           # Docker execution sandbox\\n│   ├── session-v2/        # Session management with compaction\\n│   ├── skills/            # Skill loading system\\n│   ├── storage/           # MongoDB storage models & repositories\\n│   ├── tool/              # 20+ tool implementations\\n│   ├── providers/         # LLM provider abstractions\\n│   └── util/              # Utilities (event bus, logging, formatting)\\n├── bin/                   # CLI executable entry point\\n├── docs/                  # Architecture documentation\\n├── skills/                # External skill packages (git-commit, ui-ux-pro-max)\\n└── tests/                 # Test files\\n```\\n\\n### Key Files\\n\\n| File | Purpose | Reference |\\n|------|---------|-----------|\\n| **src/index.ts** | Application entry point | src/index.ts:1-50 |\\n| **package.json** | Dependencies & scripts | package.json:1-62 |\\n| **tsconfig.json** | TypeScript config | tsconfig.json:1-25 |\\n| **CLAUDE.md** | Developer guidance | CLAUDE.md:1-101 |\\n| **src/agent/index.ts** | Core Agent class (deprecated) | src/agent/index.ts:1-50 |\\n| **src/session-v2/index.ts** | Session manager with compaction | src/session-v2/index.ts |\\n| **src/cli/CLI.ts** | Interactive CLI implementation | src/cli/CLI.ts |\\n\\n### Core Architecture Components\\n\\n**CLI Layer** (src/cli/)\\n- Interactive commands with readline history\\n- Command registry pattern in `cli/commands/`\\n- Smart input handling\\n\\n**Agent Layer** (src/agent/)\\n- Two implementations: `index.ts` and `index-eventbus.ts`\\n- LLM call orchestration\\n- Tool execution with concurrency control\\n\\n**Tool System** (src/tool/)\\n- 20+ tools: bash, grep, glob, web-search, file operations, etc.\\n- Tool registry for dynamic tool loading\\n- MCP tool adapters\\n\\n**Session Management** (src/session-v2/)\\n- Multi-session support with compaction\\n- MongoDB persistence via Mongoose\\n- Lazy-loading history\\n\\n**Observability** (src/observability/)\\n- Langfuse integration\\n- Event bus system (src/util/event-bus.ts)\\n\\n### Configuration\\n\\n**Environment Files:**\\n- `.env.development` - Development config\\n- `.env.example` - Environment variable template (not found)\\n- Requires: `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL`\\n\\n**Build Config:**\\n- TypeScript with strict mode\\n- Output: `dist/` directory\\n- Package: `@qps` CLI via `bin/index.js`\\n\\n### Key Features\\n\\n1. **Multi-Session Management**: User-specified or auto-generated session IDs\\n2. **Message Compaction**: Advanced context management (see docs/compaction-analysis.md)\\n3. **Tool Integration**: MCP protocol support, custom tools, subagent delegation\\n4. **Sandbox Execution**: Docker-based code execution (src/sandbox/)\\n5. **Event-Driven Architecture**: Event bus for agent communication\\n6. **Skill System**: External skill loading with parser/loader\\n\\n### Important Documentation\\n\\n- **Architecture**: React Fiber-inspired multi-agent scheduling\\n- **Breakpoint Continuation**: Session persistence and resumption\\n- **Background Tasks**: Async task processing with Bull queues\\n- **Performance**: Optimization reports and analysis\\n- **API Routes**: REST API design for frontend integration\\n\\n### Technical Stack\\n\\n- **Runtime**: Node.js 18+ with CommonJS\\n- **Language**: TypeScript 5.9+\\n- **Database**: MongoDB via Mongoose 9.1+\\n- **LLM**: OpenAI-compatible providers\\n- **Tools**: ripgrep, tree-sitter, Docker API\\n- **Observability**: Langfuse 3.38+\\n- **Testing**: Vitest 3.2+\"}",
+  "tool_call_id": "call_-7947998263492398336"
+}
+```
+```
+{
+  "content": "这是一个名为 **ai-agent-v2** 的多会话 AI 代理系统项目，使用 TypeScript 构建，采用领域驱动设计（DDD）和仓储模式。\n\n## 主要目录结构\n\n```\nai-agent-v2/\n├── src/                    # 主要源代码（70+ 文件）\n│   ├── agent/             # Agent 编排和 LLM 协调\n│   ├── cli/               # 命令行接口（含 readline）\n│   ├── mcp/               # MCP 协议集成\n│   ├── observability/     # Langfuse 可观测性集成\n│   ├── prompts/           # 系统和操作员提示词\n│   ├── sandbox/           # Docker 执行沙箱\n│   ├── session-v2/        # 会话管理（含压缩）\n│   ├── skills/            # 技能加载系统\n│   ├── storage/           # MongoDB 存储模型和仓储\n│   ├── tool/              # 20+ 工具实现\n│   ├── providers/         # LLM 提供商抽象\n│   └── util/              # 工具类（事件总线、日志、格式化）\n├── bin/                   # CLI 可执行入口\n├── docs/                  # 架构文档\n├── skills/                # 外部技能包（git-commit, ui-ux-pro-max）\n└── tests/                 # 测试文件\n```\n\n## 核心功能\n\n1. **多会话管理**：用户指定或自动生成会话 ID\n2. **消息压缩**：高级上下文管理\n3. **工具集成**：MCP 协议支持、自定义工具、子代理委派\n4. **沙箱执行**：基于 Docker 的代码执行\n5. **事件驱动架构**：用于代理通信的事件总线\n6. **技能系统**：外部技能加载\n\n## 技术栈\n\n- **运行时**：Node.js 18+（CommonJS）\n- **语言**：TypeScript 5.9+\n- **数据库**：MongoDB（Mongoose 9.1+）\n- **LLM**：OpenAI 兼容提供商\n- **可观测性**：Langfuse 3.38+\n- **测试**：Vitest 3.2+\n\n## 开发命令\n\n| 命令 | 描述 |\n|------|------|\n| `pnpm typecheck` | 类型检查 |\n| `pnpm build` | 生产构建 |\n| `pnpm dev` | 交互式 CLI 模式 |\n| `pnpm dev:demo` | 演示模式 |\n| `pnpm dev:cli [sessionId]` | CLI 带可选会话 ID |\n\n需要我查看具体的文件或功能吗？",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [],
+  "usage": {
+    "prompt_tokens": 7488,
+    "completion_tokens": 642,
+    "total_tokens": 8130
+  }
+}
+```
+```
+{
+  "content": "这是一个名为 **ai-agent-v2** 的多会话 AI 代理系统项目，使用 TypeScript 构建，采用领域驱动设计（DDD）和仓储模式。\n\n## 主要目录结构\n\n```\nai-agent-v2/\n├── src/                    # 主要源代码（70+ 文件）\n│   ├── agent/             # Agent 编排和 LLM 协调\n│   ├── cli/               # 命令行接口（含 readline）\n│   ├── mcp/               # MCP 协议集成\n│   ├── observability/     # Langfuse 可观测性集成\n│   ├── prompts/           # 系统和操作员提示词\n│   ├── sandbox/           # Docker 执行沙箱\n│   ├── session-v2/        # 会话管理（含压缩）\n│   ├── skills/            # 技能加载系统\n│   ├── storage/           # MongoDB 存储模型和仓储\n│   ├── tool/              # 20+ 工具实现\n│   ├── providers/         # LLM 提供商抽象\n│   └── util/              # 工具类（事件总线、日志、格式化）\n├── bin/                   # CLI 可执行入口\n├── docs/                  # 架构文档\n├── skills/                # 外部技能包（git-commit, ui-ux-pro-max）\n└── tests/                 # 测试文件\n```\n\n## 核心功能\n\n1. **多会话管理**：用户指定或自动生成会话 ID\n2. **消息压缩**：高级上下文管理\n3. **工具集成**：MCP 协议支持、自定义工具、子代理委派\n4. **沙箱执行**：基于 Docker 的代码执行\n5. **事件驱动架构**：用于代理通信的事件总线\n6. **技能系统**：外部技能加载\n\n## 技术栈\n\n- **运行时**：Node.js 18+（CommonJS）\n- **语言**：TypeScript 5.9+\n- **数据库**：MongoDB（Mongoose 9.1+）\n- **LLM**：OpenAI 兼容提供商\n- **可观测性**：Langfuse 3.38+\n- **测试**：Vitest 3.2+\n\n## 开发命令\n\n| 命令 | 描述 |\n|------|------|\n| `pnpm typecheck` | 类型检查 |\n| `pnpm build` | 生产构建 |\n| `pnpm dev` | 交互式 CLI 模式 |\n| `pnpm dev:demo` | 演示模式 |\n| `pnpm dev:cli [sessionId]` | CLI 带可选会话 ID |\n\n需要我查看具体的文件或功能吗？",
+  "role": "assistant",
+  "type": "text"
+}
+```
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "帮我找一下 this.sessionManager.addMessage这个被调用了多少次，分别在哪里调用了"
+}
+```
+```
+{
+  "content": "",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"pattern\":\"this\\\\.sessionManager\\\\.addMessage\",\"path\":\".\"}",
+        "name": "grep"
+      },
+      "id": "call_-7948047191764735438",
+      "index": 0,
+      "type": "function"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 8696,
+    "completion_tokens": 79,
+    "total_tokens": 8775
+  }
+}
+```
+```
+{
+  "role": "tool",
+  "type": "text",
+  "content": "{\"ok\":true,\"countFiles\":2,\"countMatches\":4,\"truncated\":false,\"timedOut\":false,\"tookMs\":70,\"rg\":{\"bin\":\"D:\\\\work\\\\ai-agent-v2\\\\node_modules\\\\@vscode\\\\ripgrep\\\\bin\\\\rg.exe\",\"args\":[\"--json\",\"--no-messages\",\"--max-filesize\",\"2M\",\"--glob\",\"!**/node_modules/**\",\"--glob\",\"!**/dist/**\",\"--glob\",\"!**/.git/**\",\"--glob\",\"!**/*.min.js\",\"--glob\",\"!**/*.min.css\",\"--glob\",\"!**/coverage/**\",\"--glob\",\"!**/.next/**\",\"--glob\",\"!**/.nuxt/**\",\"--glob\",\"!**/build/**\",\"--smart-case\",\"--\",\"this\\\\.sessionManager\\\\.addMessage\",\"D:\\\\work\\\\ai-agent-v2\"]},\"result\":[{\"file\":\"openai-request.json\",\"mtimeMs\":1769272711269.6555,\"mtimeIso\":\"2026-01-24T16:38:31.269Z\",\"matches\":[{\"line\":43,\"column\":35,\"content\":\"      \\\"content\\\": \\\"帮我找一下 this.sessionManager.addMessage这个被调用了多少次，分别在哪里调用了\\\"\",\"matchText\":\"this.sessionManager.addMessage\",\"start\":34,\"end\":64}]},{\"file\":\"src/agent/index.ts\",\"mtimeMs\":1769272670111.7012,\"mtimeIso\":\"2026-01-24T16:37:50.111Z\",\"matches\":[{\"line\":116,\"column\":9,\"content\":\"        this.sessionManager.addMessage(toolResults);\",\"matchText\":\"this.sessionManager.addMessage\",\"start\":8,\"end\":38},{\"line\":144,\"column\":9,\"content\":\"        this.sessionManager.addMessage({\",\"matchText\":\"this.sessionManager.addMessage\",\"start\":8,\"end\":38},{\"line\":171,\"column\":17,\"content\":\"                this.sessionManager.addMessage(llmResponse);\",\"matchText\":\"this.sessionManager.addMessage\",\"start\":16,\"end\":46}]}]}",
+  "tool_call_id": "call_-7948047191764735438"
+}
+```
+```
+{
+  "content": "",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"filePath\":\"src/agent/index.ts\"}",
+        "name": "read_file"
+      },
+      "id": "call_-7948022796346722404",
+      "index": 0,
+      "type": "function"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 9163,
+    "completion_tokens": 72,
+    "total_tokens": 9235
+  }
+}
+```
+```
+{
+  "role": "tool",
+  "type": "text",
+  "content": "--- FILE: src/agent/index.ts ---\nRange: 1 - 220\n\n1 | /**\r\n2 |  * Agent - AI 代理\r\n3 |  * 负责编排 LLM 调用和会话管理\r\n4 |  *\r\n5 |  * 注意：此文件是旧版 Agent，建议使用 index-eventbus.ts 以获得 EventBus 集成\r\n6 |  * 要启用 EventBus 功能，请导入 './index-eventbus' 而不是此文件\r\n7 |  */\r\n8 | import EventEmitter from \"events\";\r\n9 | import { LLMProvider, LLMResponse, Message, ToolCall, ToolSchema } from \"../providers/base\";\r\n10 | import { ScopedLogger } from \"../util/log\";\r\n11 | import { SessionManager } from \"../session-v2\";\r\n12 | import { ToolRegistry } from \"../tool/registry\";\r\n13 | \r\n14 | export interface AgentConfig {\r\n15 |     llmProvider: LLMProvider;\r\n16 |     sessionManager: SessionManager;\r\n17 |     systemPrompt: string;\r\n18 |     /** 默认工具列表（可选），不传则使用 ToolRegistry 中所有工具 */\r\n19 |     defaultTools?: ToolSchema[];\r\n20 |     /** 最大循环次数，防止无限循环，默认 1024 */\r\n21 |     maxLoop?: number;\r\n22 |     /** 最大 token 数，默认 8000 */\r\n23 |     maxTokens?: number;\r\n24 |     /** 最大输出 token 数，默认 8000 */\r\n25 |     maxOutputTokens?: number;\r\n26 |     /** 工具并发上限，默认 1 */\r\n27 |     toolConcurrency?: number;\r\n28 |     /** 单次工具调用超时（毫秒），默认 300000 (5分钟) */\r\n29 |     toolTimeoutMs?: number;\r\n30 |     /** 连续错误次数上限，默认 2 */\r\n31 |     noProgressLimit?: number;\r\n32 | }\r\n33 | \r\n34 | export interface AgentResponse {\r\n35 |     content: string;\r\n36 |     role: Message['role'];\r\n37 |     type?: Message['type'];\r\n38 | }\r\n39 | \r\n40 | export default class Agent extends EventEmitter {\r\n41 |     private llmProvider: LLMProvider;\r\n42 |     private logger: ScopedLogger;\r\n43 |     private sessionManager: SessionManager;\r\n44 |     private systemPrompt: string;\r\n45 |     private defaultTools: ToolSchema[] | undefined;\r\n46 |     private maxLoop: number;\r\n47 |     maxOutputTokens: number;\r\n48 |     maxTokens: number;\r\n49 |     private noProgressLimit: number;\r\n50 | \r\n51 |     constructor(config: AgentConfig) {\r\n52 |         super();\r\n53 |         this.llmProvider = config.llmProvider;\r\n54 |         this.sessionManager = config.sessionManager;\r\n55 |         this.systemPrompt = config.systemPrompt;\r\n56 |         this.defaultTools = config.defaultTools;\r\n57 |         this.logger = new ScopedLogger('Agent');\r\n58 |         this.maxLoop = config.maxLoop ?? 1024;\r\n59 | \r\n60 |         const providerMaxOutput = this.llmProvider.maxOutputTokens;\r\n61 |         const providerMaxTokens = this.llmProvider.maxTokens;\r\n62 |         this.maxOutputTokens = Math.min(config.maxOutputTokens ?? providerMaxOutput, providerMaxOutput);\r\n63 |         this.maxTokens = Math.min(config.maxTokens ?? providerMaxTokens, providerMaxTokens);\r\n64 |         this.noProgressLimit = Math.max(0, config.noProgressLimit ?? 2);\r\n65 | \r\n66 |         this.sessionManager.maxOutputTokens = this.maxOutputTokens;\r\n67 |         this.sessionManager.maxTokens = this.maxTokens;\r\n68 |     }\r\n69 | \r\n70 |     /**\r\n71 |      * 执行单个工具调用\r\n72 |      */\r\n73 |     private async executeToolCall(toolCall: ToolCall): Promise<Message> {\r\n74 |         const { name, arguments: args } = toolCall.function;\r\n75 |         if (!name) {\r\n76 |             return {\r\n77 |                 role: 'tool',\r\n78 |                 type: 'text',\r\n79 |                 content: 'Error: Tool name is empty',\r\n80 |                 tool_call_id: toolCall.id,\r\n81 |             };\r\n82 |         }\r\n83 | \r\n84 |         const result = await ToolRegistry.execute(name, args);\r\n85 | \r\n86 |         let content: string;\r\n87 |         if (typeof result === 'string') {\r\n88 |             content = result;\r\n89 |         } else {\r\n90 |             content = JSON.stringify(result?.metadata ?? result ?? {});\r\n91 |         }\r\n92 | \r\n93 |         return {\r\n94 |             role: 'tool',\r\n95 |             type: 'text',\r\n96 |             content,\r\n97 |             tool_call_id: toolCall.id,\r\n98 |         };\r\n99 |     }\r\n100 | \r\n101 |     /**\r\n102 |      * 处理工具调用，返回是否有工具被调用\r\n103 |      */\r\n104 |     private async handleToolCalls(\r\n105 |         llmResponse: LLMResponse,\r\n106 |         spinner: ReturnType<ScopedLogger['spinner']>\r\n107 |     ): Promise<boolean> {\r\n108 |         if (!llmResponse.tool_calls || llmResponse.tool_calls.length === 0) {\r\n109 |             return false;\r\n110 |         }\r\n111 | \r\n112 |         const toolResults = await Promise.all(\r\n113 |             llmResponse.tool_calls.map(call => this.executeToolCall(call))\r\n114 |         );\r\n115 | \r\n116 |         this.sessionManager.addMessage(toolResults);\r\n117 | \r\n118 |         // Bug修复：提取content字段进行拼接，而非直接join对象数组\r\n119 |         const summaries = toolResults\r\n120 |             .map(r => {\r\n121 |                 const content = r.content ?? '';\r\n122 |                 return content.length > 50 ? content.slice(0, 47) + '...' : content;\r\n123 |             })\r\n124 |             .join(', ');\r\n125 | \r\n126 |         spinner.succeed(`Tool calls: ${summaries}`);\r\n127 |         return true;\r\n128 |     }\r\n129 | \r\n130 |     /**\r\n131 |      * 运行 Agent 处理用户查询\r\n132 |      * @param query 用户查询\r\n133 |      * @param options 选项\r\n134 |      * @returns Agent 响应\r\n135 |      */\r\n136 |     async run(\r\n137 |         query: string,\r\n138 |         options?: { silent?: boolean; tools?: ToolSchema[] }\r\n139 |     ): Promise<AgentResponse | null> {\r\n140 |         const tools = options?.tools ?? this.defaultTools ?? [];\r\n141 |         let consecutiveErrorCount = 0;\r\n142 | \r\n143 |         // 添加用户消息\r\n144 |         this.sessionManager.addMessage({\r\n145 |             role: 'user',\r\n146 |             type: 'text',\r\n147 |             content: query,\r\n148 |         });\r\n149 | \r\n150 |         for (let i = 0; i < this.maxLoop; i++) {\r\n151 |             const llmMessages = await this.sessionManager.getMessages();\r\n152 |             const spinner = this.logger.spinner(`Thinking-${i + 1}...`);\r\n153 | \r\n154 |             try {\r\n155 |                 const llmResponse = await this.llmProvider.generate(\r\n156 |                     [\r\n157 |                         { role: 'system', content: this.systemPrompt },\r\n158 |                         ...llmMessages,\r\n159 |                     ],\r\n160 |                     {\r\n161 |                         model: process.env.AI_MODEL,\r\n162 |                         tools: tools.length > 0 ? tools : undefined,\r\n163 |                         max_tokens: this.maxOutputTokens,\r\n164 |                     }\r\n165 |                 );\r\n166 | \r\n167 |                 if (!llmResponse) {\r\n168 |                      throw new Error('LLM response is null');\r\n169 |                 }\r\n170 |                   \r\n171 |                 this.sessionManager.addMessage(llmResponse);\r\n172 | \r\n173 |                 const hasToolCalls = await this.handleToolCalls(llmResponse, spinner);\r\n174 |                 \r\n175 |                 if (!hasToolCalls) {\r\n176 |                     // 最终文本响应\r\n177 |                     const finalResponse: AgentResponse = {\r\n178 |                         content: llmResponse?.content ?? '',\r\n179 |                         role: 'assistant',\r\n180 |                         type: 'text',\r\n181 |                     };\r\n182 | \r\n183 |                     spinner.succeed(finalResponse.content);\r\n184 |                     this.sessionManager.addMessage(finalResponse);\r\n185 |                     return finalResponse;\r\n186 |                 }\r\n187 | \r\n188 |                 // 工具调用成功，重置连续错误计数\r\n189 |                 consecutiveErrorCount = 0;\r\n190 | \r\n191 |             } catch (error) {\r\n192 |                 const errorMsg = error instanceof Error ? error.message : String(error);\r\n193 |                 spinner.fail(errorMsg);\r\n194 |                 this.logger.error(`LLM call failed: ${errorMsg}`);\r\n195 | \r\n196 |                 this.sessionManager.addMessage({\r\n197 |                     role: 'assistant',\r\n198 |                     type: 'text',\r\n199 |                     content: `LLM error: ${errorMsg}`,\r\n200 |                 });\r\n201 | \r\n202 |                 consecutiveErrorCount++;\r\n203 | \r\n204 |                 if (consecutiveErrorCount > this.noProgressLimit) {\r\n205 |                     return {\r\n206 |                         content: `Max error limit reached: ${errorMsg}`,\r\n207 |                         role: 'assistant',\r\n208 |                     };\r\n209 |                 }\r\n210 |             }\r\n211 |         }\r\n212 | \r\n213 |         // Bug修复：循环达到上限时返回错误信息\r\n214 |         return {\r\n215 |             content: 'Error :Agent reached maximum loop limit without completion',\r\n216 |             role: 'assistant',\r\n217 |         };\r\n218 |     }\r\n219 | }\r\n220 | ",
+  "tool_call_id": "call_-7948022796346722404"
+}
+```
+```
+{
+  "content": "`this.sessionManager.addMessage` 在代码中共被调用了 **4 次**，全部在 `src/agent/index.ts` 文件中：\n\n## 调用位置\n\n### 1. src/agent/index.ts:116\n```typescript\nthis.sessionManager.addMessage(toolResults);\n```\n- **位置**：`handleToolCalls` 方法中\n- **作用**：添加工具执行结果到会话\n- **上下文**：当 LLM 调用了工具后，将工具的执行结果记录下来\n\n### 2. src/agent/index.ts:144\n```typescript\nthis.sessionManager.addMessage({\n    role: 'user',\n    type: 'text',\n    content: query,\n});\n```\n- **位置**：`run` 方法开始处\n- **作用**：添加用户消息（查询）到会话\n\n### 3. src/agent/index.ts:171\n```typescript\nthis.sessionManager.addMessage(llmResponse);\n```\n- **位置**：`run` 方法的主循环中\n- **作用**：添加 LLM 的原始响应（包含可能的工具调用）\n\n### 4. src/agent/index.ts:184\n```typescript\nthis.sessionManager.addMessage(finalResponse);\n```\n- **位置**：`run` 方法中，当没有工具调用时的分支\n- **作用**：添加最终的文本响应\n\n## 总结\n\n这个方法的调用流程反映了 Agent 的完整工作流程：\n1. **用户输入** → 添加用户消息\n2. **LLM 响应** → 添加 LLM 原始响应\n3. **工具结果** → 如果有工具调用，添加工具执行结果\n4. **最终输出** → 如果没有工具调用，添加最终文本响应\n\n注意：还有一个匹配在 `openai-request.json` 中，但这只是日志文件，不是代码调用。",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [],
+  "usage": {
+    "prompt_tokens": 11204,
+    "completion_tokens": 552,
+    "total_tokens": 11756
+  }
+}
+```
+```
+{
+  "content": "`this.sessionManager.addMessage` 在代码中共被调用了 **4 次**，全部在 `src/agent/index.ts` 文件中：\n\n## 调用位置\n\n### 1. src/agent/index.ts:116\n```typescript\nthis.sessionManager.addMessage(toolResults);\n```\n- **位置**：`handleToolCalls` 方法中\n- **作用**：添加工具执行结果到会话\n- **上下文**：当 LLM 调用了工具后，将工具的执行结果记录下来\n\n### 2. src/agent/index.ts:144\n```typescript\nthis.sessionManager.addMessage({\n    role: 'user',\n    type: 'text',\n    content: query,\n});\n```\n- **位置**：`run` 方法开始处\n- **作用**：添加用户消息（查询）到会话\n\n### 3. src/agent/index.ts:171\n```typescript\nthis.sessionManager.addMessage(llmResponse);\n```\n- **位置**：`run` 方法的主循环中\n- **作用**：添加 LLM 的原始响应（包含可能的工具调用）\n\n### 4. src/agent/index.ts:184\n```typescript\nthis.sessionManager.addMessage(finalResponse);\n```\n- **位置**：`run` 方法中，当没有工具调用时的分支\n- **作用**：添加最终的文本响应\n\n## 总结\n\n这个方法的调用流程反映了 Agent 的完整工作流程：\n1. **用户输入** → 添加用户消息\n2. **LLM 响应** → 添加 LLM 原始响应\n3. **工具结果** → 如果有工具调用，添加工具执行结果\n4. **最终输出** → 如果没有工具调用，添加最终文本响应\n\n注意：还有一个匹配在 `openai-request.json` 中，但这只是日志文件，不是代码调用。",
+  "role": "assistant",
+  "type": "text"
+}
+```

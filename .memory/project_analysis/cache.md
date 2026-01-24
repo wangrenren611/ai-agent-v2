@@ -1,0 +1,204 @@
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "Task: Explore codebase\n\nWork autonomously using the allowed tools.\n\nDo not ask follow-up questions.\n\nReturn a concise summary with findings and file:line references.\n\n探索这个AI代理项目的整体结构，包括：\n1. 所有目录和文件的层次结构\n2. 主要的源代码目录（src/）下的模块组织\n3. 配置文件（package.json, tsconfig.json等）\n4. 文档文件\n5. 依赖项和构建配置\n\n请提供详细的项目结构概览。"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "我将探索这个AI代理项目的整体结构。让我从多个角度进行调查。",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"pattern\":\"*\"}",
+        "name": "glob"
+      },
+      "id": "call_-7948039289022654840",
+      "index": 0,
+      "type": "function"
+    },
+    {
+      "function": {
+        "arguments": "{\"pattern\":\"**/*.json\"}",
+        "name": "glob"
+      },
+      "id": "call_-7948039289022654839",
+      "index": 1,
+      "type": "function"
+    },
+    {
+      "function": {
+        "arguments": "{\"pattern\":\"**/*.md\"}",
+        "name": "glob"
+      },
+      "id": "call_-7948039289022654838",
+      "index": 2,
+      "type": "function"
+    },
+    {
+      "function": {
+        "arguments": "{\"pattern\":\"src/**/*\"}",
+        "name": "glob"
+      },
+      "id": "call_-7948039289022654837",
+      "index": 3,
+      "type": "function"
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "agent-scheduler-architecture-continued.md\nagent-scheduler-architecture.md\nclaude-code-multi-agent-analysis.md\nCLAUDE.md\nCompaction深度分析.md\ncustomPrompt.md\nenv.example\neslint.config.js\nESLINT_SETUP.md\nexecution-strategies-deep-dive.md\nhybrid-multi-agent-architecture.md\nmulti-agent-call-chain.md\nmulti-agent-implementation.md\nopenai-request.json\npackage-lock.json\npackage.json\nPERFORMANCE_ANALYSIS_REPORT.md\nPERFORMANCE_OPTIMIZATION_REPORT.md\npnpm-lock.yaml\nSANDBOX_CONFIG.md\ntest.js\ntsconfig.json\nvitest.config.ts",
+  "type": "tool",
+  "tool_call_id": "call_-7948039289022654840"
+}
+```
+```
+{
+  "role": "tool",
+  "content": "openai-request.json\npackage-lock.json\npackage.json\ntsconfig.json",
+  "type": "tool",
+  "tool_call_id": "call_-7948039289022654839"
+}
+```
+```
+{
+  "role": "tool",
+  "content": "agent-scheduler-architecture-continued.md\nagent-scheduler-architecture.md\nclaude-code-multi-agent-analysis.md\nCLAUDE.md\nCompaction深度分析.md\ncustomPrompt.md\nESLINT_SETUP.md\nexecution-strategies-deep-dive.md\nhybrid-multi-agent-architecture.md\nmulti-agent-call-chain.md\nmulti-agent-implementation.md\nPERFORMANCE_ANALYSIS_REPORT.md\nPERFORMANCE_OPTIMIZATION_REPORT.md\nSANDBOX_CONFIG.md\ndocs/agent-api-routes.md\ndocs/agent-background-tasks.md\ndocs/agent-breakpoint-continuation.md\ndocs/compaction-analysis.md\ndocs/CROSS_PLATFORM.md\ndocs/LANGFUSE_INTEGRATION.md\ndocs/multi-agent-implementation.md\ndocs/PROJECT_ANALYSIS.md\ndocs/PROMPTS.md\ndocs/README.md\nskills/git-commit/SKILL.md\nskills/ui-ux-pro-max/SKILL.md\nsrc/mcp/README.md\nsrc/util/event-bus-README.md\nsrc/agent/hooks/README.md",
+  "type": "tool",
+  "tool_call_id": "call_-7948039289022654838"
+}
+```
+```
+{
+  "role": "tool",
+  "content": "src/codeCompressor.ts\nsrc/index.ts\nsrc/agent/export.ts\nsrc/agent/generate.txt\nsrc/agent/index-eventbus.ts\nsrc/agent/index.ts\nsrc/agent/manager.ts\nsrc/examples/langfuse-demo.ts\nsrc/examples/log-demo.ts\nsrc/cli/CLI.ts\nsrc/cli/index.ts\nsrc/mcp/client.ts\nsrc/mcp/config-loader.ts\nsrc/mcp/index.ts\nsrc/mcp/json-schema-to-zod.ts\nsrc/mcp/manager.ts\nsrc/mcp/README.md\nsrc/mcp/tool-adapter.ts\nsrc/mcp/types.ts\nsrc/prompts/operator.ts\nsrc/prompts/system.ts\nsrc/providers/base.ts\nsrc/providers/openai.ts\nsrc/sandbox/base.ts\nsrc/sandbox/docker-executor.ts\nsrc/sandbox/index.ts\nsrc/sandbox/types.ts\nsrc/session-v2/compaction.edge-cases.test.ts\nsrc/session-v2/compaction.multi-tools.test.ts\nsrc/session-v2/compaction.test.ts\nsrc/session-v2/compaction.ts\nsrc/session-v2/index.ts\nsrc/observability/langfuse.ts\nsrc/skills/index.ts\nsrc/skills/loader.ts\nsrc/skills/parser.ts\nsrc/skills/skill-tool.ts\nsrc/skills/types.ts\nsrc/tool/base.ts\nsrc/tool/bash copy.ts\nsrc/tool/bash-parser.ts\nsrc/tool/bash.test.ts\nsrc/tool/bash.ts\nsrc/tool/batch-replace.ts\nsrc/tool/complete-task.ts\nsrc/tool/explore.ts\nsrc/tool/file.ts\nsrc/tool/glob.ts\nsrc/tool/grep.test.ts\nsrc/tool/grep.ts\nsrc/tool/index.test.ts\nsrc/tool/index.ts\nsrc/tool/registry.ts\nsrc/tool/rollback.ts\nsrc/tool/subagent.ts\nsrc/tool/surgical.ts\nsrc/tool/task.ts\nsrc/tool/todo.ts\nsrc/tool/todowrite.ts\nsrc/tool/web-search.ts\nsrc/util/backup-manager.ts\nsrc/util/event-bus-agent.ts\nsrc/util/event-bus-README.md\nsrc/util/event-bus-session-integration.ts\nsrc/util/event-bus.test.ts\nsrc/util/event-bus.ts\nsrc/util/log-format.ts\nsrc/util/log.ts\nsrc/util/platform-cmd.ts\nsrc/storage/memory.ts\nsrc/storage/mongoose.ts\nsrc/agent/hooks/examples.ts\nsrc/agent/hooks/index.ts\nsrc/agent/hooks/integration-example.ts\nsrc/agent/hooks/README.md\nsrc/agent/prompt/compaction.txt\nsrc/agent/prompt/explore.txt\nsrc/agent/prompt/summary.txt\nsrc/agent/prompt/title.txt\nsrc/cli/commands/clear.ts\nsrc/cli/commands/exit.ts\nsrc/cli/commands/help.ts\nsrc/cli/commands/history.ts\nsrc/cli/commands/index.ts\nsrc/cli/commands/session.ts\nsrc/cli/commands/types.ts\nsrc/cli/utils/format.ts\nsrc/cli/utils/index.ts\nsrc/cli/utils/input.ts\nsrc/cli/utils/reader.ts\nsrc/cli/utils/smart-input.ts\nsrc/storage/models/message.ts\nsrc/storage/models/session.ts",
+  "type": "tool",
+  "tool_call_id": "call_-7948039289022654837"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"filePath\":\"package.json\"}",
+        "name": "read_file"
+      },
+      "id": "call_-7948036162285544033",
+      "index": 0,
+      "type": "function"
+    },
+    {
+      "function": {
+        "arguments": "{\"filePath\":\"tsconfig.json\"}",
+        "name": "read_file"
+      },
+      "id": "call_-7948036162285544032",
+      "index": 1,
+      "type": "function"
+    },
+    {
+      "function": {
+        "arguments": "{\"filePath\":\"vitest.config.ts\"}",
+        "name": "read_file"
+      },
+      "id": "call_-7948036162285544031",
+      "index": 2,
+      "type": "function"
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "--- FILE: package.json ---\nRange: 1 - 62\n\n1 | {\r\n2 |   \"name\": \"ai-agent-v2\",\r\n3 |   \"version\": \"1.0.0\",\r\n4 |   \"description\": \"\",\r\n5 |   \"license\": \"ISC\",\r\n6 |   \"author\": \"\",\r\n7 |   \"type\": \"commonjs\",\r\n8 |   \"main\": \"index.js\",\r\n9 |   \"bin\": {\r\n10 |     \"@qps\": \"bin/index.js\"\r\n11 |   },\r\n12 |   \"files\": [\r\n13 |     \"dist\"\r\n14 |   ],\r\n15 |   \"scripts\": {\r\n16 |     \"typecheck\": \"tsc --noEmit\",\r\n17 |     \"lint\": \"eslint . --ext .ts,.js\",\r\n18 |     \"lint:fix\": \"eslint . --ext .ts,.js --fix\",\r\n19 |     \"lint:strict\": \"eslint . --ext .ts,.js --max-warnings 0\",\r\n20 |     \"build\": \"cross-env NODE_ENV=production  tsc\",\r\n21 |     \"dev\": \"cross-env NODE_ENV=development  tsx src/index.ts\",\r\n22 |     \"dev:demo\": \"cross-env NODE_ENV=development  tsx src/index.ts demo\",\r\n23 |     \"dev:cli\": \"cross-env NODE_ENV=development  tsx src/index.ts cli\",\r\n24 |     \"test\": \"vitest run src/tool/grep.test.ts\",\r\n25 |     \"codeCompressor\": \"cross-env NODE_ENV=development  tsx src/codeCompressor.ts\",\r\n26 |     \"test:ui\": \"vitest --ui\",\r\n27 |     \"langfuse:demo\": \"cross-env NODE_ENV=development tsx src/examples/langfuse-demo.ts\"\r\n28 |   },\r\n29 |   \"devDependencies\": {\r\n30 |     \"@eslint/js\": \"^9.39.2\",\r\n31 |     \"@types/node\": \"^22.19.3\",\r\n32 |     \"@types/prompts\": \"^2.4.9\",\r\n33 |     \"@typescript-eslint/eslint-plugin\": \"^8.39.0\",\r\n34 |     \"@typescript-eslint/parser\": \"^8.39.0\",\r\n35 |     \"cross-env\": \"^10.1.0\",\r\n36 |     \"typescript\": \"^5.9.3\",\r\n37 |     \"typescript-eslint\": \"^8.53.0\",\r\n38 |     \"vitest\": \"^3.2.4\"\r\n39 |   },\r\n40 |   \"dependencies\": {\r\n41 |     \"@tavily/core\": \"^0.7.1\",\r\n42 |     \"@vscode/ripgrep\": \"^1.17.0\",\r\n43 |     \"chalk\": \"^5.6.2\",\r\n44 |     \"dockerode\": \"^4.0.9\",\r\n45 |     \"dotenv\": \"^17.2.3\",\r\n46 |     \"execa\": \"^8.0.1\",\r\n47 |     \"fast-glob\": \"^3.3.3\",\r\n48 |     \"gray-matter\": \"^4.0.3\",\r\n49 |     \"iconv-lite\": \"^0.7.2\",\r\n50 |     \"isbinaryfile\": \"^6.0.0\",\r\n51 |     \"json5\": \"^2.2.3\",\r\n52 |     \"langfuse\": \"^3.38.6\",\r\n53 |     \"mongoose\": \"^9.1.3\",\r\n54 |     \"ora\": \"^9.0.0\",\r\n55 |     \"tree-sitter\": \"^0.22.0\",\r\n56 |     \"tree-sitter-bash\": \"^0.23.1\",\r\n57 |     \"tree-sitter-typescript\": \"^0.23.2\",\r\n58 |     \"tsx\": \"^4.21.0\",\r\n59 |     \"zod\": \"^3.24.1\"\r\n60 |   }\r\n61 | }\r\n62 | ",
+  "type": "tool",
+  "tool_call_id": "call_-7948036162285544033"
+}
+```
+```
+{
+  "role": "tool",
+  "content": "--- FILE: tsconfig.json ---\nRange: 1 - 25\n\n1 | {\r\n2 |   \"exclude\": [\"dist\", \"__tests__\", \"node_modules\"],\r\n3 |   \"compilerOptions\": {\r\n4 |     \"lib\": [\"ESNext\"],\r\n5 |     \"module\": \"CommonJS\",\r\n6 |     \"types\": [\"node\"],\r\n7 |     \"resolveJsonModule\": true,\r\n8 |     \"allowSyntheticDefaultImports\": true,\r\n9 |     \"strict\": true,\r\n10 |     \"strictNullChecks\": true,\r\n11 |     \"skipLibCheck\": true,\r\n12 |     \"declaration\": true,\r\n13 |     \"outDir\": \"./dist\",\r\n14 |     \"rootDir\": \"./src\",\r\n15 |     \"target\": \"ESNext\",\r\n16 |     \"esModuleInterop\": true\r\n17 |   },\r\n18 |   \"include\": [\r\n19 |     \"./src/**/*\",\r\n20 |     \"./typings\",\r\n21 |     \"./typing.d.ts\",\r\n22 |     \"src/tools/todowrite.ts\"\r\n23 | , \"test-model.js\"  ]\r\n24 | }\r\n25 | ",
+  "type": "tool",
+  "tool_call_id": "call_-7948036162285544032"
+}
+```
+```
+{
+  "role": "tool",
+  "content": "--- FILE: vitest.config.ts ---\nRange: 1 - 8\n\n1 | import { defineConfig } from 'vitest/config';\r\n2 | \r\n3 | export default defineConfig({\r\n4 |   test: {\r\n5 |     globals: true,\r\n6 |   },\r\n7 | });\r\n8 | ",
+  "type": "tool",
+  "tool_call_id": "call_-7948036162285544031"
+}
+```
+```
+{
+  "role": "assistant",
+  "content": "",
+  "type": "tool_call",
+  "tool_calls": [
+    {
+      "function": {
+        "arguments": "{\"filePath\":\"src/index.ts\"}",
+        "name": "read_file"
+      },
+      "id": "call_-7948037914632680251",
+      "index": 0,
+      "type": "function"
+    },
+    {
+      "function": {
+        "arguments": "{\"filePath\":\"src/agent/index.ts\"}",
+        "name": "read_file"
+      },
+      "id": "call_-7948037914632680250",
+      "index": 1,
+      "type": "function"
+    },
+    {
+      "function": {
+        "arguments": "{\"filePath\":\"src/session-v2/index.ts\"}",
+        "name": "read_file"
+      },
+      "id": "call_-7948037914632680249",
+      "index": 2,
+      "type": "function"
+    }
+  ]
+}
+```
+```
+{
+  "role": "tool",
+  "content": "--- FILE: src/index.ts ---\nRange: 1 - 125\n\n1 | /**\r\n2 |  * 主入口文件\r\n3 |  * 初始化并启动 AI Agent 应用\r\n4 |  */\r\n5 | import dotenv from 'dotenv';\r\n6 | import { OpenAIProvider } from './providers/openai';\r\n7 | import Agent from './agent';\r\n8 | import { CLI } from './cli';\r\n9 | import { registerDefaultToolsAsync, ToolRegistry } from './tool';\r\n10 | import { SessionManager } from './session-v2';\r\n11 | import { operatorPrompt } from './prompts/operator';\r\n12 | import path from 'path';\r\n13 | import fs from 'fs';\r\n14 | \r\n15 | const env = process.env.NODE_ENV || 'development';\r\n16 | dotenv.config({ path: `.env.${env}`, override: true });\r\n17 | \r\n18 | /**\r\n19 |  * 应用配置\r\n20 |  */\r\n21 | interface AppConfig {\r\n22 |     deepseekApiKey: string;\r\n23 |     deepseekBaseUrl: string;\r\n24 | }\r\n25 | \r\n26 | /**\r\n27 |  * 初始化应用\r\n28 |  */\r\n29 | async function initializeApp(config: AppConfig) {\r\n30 |     // 1. 连接数据库\r\n31 |     // await connectDB();\r\n32 | \r\n33 |     // 2. 初始化工具（包括 MCP 工具）\r\n34 |     await registerDefaultToolsAsync();\r\n35 | \r\n36 |  \r\n37 |     // 5. 初始化 LLM Provider\r\n38 |     const llmProvider = new OpenAIProvider({\r\n39 |         apiKey: config.deepseekApiKey,\r\n40 |         baseURL: config.deepseekBaseUrl,\r\n41 |     });\r\n42 |       \r\n43 | \r\n44 |    const sessionManager = new SessionManager({\r\n45 |        sessionId:new Date().getTime().toString(),\r\n46 |        llmProvider,\r\n47 |    });\r\n48 |    \r\n49 |   await sessionManager.init();\r\n50 | \r\n51 |     ToolRegistry.setContext({\r\n52 |         sessionId: sessionManager.id,\r\n53 |         sessionPath: sessionManager.sessionPath,\r\n54 |     });\r\n55 | \r\n56 | \r\n57 |     const customPrompt = operatorPrompt({\r\n58 |         directory: process.cwd(),\r\n59 |         vcs: \"git\",\r\n60 |     });\r\n61 | \r\n62 |     console.log(`Available tools:\\n${ToolRegistry.getSchemas().map(tool => `'${tool.function.name}'`).join(\"\\n\")}`);\r\n63 | \r\n64 |     fs.writeFileSync(path.resolve(process.cwd(), 'customPrompt.md'), customPrompt);\r\n65 |     const agent = new Agent({\r\n66 |         llmProvider,\r\n67 |         sessionManager,\r\n68 |         systemPrompt: customPrompt,\r\n69 |         defaultTools: ToolRegistry.getSchemas(),\r\n70 |     });\r\n71 | \r\n72 |     return { agent, sessionManager };\r\n73 | }\r\n74 | \r\n75 | /**\r\n76 |  * 启动 CLI 交互模式\r\n77 |  */\r\n78 | async function startCLI(agent: Agent, sessionManager: SessionManager): Promise<void> {\r\n79 |     const cli = new CLI({\r\n80 |         agent,\r\n81 |         sessionManager,\r\n82 |         sessionId: sessionManager.id,\r\n83 |         prompt: '>',\r\n84 |     });\r\n85 | \r\n86 |     await cli.start();\r\n87 | }\r\n88 | \r\n89 | \r\n90 | /**\r\n91 |  * 主函数\r\n92 |  */\r\n93 | async function main() {\r\n94 |     // 验证环境变量\r\n95 |     const deepseekApiKey = process.env.DEEPSEEK_API_KEY;\r\n96 |     const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL;\r\n97 | \r\n98 |     if (!deepseekApiKey) {\r\n99 |         throw new Error('DEEPSEEK_API_KEY is not set');\r\n100 |     }\r\n101 | \r\n102 |     if (!deepseekBaseUrl) {\r\n103 |         throw new Error('DEEPSEEK_BASE_URL is not set');\r\n104 |     }\r\n105 | \r\n106 |     // 初始化应用\r\n107 |     const { agent, sessionManager } = await initializeApp({\r\n108 |         deepseekApiKey,\r\n109 |         deepseekBaseUrl,\r\n110 |     });\r\n111 | \r\n112 |     // 检查命令行参数\r\n113 |     const args = process.argv.slice(2);\r\n114 |     const mode = args[0] || 'cli';\r\n115 | \r\n116 |     switch (mode) {\r\n117 |         case 'cli':\r\n118 |         default:\r\n119 |             await startCLI(agent, sessionManager);\r\n120 |             break;\r\n121 |     }\r\n122 | }\r\n123 | \r\n124 | main().catch(console.error);\r\n125 | ",
+  "type": "tool",
+  "tool_call_id": "call_-7948037914632680251"
+}
+```
+```
+{
+  "role": "tool",
+  "content": "--- FILE: src/agent/index.ts ---\nRange: 1 - 392\n\n1 | /**\r\n2 |  * Agent - AI 代理\r\n3 |  * 负责编排 LLM 调用和会话管理\r\n4 |  * \r\n5 |  * 注意：此文件是旧版 Agent，建议使用 index-eventbus.ts 以获得 EventBus 集成\r\n6 |  * 要启用 EventBus 功能，请导入 './index-eventbus' 而不是此文件\r\n7 |  */\r\n8 | import EventEmitter from \"events\";\r\n9 | import { LLMProvider, LLMResponse, ToolSchema } from \"../providers/base\";\r\n10 | import { ScopedLogger } from \"../util/log\";\r\n11 | import { formatToolResult } from \"../util/log-format\";\r\n12 | import { SessionManager } from \"../session-v2\";\r\n13 | import { SYSTEM_PROMPT } from \"../prompts/system\";\r\n14 | import { ToolRegistry } from \"../tool/registry\";\r\n15 | \r\n16 | export interface AgentConfig {\r\n17 |     llmProvider: LLMProvider;\r\n18 |     sessionManager: SessionManager;\r\n19 |     systemPrompt: string;\r\n20 |     /** 默认工具列表（可选），不传则使用 ToolRegistry 中所有工具 */\r\n21 |     defaultTools?: ToolSchema[];\r\n22 |     /** 最大循环次数，防止无限循环，默认 10 */\r\n23 |     maxLoop?: number;\r\n24 |     /** 最大 token 数，默认 8000 */\r\n25 |     maxTokens?: number;\r\n26 |     /** 最大输出 token 数，默认 8000 */\r\n27 |     maxOutputTokens?: number;\r\n28 |     /** 工具并发上限，默认 4 */\r\n29 |     toolConcurrency?: number;\r\n30 |     /** 单次工具调用超时（毫秒），默认 120000 */\r\n31 |     toolTimeoutMs?: number;\r\n32 |     /** 连续重复的工具调用轮次上限，默认 2 */\r\n33 |     noProgressLimit?: number;\r\n34 | }\r\n35 | \r\n36 | export interface AgentResponse {\r\n37 |     content: string;\r\n38 |     role: 'assistant';\r\n39 | }\r\n40 | \r\n41 | export default class Agent extends EventEmitter {\r\n42 |     private llmProvider: LLMProvider;\r\n43 |     private logger: ScopedLogger;\r\n44 |     private sessionManager: SessionManager;\r\n45 |     private systemPrompt: string;\r\n46 |     private defaultTools: ToolSchema[] | undefined;\r\n47 |     private maxLoop: number;\r\n48 |     maxOutputTokens: number;\r\n49 |     maxTokens: number;\r\n50 |     private toolConcurrency: number;\r\n51 |     private toolTimeoutMs: number;\r\n52 |     private noProgressLimit: number;\r\n53 |     constructor(config: AgentConfig) {\r\n54 |         super();\r\n55 |         this.llmProvider = config.llmProvider;\r\n56 |         this.sessionManager = config.sessionManager;\r\n57 |         this.systemPrompt = config.systemPrompt;\r\n58 |         this.defaultTools = config.defaultTools;\r\n59 |         this.logger = new ScopedLogger('Agent');\r\n60 |         this.maxLoop = config.maxLoop ?? 1024;\r\n61 |         const providerMaxOutput = this.llmProvider.maxOutputTokens;\r\n62 |         const providerMaxTokens = this.llmProvider.maxTokens;\r\n63 |         this.maxOutputTokens = Math.min(config.maxOutputTokens ?? providerMaxOutput, providerMaxOutput);\r\n64 |         this.maxTokens = Math.min(config.maxTokens ?? providerMaxTokens, providerMaxTokens);\r\n65 |         this.toolConcurrency = Math.max(1, config.toolConcurrency ?? 1);\r\n66 |         this.toolTimeoutMs = config.toolTimeoutMs ?? 1000*60*5*100;\r\n67 |         this.noProgressLimit = Math.max(0, config.noProgressLimit ?? 2);\r\n68 |         this.sessionManager.maxOutputTokens = this.maxOutputTokens;\r\n69 |         this.sessionManager.maxTokens = this.maxTokens;\r\n70 |     }\r\n71 | \r\n72 |     private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {\r\n73 |         if (!timeoutMs || timeoutMs <= 0) {\r\n74 |             return promise;\r\n75 |         }\r\n76 | \r\n77 |         let timeoutId: ReturnType<typeof setTimeout> | undefined;\r\n78 |         const timeoutPromise = new Promise<never>((_, reject) => {\r\n79 |             timeoutId = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);\r\n80 |         });\r\n81 | \r\n82 |         return Promise.race([promise, timeoutPromise]).finally(() => {\r\n83 |             if (timeoutId) {\r\n84 |                 clearTimeout(timeoutId);\r\n85 |             }\r\n86 |         });\r\n87 |     }\r\n88 | \r\n89 |     private async runWithConcurrency<T, R>(\r\n90 |         items: T[],\r\n91 |         limit: number,\r\n92 |         task: (item: T, index: number) => Promise<R>\r\n93 |     ): Promise<R[]> {\r\n94 |         if (items.length === 0) {\r\n95 |             return [];\r\n96 |         }\r\n97 | \r\n98 |         if (limit <= 1) {\r\n99 |             const results: R[] = [];\r\n100 |             for (let i = 0; i < items.length; i++) {\r\n101 |                 results.push(await task(items[i], i));\r\n102 |             }\r\n103 |             return results;\r\n104 |         }\r\n105 | \r\n106 |         const results = new Array<R>(items.length);\r\n107 |         let nextIndex = 0;\r\n108 |         const workerCount = Math.min(limit, items.length);\r\n109 | \r\n110 |         const workers = Array.from({ length: workerCount }, async () => {\r\n111 |             while (true) {\r\n112 |                 const currentIndex = nextIndex++;\r\n113 |                 if (currentIndex >= items.length) {\r\n114 |                     break;\r\n115 |                 }\r\n116 |                 results[currentIndex] = await task(items[currentIndex], currentIndex);\r\n117 |             }\r\n118 |         });\r\n119 | \r\n120 |         await Promise.all(workers);\r\n121 |         return results;\r\n122 |     }\r\n123 | \r\n124 |     private buildToolSignature(toolCalls: NonNullable<LLMResponse['tool_calls']>): string {\r\n125 |         try {\r\n126 |             return JSON.stringify(\r\n127 |                 toolCalls.map((call) => ({\r\n128 |                     name: call.function.name,\r\n129 |                     arguments: call.function.arguments,\r\n130 |                 }))\r\n131 |             );\r\n132 |         } catch (_) {\r\n133 |             return '';\r\n134 |         }\r\n135 |     }\r\n136 | \r\n137 |     /**\r\n138 |      * 运行 Agent 处理用户查询\r\n139 |      * @param sessionId 会话 ID\r\n140 |      * @param userId 用户 ID\r\n141 |      * @param query 用户查询\r\n142 |      * @param options 选项\r\n143 |      * @returns Agent 响应\r\n144 |      */\r\n145 |     async run(\r\n146 |         query: string,\r\n147 |         options?: { silent?: boolean; tools?: ToolSchema[] }\r\n148 |     ): Promise<AgentResponse | null> {\r\n149 | \r\n150 |      \r\n151 |         try {\r\n152 | \r\n153 |             // 3. 获取工具 schemas（优先级：传入参数 > 默认配置 > ToolRegistry 全部）\r\n154 |             const tools = options?.tools ?? this.defaultTools ?? [];\r\n155 | \r\n156 |             // 4. LLM 调用循环（处理工具调用）\r\n157 |             let i = 0; // 防止无限循环\r\n158 |             let finalResponse: AgentResponse | null = null;\r\n159 |             let lastToolSignature: string | null = null;\r\n160 |             let repeatedToolCalls = 0;\r\n161 |   \r\n162 |   \r\n163 |             this.sessionManager.addMessage({\r\n164 |                 role: 'user',\r\n165 |                 type: 'text',\r\n166 |                 content: query\r\n167 |             });\r\n168 | \r\n169 |             while (i < this.maxLoop) {\r\n170 |                 i++; // 在循环开始时递增计数器\r\n171 | \r\n172 |                 const llmMessages = await this.sessionManager.getMessages();\r\n173 | \r\n174 |                 const spinner = this.logger.spinner(`Thinking-${i}...`);\r\n175 |                 let llmResponse: Awaited<ReturnType<LLMProvider['generate']>> = null;\r\n176 |                 try {\r\n177 |                     // 调用 LLM\r\n178 |                     llmResponse = await this.llmProvider.generate([\r\n179 |                         {\r\n180 |                             role: 'system',\r\n181 |                             content: this.systemPrompt,\r\n182 |                         },\r\n183 |                         ...llmMessages\r\n184 |                     ], {\r\n185 |                         model: process.env.AI_MODEL,\r\n186 |                         tools: tools.length > 0 ? tools : undefined,\r\n187 |                         max_tokens: this.maxOutputTokens,\r\n188 |                     });\r\n189 |                     // console.log( this.systemPrompt)\r\n190 |                 } catch (error) {\r\n191 |                     const errorMsg = error instanceof Error ? error.message : String(error);\r\n192 | \r\n193 |                     spinner.fail(`Thinking-${i} failed`);\r\n194 | \r\n195 |                     this.logger.error(`LLM error: ${errorMsg}`);\r\n196 |                       this.sessionManager.addMessage({\r\n197 |                         role: 'assistant',\r\n198 |                         type: 'text',\r\n199 |                         content: errorMsg\r\n200 |                     });\r\n201 | \r\n202 |                     return {\r\n203 |                         content: errorMsg,\r\n204 |                         role: 'assistant',\r\n205 |                     };\r\n206 |                 }\r\n207 | \r\n208 |                 if (!llmResponse) {\r\n209 |                     const errorMsg = 'LLM returned null response';\r\n210 |                     this.logger.error(errorMsg);\r\n211 |                     spinner.fail(`Thinking-${i} failed`);\r\n212 | \r\n213 |                    this.sessionManager.addMessage({\r\n214 |                         role: 'assistant',\r\n215 |                         type: 'text',\r\n216 |                         content: errorMsg\r\n217 |                     });\r\n218 | \r\n219 |                     return {\r\n220 |                         content: errorMsg,\r\n221 |                         role: 'assistant',\r\n222 |                     };\r\n223 |                 }\r\n224 |                 spinner.succeed(`Thinking-${i} end`);\r\n225 | \r\n226 |                 // 检查是否有工具调用\r\n227 |                 if (llmResponse.tool_calls && llmResponse.tool_calls.length > 0) {\r\n228 |                     const toolSignature = this.buildToolSignature(llmResponse.tool_calls);\r\n229 |                     if (toolSignature && toolSignature === lastToolSignature) {\r\n230 |                         repeatedToolCalls += 1;\r\n231 |                     } else {\r\n232 |                         repeatedToolCalls = 0;\r\n233 |                         lastToolSignature = toolSignature;\r\n234 |                     }\r\n235 | \r\n236 |                     if (this.noProgressLimit > 0 && repeatedToolCalls >= this.noProgressLimit) {\r\n237 |                         const errorMsg = `Repeated tool_calls detected for ${this.noProgressLimit + 1} iterations, aborting to prevent loop.`;\r\n238 |                         this.logger.error(errorMsg);\r\n239 |                         this.sessionManager.addMessage({\r\n240 |                                 role: 'assistant',\r\n241 |                                 type: 'text',\r\n242 |                                 content: errorMsg\r\n243 |                          });\r\n244 | \r\n245 |                         return {\r\n246 |                             content: errorMsg,\r\n247 |                             role: 'assistant',\r\n248 |                         };\r\n249 |                     }\r\n250 | \r\n251 |                     // 添加 assistant 消息（包含 tool_calls）\r\n252 |                     this.sessionManager.addMessage({\r\n253 |                         role: 'assistant',\r\n254 |                         content: llmResponse.content,\r\n255 |                         type: 'tool_call',\r\n256 |                         tool_calls: llmResponse.tool_calls,\r\n257 |                     });\r\n258 | \r\n259 |                     this.logger.info(`Tool tips: ${llmResponse.content}`);\r\n260 | \r\n261 |                     const toolCalls = llmResponse.tool_calls;\r\n262 |                     const toolConcurrency = Math.min(this.toolConcurrency, toolCalls.length);\r\n263 | \r\n264 |                     const results = await this.runWithConcurrency(toolCalls, toolConcurrency, async (toolCall) => {\r\n265 |                         const { id,function: fn } = toolCall;\r\n266 |                         try {\r\n267 |                             // 解析参数（带容错处理）\r\n268 |                             let args: unknown;\r\n269 |                             try {\r\n270 |                                 args = JSON.parse(fn.arguments);\r\n271 |                             } catch (parseError) {\r\n272 |                                 // JSON 解析失败 - 记录详细信息并返回友好的错误信息\r\n273 |                                 const truncatedArgs = fn.arguments.length > 200\r\n274 |                                     ? fn.arguments.slice(0, 200) + '...'\r\n275 |                                     : fn.arguments;\r\n276 |                                 const parseErrorMsg = parseError instanceof Error ? parseError.message : String(parseError);\r\n277 |                                 const errorMsg = `Invalid JSON in tool parameters: ${parseErrorMsg}\\nReceived: ${truncatedArgs}`;\r\n278 |                                 this.logger.error(errorMsg);\r\n279 |                                 return {\r\n280 |                                     toolCall,\r\n281 |                                     result: `Error: Failed to parse tool arguments. The JSON was malformed. Please try again with properly formatted parameters.`,\r\n282 |                                     error: errorMsg,\r\n283 |                                     id,\r\n284 |                                 };\r\n285 |                             }\r\n286 | \r\n287 |                             const spinner = this.logger.spinner(`Tool ${fn.name}(...)`);\r\n288 |                             // 执行工具\r\n289 |                             let result: any;\r\n290 |                             try {\r\n291 |                                 result = await this.withTimeout(\r\n292 |                                     ToolRegistry.execute(fn.name, args),\r\n293 |                                     this.toolTimeoutMs,\r\n294 |                                     `Tool ${fn.name} timed out after ${this.toolTimeoutMs}ms`\r\n295 |                                 );\r\n296 |                                 spinner.succeed(`Tool ${fn.name} completed`);\r\n297 |                             } catch (error) {\r\n298 |                                 spinner.fail(`Tool ${fn.name} failed`);\r\n299 |                                 throw error;\r\n300 |                             } \r\n301 | \r\n302 |                             \r\n303 |                             if(typeof result !== 'string'){\r\n304 |                                 result=JSON.stringify(result.metadata);\r\n305 |                             }  \r\n306 | \r\n307 |                             if (!options?.silent) {\r\n308 |                                 this.logger.info(`Tool ${fn.name} result: ${formatToolResult(fn.name, result)}`);\r\n309 |                             }\r\n310 | \r\n311 |                             \r\n312 |                          \r\n313 |                           \r\n314 |                             // 返回成功结果\r\n315 |                             return { toolCall, result, error: undefined ,id};\r\n316 |                         } catch (error) {\r\n317 |                             const errorMsg = error instanceof Error ? error.message : String(error);\r\n318 |                             this.logger.error(`Tool execution error: ${errorMsg}`);\r\n319 | \r\n320 |                             // 返回错误结果\r\n321 |                             return { toolCall, result: `Error: ${errorMsg}`, error: errorMsg,id };\r\n322 |                         }\r\n323 |                     });\r\n324 | \r\n325 |                     // 按原始顺序添加工具结果消息\r\n326 |                     for (const { toolCall, result, error: _error } of results) {\r\n327 |                         const { id } = toolCall;\r\n328 |                        \r\n329 |                          \r\n330 |                         this.sessionManager.addMessage({\r\n331 |                             role: 'tool',\r\n332 |                             content: result,\r\n333 |                             type: 'tool',\r\n334 |                             tool_call_id: id,\r\n335 |                         });\r\n336 |                     }\r\n337 | \r\n338 |                     // 继续循环，让 LLM 基于工具结果生成响应\r\n339 |                    continue;\r\n340 |                 }\r\n341 |    \r\n342 |                 // 没有工具调用，这是最终响应\r\n343 |                 this.sessionManager.addMessage({\r\n344 |                     role: 'assistant',\r\n345 |                     type: 'text',\r\n346 |                     content: llmResponse.content,\r\n347 |                 });\r\n348 | \r\n349 |                 finalResponse = {\r\n350 |                     content: llmResponse.content,\r\n351 |                     role: 'assistant',\r\n352 |                 };\r\n353 | \r\n354 |                 break;\r\n355 |             }\r\n356 | \r\n357 |             if (i >= this.maxLoop) {\r\n358 |                 this.logger.error('Max iterations reached, possible infinite loop');\r\n359 |                 this.sessionManager.addMessage({\r\n360 |                         role: 'assistant',\r\n361 |                         type: 'text',\r\n362 |                         content: 'Max iterations reached, possible infinite loop'\r\n363 |                  });\r\n364 | \r\n365 |                 return {\r\n366 |                     content: 'Max iterations reached, possible infinite loop',\r\n367 |                     role: 'assistant',\r\n368 |                 };\r\n369 |             }\r\n370 | \r\n371 |     \r\n372 | \r\n373 |             return finalResponse;\r\n374 | \r\n375 |         } catch (error) {\r\n376 |             const errorMsg = error instanceof Error ? error.message : String(error);\r\n377 |             this.logger.error(`Agent error: ${errorMsg}`);\r\n378 |              this.sessionManager.addMessage({\r\n379 |                         role: 'assistant',\r\n380 |                         type: 'text',\r\n381 |                         content: errorMsg\r\n382 |            });\r\n383 |                        \r\n384 |             return {\r\n385 |                 content: errorMsg,\r\n386 |                 role: 'assistant',\r\n387 |             };\r\n388 |         }\r\n389 |     }\r\n390 | \r\n391 | }\r\n392 | ",
+  "type": "tool",
+  "tool_call_id": "call_-7948037914632680250"
+}
+```
+```
+{
+  "role": "tool",
+  "content": "--- FILE: src/session-v2/index.ts ---\nRange: 1 - 88\n\n1 | import path from \"node:path\";\r\n2 | import { LLMProvider, Message } from \"../providers/base\";\r\n3 | import fs, { mkdir } from 'node:fs/promises';\r\n4 | import { Compaction } from \"./compaction\";\r\n5 | \r\n6 | export class SessionManager {\r\n7 |   id: string;\r\n8 |   messageList: Message[];\r\n9 |   sessionPath: string;\r\n10 |   private saveQueue: Promise<void> = Promise.resolve();\r\n11 |   maxOutputTokens: number;\r\n12 |   maxTokens: number;\r\n13 |   llmProvider: LLMProvider;\r\n14 | \r\n15 |   constructor({\r\n16 |     sessionId,\r\n17 |     llmProvider\r\n18 |   }: {\r\n19 |     sessionId: string,\r\n20 |     llmProvider: LLMProvider\r\n21 |   }) {\r\n22 |     this.id = sessionId;\r\n23 |     this.messageList = []\r\n24 |     this.sessionPath = path.join('.memory', this.id);\r\n25 |     this.maxOutputTokens = llmProvider.maxOutputTokens;\r\n26 |     this.maxTokens = llmProvider.maxTokens\r\n27 |     this.llmProvider = llmProvider;\r\n28 |   }\r\n29 | \r\n30 |   async init() {\r\n31 |     await mkdir(this.sessionPath, { recursive: true });\r\n32 |     try {\r\n33 |       const filePath = path.join(this.sessionPath, 'messages.json');\r\n34 |       const stats = await fs.stat(filePath);\r\n35 | \r\n36 |       if (stats.isFile()) {\r\n37 |         const content = await fs.readFile(filePath, {\r\n38 |           encoding: 'utf-8'\r\n39 |         });\r\n40 | \r\n41 |         const messageList = JSON.parse(content.trim());\r\n42 |         if (messageList.length) {\r\n43 |           this.messageList = messageList;\r\n44 |         }\r\n45 |       }\r\n46 |     } catch (_:any) {\r\n47 |       // 文件不存在或其他错误，忽略\r\n48 |       console.log(\"NOT FOUND HISTORY\")\r\n49 |     }\r\n50 |   }\r\n51 | \r\n52 |   addMessage(message: Message) {\r\n53 |     this.messageList.push(message);\r\n54 |     this.save(message);\r\n55 |   }\r\n56 | \r\n57 | \r\n58 |   private save(message: Message) {\r\n59 |     // 使用 Promise 链确保保存顺序，防止竞态条件\r\n60 |     this.saveQueue = this.saveQueue.then(async () => {\r\n61 |       try {\r\n62 |         await fs.writeFile(\r\n63 |           path.join(this.sessionPath, 'messages.json'),\r\n64 |           JSON.stringify(this.messageList, null, 2)\r\n65 |         );\r\n66 |         await fs.appendFile(\r\n67 |           path.join(this.sessionPath, 'cache.md'),\r\n68 |           `\\`\\`\\`\\n${JSON.stringify(message, null, 2)}\\n\\`\\`\\`\\n`,\r\n69 |           { flag: 'a' }\r\n70 |         );\r\n71 |       } catch (err) {\r\n72 |         console.error('Session save error:', err);\r\n73 |       }\r\n74 |     });\r\n75 |   }\r\n76 | \r\n77 |   async getMessages(): Promise<Message[]> {\r\n78 |     return this.messageList\r\n79 |   }\r\n80 | \r\n81 |   async clearAll() {\r\n82 |     this.messageList = [];\r\n83 |     await fs.writeFile(\r\n84 |       path.join(this.sessionPath, 'messages.json'),\r\n85 |       '[]'\r\n86 |     );\r\n87 |   }\r\n88 | }",
+  "type": "tool",
+  "tool_call_id": "call_-7948037914632680249"
+}
+```

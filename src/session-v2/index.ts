@@ -11,7 +11,7 @@ export class SessionManager {
   maxOutputTokens: number;
   maxTokens: number;
   llmProvider: LLMProvider;
-
+  
   constructor({
     sessionId,
     llmProvider
@@ -43,19 +43,27 @@ export class SessionManager {
           this.messageList = messageList;
         }
       }
-    } catch (_:any) {
+    } catch (_: any) {
       // 文件不存在或其他错误，忽略
       console.log("NOT FOUND HISTORY")
     }
   }
 
-  addMessage(message: Message) {
-    this.messageList.push(message);
-    this.save(message);
+  addMessage(message: Message | Message[]) {
+
+    if (Array.isArray(message)) {
+      for (const msg of message) {
+        this.messageList.push(msg);
+        this.save(msg);
+      }
+    } else {
+      this.messageList.push(message);
+      this.save(message);
+    }
   }
 
 
-  private save(message: Message) {
+  private save(message: Message | Message[]) {
     // 使用 Promise 链确保保存顺序，防止竞态条件
     this.saveQueue = this.saveQueue.then(async () => {
       try {

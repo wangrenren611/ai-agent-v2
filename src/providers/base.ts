@@ -42,18 +42,21 @@ export type Message = {
   }>;
 }
 
+export type ToolCall = {
+  id: string;
+  type: 'function';
+  function: {
+    name: string;
+    arguments: string;
+  };
+}
 export type LLMResponse = {
   content: string;
   role:'assistant';
   type?: 'text' | 'tool' | 'tool_call';
-  tool_calls?: {
-    id: string;
-    type: 'function';
-    function: {
-      name: string;
-      arguments: string;
-    };
-  }[];
+  tool_calls?: ToolCall[];
+ finishReason?: string;
+  /** Token usage metrics */
   usage: {
     prompt_tokens: number;
     completion_tokens: number;

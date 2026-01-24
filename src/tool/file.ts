@@ -48,7 +48,7 @@ const writeFileSchema = z.object({
         "IMPORTANT: Provide the raw content directly, NOT wrapped in markdown code blocks or backticks. " +
         "All newlines, quotes, and special characters will be properly handled automatically."
     ),
-})
+}).strict();
 
 export class WriteFileTool extends BaseTool<typeof writeFileSchema> {
 

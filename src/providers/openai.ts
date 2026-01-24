@@ -347,6 +347,7 @@ export class OpenAIProvider extends LLMProvider {
           type: data.choices[0]?.message?.type || 'text',
           tool_calls: accumulatedToolCalls,
           usage: totalUsage,
+          finishReason,
         };
 
       } catch (error) {
@@ -359,6 +360,7 @@ export class OpenAIProvider extends LLMProvider {
             type: 'text',
             tool_calls: accumulatedToolCalls,
             usage: totalUsage,
+            finishReason: 'error',
           };
         }
 
@@ -374,6 +376,7 @@ export class OpenAIProvider extends LLMProvider {
             completion_tokens: 0,
             total_tokens: 0,
           },
+          finishReason: 'error',
         };
       }
     }
@@ -385,6 +388,7 @@ export class OpenAIProvider extends LLMProvider {
       type: 'text',
       tool_calls: accumulatedToolCalls,
       usage: totalUsage,
+      finishReason: 'error',
     };
   }
 

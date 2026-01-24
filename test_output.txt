@@ -1,0 +1,272 @@
+﻿node.exe : npm warn Unknown env config "enable-pre-post-scripts". This will stop working in the next major version of n
+pm.
+所在位置 C:\Program Files\nodejs\npx.ps1:29 字符: 3
++   & $NODE_EXE $NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn Unknow...version of npm.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm.
+npm warn Unknown env config "_jsr-registry". This will stop working in the next major version of npm.
+npm warn Unknown project config "enable-pre-post-scripts". This will stop working in the next major version of npm.
+npm warn Unknown project config "public-hoist-pattern". This will stop working in the next major version of npm.
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mD:/work/ai-agent-v2[39m
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鎴愬姛鏇挎崲鍦烘櫙[2m > [22m[2m搴旇鎴愬姛鏇挎崲鎸囧畾琛岀殑鏂囨湰
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:2
+- line2
++ modified-line2
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鎴愬姛鏇挎崲鍦烘櫙[2m > [22m[2m搴旇鍙浛鎹㈤儴鍒嗘枃鏈紙淇濈暀琛岀殑鍏朵粬鍐呭锛?[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- const name = "test";
++ const name = "modified";
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鎴愬姛鏇挎崲鍦烘櫙[2m > [22m[2m搴旇鏀寔鏇挎崲涓虹┖瀛楃涓诧紙鍒犻櫎鏂囨湰锛?[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:2
+- line2
++ 
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鎴愬姛鏇挎崲鍦烘櫙[2m > [22m[2m搴旇鏀寔鏇挎崲涓虹┖瀛楃涓茬殑涓€閮ㄥ垎锛堜繚鐣欓儴鍒嗗唴瀹癸級
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- const greeting = "Hello, World!";
++ const greeting = "Hello";
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鎴愬姛鏇挎崲鍦烘櫙[2m > [22m[2m搴旇鏀寔鏇挎崲涓哄琛屾枃鏈?[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:2
+- line2
++ line2-a
+line2-b
+line2-c
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m杈圭晫鏉′欢[2m > [22m[2m搴旇鑳芥浛鎹㈢1琛?[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- line1
++ first-line
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m杈圭晫鏉′欢[2m > [22m[2m搴旇鑳芥浛鎹㈡渶鍚庝竴琛?[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:5
+- line5
++ last-line
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m杈圭晫鏉′欢[2m > [22m[2m搴旇鑳芥浛鎹㈠彧鏈変竴琛岀殑鏂囦欢
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- single-line
++ modified-single
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m杈圭晫鏉′欢[2m > [22m[2m搴旇鑳藉鐞嗙┖鏂囦欢 - 琛屽彿瓒婄晫
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- 
++ new-content
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m杈圭晫鏉′欢[2m > [22m[2m搴旇鑳藉鐞嗗寘鍚噸澶嶆枃鏈殑琛?[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- test test test
++ TEST test test
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m閿欒澶勭悊 - oldText 涓嶅尮閰?[2m > [22m[2m搴旇杩斿洖绌烘牸涓嶅尮閰嶇殑閿欒
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- indented line
++ modified
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m璺緞澶勭悊[2m > [22m[2m搴旇鏀寔鐩稿璺緞
+[22m[39m
+[Edit] Modified .test_surgical\test-file.txt:2
+- line2
++ modified
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m璺緞澶勭悊[2m > [22m[2m搴旇鏀寔缁濆璺緞
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:2
+- line2
++ modified
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m璺緞澶勭悊[2m > [22m[2m搴旇鏀寔 ./ 鍓嶇紑鐨勮矾寰?[22m[39m
+[Edit] Modified .\.test_surgical\test-file.txt:2
+- line2
++ modified
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鐗规畩瀛楃澶勭悊[2m > [22m[2m搴旇鑳藉鐞嗗寘鍚紩鍙风殑鏂囨湰
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- const str = "hello";
++ const str = "world";
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鐗规畩瀛楃澶勭悊[2m > [22m[2m搴旇鑳藉鐞嗗寘鍚鍒欑壒娈婂瓧绗︾殑鏂囨湰
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- test[0].value
++ test[1].value
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鐗规畩瀛楃澶勭悊[2m > [22m[2m搴旇鑳藉鐞?unicode 瀛楃
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- 涓枃娴嬭瘯
++ 淇敼鍚庣殑鍐呭
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鐗规畩瀛楃澶勭悊[2m > [22m[2m搴旇鑳藉鐞嗚〃鎯呯
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- Hello 馃榾
++ Hello 馃檪
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m骞跺彂瀹夊叏[2m > [22m[2m搴旇鑳藉鐞嗗涓苟鍙戜慨鏀硅姹傦紙涓嶅悓琛岋級
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:3
+- line3
++ modified-3
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m骞跺彂瀹夊叏[2m > [22m[2m搴旇鑳藉鐞嗗涓苟鍙戜慨鏀硅姹傦紙涓嶅悓琛岋級
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- line1
++ modified-1
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m骞跺彂瀹夊叏[2m > [22m[2m搴旇鑳藉鐞嗕慨鏀瑰悓涓€琛岀殑骞跺彂璇锋眰锛堝悗涓€涓細澶辫触锛?[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- original
++ first-mod
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鏂囦欢缂栫爜[2m > [22m[2m搴旇鑳芥纭鐞?UTF-8 缂栫爜鐨勬枃浠?[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- caf茅
++ restaurant
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鏂囦欢缂栫爜[2m > [22m[2m搴旇鑳藉鐞嗗甫 BOM 鐨?UTF-8 鏂囦欢 - BOM 浼氫綔涓哄唴瀹圭殑涓€閮ㄥ垎
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- line1
++ modified
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鎬ц兘娴嬭瘯[2m > [22m[2m搴旇鑳藉鐞嗗ぇ鏂囦欢鐨勫崟琛屾浛鎹?[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:5000
+- line-4999
++ modified-line
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m鎬ц兘娴嬭瘯[2m > [22m[2m搴旇鑳藉鐞嗛暱琛岀殑鏇挎崲
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
++ bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+ [31m鉂?[39m src/tool/surgical.test.ts [2m([22m[2m39 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[32m 96[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鍩虹灞炴€?[2m > [22m搴旇鍏锋湁姝ｇ‘鐨勫伐鍏峰悕绉?[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鍩虹灞炴€?[2m > [22m搴旇鍏锋湁姝ｇ‘鐨勬弿杩?[32m 1[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鍩虹灞炴€?[2m > [22m搴旇鍏锋湁姝ｇ‘鐨?schema 瀹氫箟[32m 1[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鎴愬姛鏇挎崲鍦烘櫙[2m > [22m搴旇鎴愬姛鏇挎崲鎸囧畾琛岀殑鏂囨湰[32m 5[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鎴愬姛鏇挎崲鍦烘櫙[2m > [22m搴旇鍙浛鎹㈤儴鍒嗘枃鏈紙淇濈暀琛岀殑鍏朵粬鍐呭锛?[32m 3[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鎴愬姛鏇挎崲鍦烘櫙[2m > [22m搴旇鏀寔鏇挎崲涓虹┖瀛楃涓诧紙鍒犻櫎鏂囨湰锛?[32m 3[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鎴愬姛鏇挎崲鍦烘櫙[2m > [22m搴旇鏀寔鏇挎崲涓虹┖瀛楃涓茬殑涓€閮ㄥ垎锛堜繚鐣欓儴鍒嗗唴瀹癸級[32m 3[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鎴愬姛鏇挎崲鍦烘櫙[2m > [22m搴旇鏀寔鏇挎崲涓哄琛屾枃鏈?[32m 3[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m杈圭晫鏉′欢[2m > [22m搴旇鑳芥浛鎹㈢1琛?[32m 3[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m杈圭晫鏉′欢[2m > [22m搴旇鑳芥浛鎹㈡渶鍚庝竴琛?[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m杈圭晫鏉′欢[2m > [22m搴旇鑳芥浛鎹㈠彧鏈変竴琛岀殑鏂囦欢[32m 2[2mms[22m[39m
+[31m   [31m脳[31m SurgicalEditTool[2m > [22m杈圭晫鏉′欢[2m > [22m搴旇鑳藉鐞嗙┖鏂囦欢 - 琛屽彿瓒婄晫[39m[32m 9[2mms[22m[39m
+[31m     鈫?expected 'Modification successful. (backup: tes鈥? to contain 'Error: Line number out of range'[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m杈圭晫鏉′欢[2m > [22m搴旇鑳藉鐞嗗寘鍚噸澶嶆枃鏈殑琛?[32m 3[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m閿欒澶勭悊 - 鏂囦欢涓嶅瓨鍦?[2m > [22m搴旇杩斿洖鏂囦欢涓嶅瓨鍦ㄧ殑閿欒[32m 1[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m閿欒澶勭悊 - 鏂囦欢涓嶅瓨鍦?[2m > [22m搴旇澶勭悊鐩稿璺緞鐨勬枃浠朵笉瀛樺湪[32m 1[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m閿欒澶勭悊 - 琛屽彿瓒婄晫[2m > [22m搴旇杩斿洖琛屽彿灏忎簬1鐨勯敊璇?[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m閿欒澶勭悊 - 琛屽彿瓒婄晫[2m > [22m搴旇杩斿洖琛屽彿涓鸿礋鏁扮殑閿欒[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m閿欒澶勭悊 - 琛屽彿瓒婄晫[2m > [22m搴旇杩斿洖琛屽彿澶т簬鎬昏鏁扮殑閿欒[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m閿欒澶勭悊 - 琛屽彿瓒婄晫[2m > [22m搴旇杩斿洖琛屽彿鎭板ソ绛変簬鎬昏鏁?1鐨勯敊璇?[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m閿欒澶勭悊 - oldText 涓嶅尮閰?[2m > [22m搴旇杩斿洖 oldText 涓嶅瓨鍦ㄧ殑閿欒[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m閿欒澶勭悊 - oldText 涓嶅尮閰?[2m > [22m搴旇杩斿洖澶у皬鍐欎笉鍖归厤鐨勯敊璇紙鍖哄垎澶у皬鍐欙級[32m 1[2mms[22m[39m
+[31m   [31m脳[31m SurgicalEditTool[2m > [22m閿欒澶勭悊 - oldText 涓嶅尮閰?[2m > [22m搴旇杩斿洖绌烘牸涓嶅尮閰嶇殑閿欒[39m[32m 3[2mms[22m[39m
+[31m     鈫?expected 'Modification successful. (backup: tes鈥? to contain 'not found on line 1'[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m閿欒澶勭悊 - oldText 涓嶅尮閰?[2m > [22m搴旇杩斿洖閮ㄥ垎鍖归厤澶辫触鐨勯敊璇?[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m璺緞澶勭悊[2m > [22m搴旇鏀寔鐩稿璺緞[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m璺緞澶勭悊[2m > [22m搴旇鏀寔缁濆璺緞[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m璺緞澶勭悊[2m > [22m搴旇鏀寔 ./ 鍓嶇紑鐨勮矾寰?[32m 2[2mms[22m[39m
+[31m   [31m脳[31m SurgicalEditTool[2m > [22m澶囦唤鍔熻兘[2m > [22m搴旇鍦ㄤ慨鏀瑰墠鍒涘缓澶囦唤[39m[32m 1[2mms[22m[39m
+[31m     鈫?getBackupManager is not defined[39m
+[31m   [31m脳[31m SurgicalEditTool[2m > [22m澶囦唤鍔熻兘[2m > [22m搴旇鍦ㄨ繑鍥炵粨鏋滀腑鍖呭惈澶囦唤淇℃伅[39m[32m 1[2mms[22m[39m
+[31m     鈫?getBackupManager is not defined[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鐗规畩瀛楃澶勭悊[2m > [22m搴旇鑳藉鐞嗗寘鍚紩鍙风殑鏂囨湰[32m 3[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鐗规畩瀛楃澶勭悊[2m > [22m搴旇鑳藉鐞嗗寘鍚鍒欑壒娈婂瓧绗︾殑鏂囨湰[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鐗规畩瀛楃澶勭悊[2m > [22m搴旇鑳藉鐞?unicode 瀛楃[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鐗规畩瀛楃澶勭悊[2m > [22m搴旇鑳藉鐞嗚〃鎯呯[32m 3[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m骞跺彂瀹夊叏[2m > [22m搴旇鑳藉鐞嗗涓苟鍙戜慨鏀硅姹傦紙涓嶅悓琛岋級[32m 3[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m骞跺彂瀹夊叏[2m > [22m搴旇鑳藉鐞嗕慨鏀瑰悓涓€琛岀殑骞跺彂璇锋眰锛堝悗涓€涓細澶辫触锛?[32m 3[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鏂囦欢缂栫爜[2m > [22m搴旇鑳芥纭鐞?UTF-8 缂栫爜鐨勬枃浠?[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鏂囦欢缂栫爜[2m > [22m搴旇鑳藉鐞嗗甫 BOM 鐨?UTF-8 鏂囦欢 - BOM 浼氫綔涓哄唴瀹圭殑涓€閮ㄥ垎[32m 2[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鎬ц兘娴嬭瘯[2m > [22m搴旇鑳藉鐞嗗ぇ鏂囦欢鐨勫崟琛屾浛鎹?[32m 4[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鎬ц兘娴嬭瘯[2m > [22m搴旇鑳藉鐞嗛暱琛岀殑鏇挎崲[32m 3[2mms[22m[39m
+   [32m鉁?[39m SurgicalEditTool[2m > [22m鏃ュ織杈撳嚭[2m > [22m搴旇杈撳嚭淇敼鍚庣殑琛屽唴瀹?[32m 2[2mms[22m[39m
+
+[31m鈳幆鈳幆鈳幆鈳?[39m[1m[41m Failed Tests 4 [49m[22m[31m鈳幆鈳幆鈳幆鈳?[39m
+
+[41m[1m FAIL [22m[49m src/tool/surgical.test.ts[2m > [22mSurgicalEditTool[2m > [22m杈圭晫鏉′欢[2m > [22m搴旇鑳藉鐞嗙┖鏂
+囦欢 - 琛屽彿瓒婄晫
+[31m[1mAssertionError[22m: expected 'Modification successful. (backup: tes鈥? to contain 'Error: Line number out of r
+ange'[39m
+
+Expected: [32m"Error: Line number out of range"[39m
+Received: [31m"Modification successful. (backup: test-file.txt_94ddb00acd7d_1769281179620)"[39m
+
+[36m [2m鉂?[22m src/tool/surgical.test.ts:[2m226:22[22m[39m
+    [90m224| [39m
+    [90m225| [39m      [90m// 绌烘枃浠舵病鏈夎锛屾墍浠ヨ鍙?鏄秺鐣岀殑[39m
+    [90m226| [39m      [34mexpect[39m(result)[33m.[39m[34mtoContain[39m([32m'Error: Line number out of range'
+[39m)[33m;[39m
+    [90m   | [39m                     [31m^[39m
+    [90m227| [39m    })[33m;[39m
+    [90m228| [39m
+
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[1/4]鈳?[22m[39m
+
+[41m[1m FAIL [22m[49m src/tool/surgical.test.ts[2m > [22mSurgicalEditTool[2m > [22m閿欒澶勭悊 - oldText 涓嶅尮閰?[2m > 
+[22m搴旇杩斿洖绌烘牸涓嶅尮閰嶇殑閿欒
+[31m[1mAssertionError[22m: expected 'Modification successful. (backup: tes鈥? to contain 'not found on line 1'[39m
+
+Expected: [32m"not found on line 1"[39m
+Received: [31m"Modification successful. (backup: test-file.txt_600c49f6523e_1769281179643)"[39m
+
+[36m [2m鉂?[22m src/tool/surgical.test.ts:[2m361:22[22m[39m
+    [90m359| [39m      })[33m;[39m
+    [90m360| [39m
+    [90m361| [39m      [34mexpect[39m(result)[33m.[39m[34mtoContain[39m([32m'not found on line 1'[39m)[33m;
+[39m
+    [90m   | [39m                     [31m^[39m
+    [90m362| [39m      [34mexpect[39m(result)[33m.[39m[34mtoContain[39m([32m'content is: "  indented line"'[3
+9m)[33m;[39m
+    [90m363| [39m    })[33m;[39m
+
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[2/4]鈳?[22m[39m
+
+[41m[1m FAIL [22m[49m src/tool/surgical.test.ts[2m > [22mSurgicalEditTool[2m > [22m澶囦唤鍔熻兘[2m > [22m搴旇鍦ㄤ慨鏀瑰墠鍒
+涘缓澶囦唤
+[31m[1mReferenceError[22m: getBackupManager is not defined[39m
+[36m [2m鉂?[22m src/tool/surgical.test.ts:[2m425:29[22m[39m
+    [90m423| [39m    [34mit[39m([32m'搴旇鍦ㄤ慨鏀瑰墠鍒涘缓澶囦唤'[39m[33m,[39m [35masync[39m () [33m=>[39m {
+    [90m424| [39m      [35mconst[39m tool [33m=[39m [34mcreateTool[39m()[33m;[39m
+    [90m425| [39m      [35mconst[39m backupManager [33m=[39m [34mgetBackupManager[39m()[33m;[39m
+    [90m   | [39m                            [31m^[39m
+    [90m426| [39m      [35mawait[39m backupManager[33m.[39m[34minitialize[39m()[33m;[39m
+    [90m427| [39m      vi.spyOn(backupManager, 'backup').mockResolvedValue('backup-test鈥?
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[3/4]鈳?[22m[39m
+
+[41m[1m FAIL [22m[49m src/tool/surgical.test.ts[2m > [22mSurgicalEditTool[2m > [22m澶囦唤鍔熻兘[2m > [22m搴旇鍦ㄨ繑鍥炵粨鏋
+滀腑鍖呭惈澶囦唤淇℃伅
+[31m[1mReferenceError[22m: getBackupManager is not defined[39m
+[36m [2m鉂?[22m src/tool/surgical.test.ts:[2m443:29[22m[39m
+    [90m441| [39m    [34mit[39m([32m'搴旇鍦ㄨ繑鍥炵粨鏋滀腑鍖呭惈澶囦唤淇℃伅'[39m[33m,[39m [35masync[39m () [33m=>[39m {
+    [90m442| [39m      [35mconst[39m tool [33m=[39m [34mcreateTool[39m()[33m;[39m
+    [90m443| [39m      [35mconst[39m backupManager [33m=[39m [34mgetBackupManager[39m()[33m;[39m
+    [90m   | [39m                            [31m^[39m
+    [90m444| [39m      [35mawait[39m backupManager[33m.[39m[34minitialize[39m()[33m;[39m
+    [90m445| [39m      vi.spyOn(backupManager, 'backup').mockResolvedValue('backup-id-4鈥?
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[4/4]鈳?[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m35 passed[39m[22m[90m (39)[39m
+[2m   Start at [22m 02:59:39
+[2m   Duration [22m 508ms[2m (transform 71ms, setup 0ms, collect 130ms, tests 96ms, environment 0ms, prepare 108ms)[22m
+

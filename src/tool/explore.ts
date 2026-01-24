@@ -31,10 +31,12 @@ import { SubAgentTool, SubAgentConfig } from './subagent';
  * Explore 子代理配置
  * 导出供 TaskTool 复用
  */
+
+
 export const EXPLORE_CONFIG: SubAgentConfig = {
   name: 'explore',
   description: 'Fast READ-ONLY explorer for searching and understanding codebases',
-  tools: ['grep', 'glob', 'read_file', 'web_search'],
+  tools: ['grep', 'glob', 'read_file'],
   systemPrompt: [
     `You are a file search specialist. You excel at thoroughly navigating and exploring codebases.
 
@@ -54,13 +56,15 @@ Guidelines:
 - Do not create any files, or run bash commands that modify the user's system state in any way
 
 Complete the user's search request efficiently and report your findings clearly.
+
+
 `,
   ].join('\n\n'),
 };
 
 const schema = z.object({
-  prompt: z.string().describe('探索任务的具体描述'),
-  session_id: z.string().describe('继续之前的探索会话').optional(),
+  prompt: z.string().describe('Specific description of the exploration task'),
+  session_id: z.string().describe('Optional session ID for continuing a previous session').optional(),
 });
 
 /**
@@ -81,7 +85,7 @@ Use this for:
 - Reading and analyzing file contents
 - Quick codebase navigation and understanding
 
-Tools: glob, grep, read_file, web_search (NO write access)
+Tools: glob, grep, read_file (NO write access)
 
 Examples:
 - "Find all API endpoints"

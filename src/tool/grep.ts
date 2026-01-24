@@ -18,22 +18,12 @@ const schema = z.object({
   filePattern: z.string().nullable().optional().default(null).describe('Glob include filter. Example: "*.ts", "*.{ts,tsx}"'),
   path: z.string().nullable().optional().default(null).describe('Search root (directory or file). Example: "src", "src/tool/grep.ts"'),
 
-  // —— 可选：给 LLM 更强可控性（不传也行）——
-  maxResults: z.number().int().min(1).max(2000).optional().default(200)
-    .describe('Max total match events kept (default 200)'),
-  maxMatchesPerFile: z.number().int().min(1).max(50).optional().default(3)
-    .describe('Max matches kept per file (default 3)'),
-  timeoutMs: z.number().int().min(100).max(60000).optional().default(5000)
-    .describe('Kill rg after timeout (default 5000ms)'),
-  maxFilesize: z.string().optional().default('2M')
-    .describe('Skip files larger than this (default "2M")'),
 
   caseMode: z.enum(['smart', 'sensitive', 'insensitive']).optional().default('smart')
     .describe('Case mode: smart/sensitive/insensitive (default smart)'),
   word: z.boolean().optional().default(false).describe('Match whole words only'),
   multiline: z.boolean().optional().default(false).describe('Enable multiline mode (-U/--multiline)'),
   pcre2: z.boolean().optional().default(false).describe('Use PCRE2 engine (--pcre2) if supported'),
-
   includeHidden: z.boolean().optional().default(false).describe('Search hidden files/directories (--hidden)'),
   noIgnore: z.boolean().optional().default(false).describe('Do not respect .gitignore/.ignore (--no-ignore)'),
 });
@@ -80,6 +70,8 @@ function normalizeFilePath(cwd: string, p: string): string {
 export default class GrepTool extends BaseTool<typeof schema> {
   name = 'grep';
 
+  timeoutMs=1000*60;
+
   description = `- Fast content search tool that works with any codebase size
 - Searches file contents using regular expressions (ripgrep)
 - Supports include filter via filePattern (glob)
@@ -96,17 +88,13 @@ export default class GrepTool extends BaseTool<typeof schema> {
     const {
       pattern,
       filePattern,
-      maxResults,
-      maxMatchesPerFile,
-      timeoutMs,
-      maxFilesize,
+      includeHidden,
       caseMode,
       word,
       multiline,
       pcre2,
-      includeHidden,
-  noIgnore,
-  path: searchRoot,
+      noIgnore,
+     path: searchRoot,
     } = input;
 
     // 基础排除规则（始终生效）
@@ -138,9 +126,8 @@ export default class GrepTool extends BaseTool<typeof schema> {
     args.push('--no-messages');
 
     // 限制文件大小，避免扫超大文件拖死（LLM 工具必备）
-    if (maxFilesize) {
-      args.push('--max-filesize', String(maxFilesize));
-    }
+ 
+    //args.push('--max-filesize', String(maxFilesize));
 
     // 文件过滤：include glob（比你现在的 minimatch 事后过滤快很多） :contentReference[oaicite:8]{index=8}
     if (filePattern) {
@@ -203,7 +190,7 @@ export default class GrepTool extends BaseTool<typeof schema> {
         truncated = true;
         kill();
         rl.close();
-      }, timeoutMs);
+      }, this.timeoutMs);
 
       // 逐行解析 JSON
       // JSON envelope: { type: "...", data: {...} } :contentReference[oaicite:10]{index=10}
@@ -224,18 +211,11 @@ export default class GrepTool extends BaseTool<typeof schema> {
 
         const file = normalizeFilePath(cwd, fileRaw);
 
-        // 结果数上限（LLM 防 token 爆炸）
-        if (totalMatchesKept >= maxResults) {
-          truncated = true;
-          kill();
-          rl.close();
-          break;
-        }
 
         const entry = fileMap.get(file) ?? { matches: [] };
 
         // 每个文件最多保留 N 条（默认 3）
-        if (entry.matches.length < maxMatchesPerFile) {
+ 
           const linesText = toDisplayString(evt?.data?.lines) || '';
           const content = linesText.replace(/\r?\n$/g, '');
 
@@ -259,7 +239,6 @@ export default class GrepTool extends BaseTool<typeof schema> {
 
           fileMap.set(file, entry);
           totalMatchesKept += 1;
-        }
       }
 
       const exitCode: number = await new Promise((resolve, reject) => {
@@ -271,7 +250,7 @@ export default class GrepTool extends BaseTool<typeof schema> {
       // exit code: 0=found, 1=not found, 2=error :contentReference[oaicite:12]{index=12}
       if (exitCode === 1 && fileMap.size === 0 && !timedOut) {
         return {
-          metadata: { ok: true, countFiles: 0, countMatches: 0, truncated: false, tookMs: Date.now() - startedAt },
+          metadata: { ok: true, countFiles: 0, countMatches: 0 },
           output: 'No matches found',
         };
       }
@@ -316,10 +295,6 @@ export default class GrepTool extends BaseTool<typeof schema> {
           countFiles: results.length,
           countMatches: totalMatchesKept,
           truncated,
-          timedOut,
-          tookMs: Date.now() - startedAt,
-          // 方便你调试：把实际 rg args 带出去（可选）
-          rg: { bin: rgBin, args },
           result: results,
         },
         output: JSON.stringify(results, null, 2),
@@ -330,7 +305,6 @@ export default class GrepTool extends BaseTool<typeof schema> {
           ok: false,
           error: error?.message || String(error),
           stderr: (stderr || '').trim() || undefined,
-          tookMs: Date.now() - startedAt,
         },
         output: error?.message || String(error),
       };

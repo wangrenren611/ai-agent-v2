@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { z } from 'zod';
-import { BaseTool } from './base';
+import { BaseTool, ToolOutput } from './base';
 import chalk from 'chalk';
 import { getBackupManager } from '../util/backup-manager';
 
@@ -24,11 +24,11 @@ export  class SurgicalEditTool extends BaseTool<any> {
       "The new replacement text. " +
       "Provide as plain text without markdown formatting."
     )
-  });
+  }).strict();
 
-  async execute({ filePath, line, oldText, newText }: z.infer<typeof this.schema>): Promise<string> {
-
-    const fullPath = path.resolve(process.cwd(), filePath);
+  async execute({ filePath, line, oldText, newText }: z.infer<typeof this.schema>): Promise<ToolOutput> {
+    const context = this.getContext();
+    const fullPath = path.resolve(context.environment, filePath);
 
     if (!fs.existsSync(fullPath)) return "Error: File not found.";
 
@@ -46,7 +46,12 @@ export  class SurgicalEditTool extends BaseTool<any> {
     const originalLine = lines[targetLineIdx];
 
     if (!originalLine.includes(oldText)) {
-      return `Error: text "${oldText}" not found on line ${line}. content is: "${originalLine.trim()}"`;
+      return {
+        metadata: {
+          error: `text "${oldText}" not found on line ${line}. content is: "${originalLine.trim()}"`,
+        },
+        output: '',
+      };
     }
 
     const newLine = originalLine.replace(oldText, newText);
@@ -59,6 +64,11 @@ export  class SurgicalEditTool extends BaseTool<any> {
     console.log(chalk.green(`+ ${newLine.trim()}`));
 
     const backupInfo = backupId ? ` (backup: ${backupId})` : '';
-    return `Modification successful.${backupInfo}`;
+    return {
+      metadata: {
+        ok: true,
+      },
+      output: `Modification successful.${backupInfo}`,
+    };
   }
 }

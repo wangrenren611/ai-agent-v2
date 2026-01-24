@@ -106,12 +106,21 @@ export abstract class SubAgentTool<T extends z.ZodType> extends BaseTool<T> {
 
     // 构建系统提示
     const systemPrompt = this.buildSystemPrompt(config);
+    const context = this.getContext();
 
+    const environment = [
+        `Here is some useful information about the environment you are running in:`,
+        `<env>`,
+        `  Working directory: ${context.environment}`,
+        `  Platform: ${context.platform}`,
+        `  Today's date: ${context.time}`,
+        `</env>`,
+    ].join("\n");
     // 创建子代理
     const agent = new Agent({
       llmProvider: provider,
       sessionManager,
-      systemPrompt,
+      systemPrompt: `${systemPrompt}\n${environment}`,
       defaultTools: toolSchemas,
       maxLoop: 1024,
       toolConcurrency: 3,

@@ -1,13 +1,13 @@
 {
   "name": "ai-agent-v2",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "license": "ISC",
   "author": "",
   "type": "commonjs",
   "main": "index.js",
   "bin": {
-    "@qps": "bin/index.js"
+    "QpsCode": "bin/index.js"
   },
   "files": [
     "dist"
@@ -21,13 +21,14 @@
     "dev": "cross-env NODE_ENV=development  tsx src/index.ts",
     "dev:demo": "cross-env NODE_ENV=development  tsx src/index.ts demo",
     "dev:cli": "cross-env NODE_ENV=development  tsx src/index.ts cli",
-    "test": "vitest run src/tool/bash.test.ts",
+    "test": "vitest run src/tool/grep.test.ts",
     "codeCompressor": "cross-env NODE_ENV=development  tsx src/codeCompressor.ts",
     "test:ui": "vitest --ui",
     "langfuse:demo": "cross-env NODE_ENV=development tsx src/examples/langfuse-demo.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@types/dockerode": "^4.0.1",
     "@types/node": "^22.19.3",
     "@types/prompts": "^2.4.9",
     "@typescript-eslint/eslint-plugin": "^8.39.0",

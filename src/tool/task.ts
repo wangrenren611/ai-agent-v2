@@ -25,6 +25,7 @@
 import { z } from 'zod';
 import { SubAgentTool, SubAgentConfig } from './subagent';
 import { EXPLORE_CONFIG } from './explore';
+import { ToolOutput } from './base';
 
 /**
  * 可用的子代理配置
@@ -150,7 +151,7 @@ export class TaskTool extends SubAgentTool<typeof parameters> {
    * 执行任务
    * 验证 subagent_type 后调用基类的 execute 方法
    */
-  async execute(args: z.infer<typeof parameters>): Promise<string> {
+  async execute(args: z.infer<typeof parameters>): Promise<ToolOutput> {
     const subagent = SUBAGENTS.find((a) => a.name === args.subagent_type);
     if (!subagent) {
       const available = SUBAGENTS.map((a) => a.name).join(', ');
