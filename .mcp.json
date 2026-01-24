@@ -1,18 +1,6 @@
 {
   "$schema": "./mcp-schema.json",
   "mcpServers": [
-   {
-    "name":"sequential-thinking",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ]
-    },
-    {
-      "name":"chrome-devtools",
-      "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp@latest"]
-    }
+ 
   ]
 }

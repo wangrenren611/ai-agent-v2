@@ -17,16 +17,6 @@ export type { AgentConfig, AgentResponse } from './index-eventbus';
 
 // Agent 管理器
 export { AgentManager } from './manager';
-export type {
-    AgentDefinition,
-    AgentFilters,
-    AgentInstance,
-    AgentManagerOptions,
-    AgentMode,
-    AgentStorage,
-    AgentType,
-    GenerationContext
-} from './manager';
 
 // 导出钩子系统
 export * from './hooks';

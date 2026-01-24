@@ -6,9 +6,10 @@
  * 用于追踪和监控 LLM 调用、工具使用和会话数据
  */
 
-import { LangfuseTraceClient } from '@langfuse/tracing';
 import { Langfuse } from 'langfuse';
 import dotenv from 'dotenv';
+
+type LangfuseTraceClient = ReturnType<Langfuse['trace']>;
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}`, override: true });
 
@@ -77,7 +78,7 @@ export function traceLLMCall(
 ) {
     if (!trace) return;
 
-    trace.span({
+    trace.generation({
         name: 'llm_call',
         input: options.input,
         output: options.output,
@@ -188,7 +189,6 @@ export class SessionTracker {
             },
         });
 
-        await this.trace.update();
     }
 
     /**

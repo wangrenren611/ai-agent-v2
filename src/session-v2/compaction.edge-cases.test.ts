@@ -1,17 +1,24 @@
 import { describe, it, expect } from 'vitest';
 import { Compaction } from './compaction';
-import type { Message, LLMProvider } from '../providers/base';
+import { LLMProvider } from '../providers/base';
+import type { Message } from '../providers/base';
 
 // Mock LLM Provider
-class MockLLMProvider implements LLMProvider {
+class MockLLMProvider extends LLMProvider {
+  maxOutputTokens = 2000;
+  maxTokens = 8000;
+
+  constructor() {
+    super({});
+  }
+
   async generate(_messages: Message[], _options?: any) {
     return {
       content: 'Summary of conversation',
-      role: 'assistant',
+      role: 'assistant' as const,
       usage: { prompt_tokens: 1000, completion_tokens: 100, total_tokens: 1100 },
     };
   }
-  config = {};
 }
 
 describe('Compaction - 边缘场景测试', () => {
@@ -84,14 +91,10 @@ describe('Compaction - 边缘场景测试', () => {
         if (assistant.tool_calls) {
           for (const call of assistant.tool_calls) {
             const hasReply = tools.some(m => m.tool_call_id === call.id);
-            console.log(`Tool call ${call.id} has reply: ${hasReply}`);
-            // 注意：当前实现可能无法通过这个检查
+            expect(hasReply).toBe(true);
           }
         }
       }
-
-      // 当前实现只处理第一个 assistant
-      // 所以这个测试会失败，展示了一个需要修复的场景
     });
   });
 
@@ -327,6 +330,87 @@ describe('Compaction - 边缘场景测试', () => {
       expect(lastThree[2].role).toBe('assistant');
 
       console.log('✓ 保护区首条不是 tool 消息时正常工作');
+    });
+  });
+
+  describe('场景6: Assistant 在 pending 区，部分 tool 在 active 区', () => {
+    it('应该正确处理 assistant 在 pending 区但部分 tool 回复在 active 区的情况', async () => {
+      const compaction = new Compaction({
+        maxTokens: 8000,
+        maxOutputTokens: 2000,
+        llmProvider: mockProvider,
+      });
+
+      const history: Message[] = [];
+
+      // 100 条旧消息，确保 assistant 在 pending 区（索引 < 101）
+      for (let i = 0; i < 100; i++) {
+        history.push({
+          role: 'user',
+          content: `Message ${i} `.repeat(5),
+          type: 'text',
+        });
+      }
+
+      // assistant 在 pending 区（索引 100）
+      history.push({
+        role: 'assistant',
+        content: '',
+        type: 'tool_call',
+        tool_calls: [
+          { id: 'call_1', type: 'function', function: { name: 'tool1', arguments: '{}' } },
+          { id: 'call_2', type: 'function', function: { name: 'tool2', arguments: '{}' } },
+          { id: 'call_3', type: 'function', function: { name: 'tool3', arguments: '{}' } },
+        ],
+      });
+
+      // tool 回复：前 2 个在 pending 区，第 3 个在 active 区
+      history.push({ role: 'tool', content: 'result 1', type: 'tool', tool_call_id: 'call_1' });
+      history.push({ role: 'tool', content: 'result 2', type: 'tool', tool_call_id: 'call_2' });
+      history.push({ role: 'tool', content: 'result 3', type: 'tool', tool_call_id: 'call_3' });
+
+      // 再加 4 条消息，确保触发压缩
+      history.push({ role: 'assistant', content: 'response', type: 'text' });
+      history.push({ role: 'user', content: 'question', type: 'text' });
+      history.push({ role: 'assistant', content: 'response 2', type: 'text' });
+      history.push({ role: 'user', content: 'question 2', type: 'text' });
+
+      // splitPoint = 107 - 6 = 101
+      // pendingMessages: [0-100] (101 messages)
+      // activeMessages: [101-106] (6 messages)
+      // assistant 在索引 100（pending 区）
+      // tool 回复：call_1/call_2 在 pending 区（101, 102），call_3 在 active 区（103）
+
+      const result = await compaction.compact(history);
+
+      // 验证压缩成功
+      expect(result.isCompacted).toBe(true);
+
+      // 验证 assistant 被移到 active 区
+      const assistant = result.list.find(m =>
+        m.role === 'assistant' && m.tool_calls && m.tool_calls.length === 3
+      );
+      expect(assistant).toBeDefined();
+
+      // 验证所有 3 个 tool 回复都存在
+      const tools = result.list.filter(m => m.role === 'tool');
+      expect(tools.length).toBe(3);
+
+      // 验证消息顺序正确：assistant → tool1 → tool2 → tool3
+      if (assistant && assistant.tool_calls) {
+        const assistantIndex = result.list.indexOf(assistant);
+
+        for (let i = 0; i < assistant.tool_calls.length; i++) {
+          const expectedCallId = assistant.tool_calls[i].id;
+          const nextMessage = result.list[assistantIndex + 1 + i];
+
+          expect(nextMessage).toBeDefined();
+          expect(nextMessage.role).toBe('tool');
+          expect(nextMessage.tool_call_id).toBe(expectedCallId);
+        }
+      }
+
+      console.log('✓ Assistant 在 pending 区但部分 tool 在 active 区时正常工作');
     });
   });
 });

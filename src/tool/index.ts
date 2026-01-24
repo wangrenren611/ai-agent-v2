@@ -26,8 +26,7 @@ import { WriteFileTool } from './file';
 import GrepTool from './grep';
 import { SurgicalEditTool } from './surgical';
 import { BatchReplaceTool } from './batch-replace';
-import { TodoReadTool } from './todo';
-import { TodoWriteTool } from './todo';
+import TodoTools from './todo';
 import { initializeMcp } from '../mcp/index';
 import { WebSearchTool } from './web-search';
 import { SkillTool, initializeSkills } from '../skills';
@@ -58,11 +57,10 @@ export function registerDefaultTools(): void {
         new WriteFileTool(),
         new SurgicalEditTool(),
         new BatchReplaceTool(),
-        new TodoReadTool(),
-        new TodoWriteTool(),
         new WebSearchTool(),
         new SkillTool(),
         new TaskTool(),
+        ...TodoTools(),
     ]);
 }
 

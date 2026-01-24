@@ -186,6 +186,7 @@ export async function runLangfuseExamples() {
 }
 
 // 如果直接运行此文件
-if (import.meta.url === `file://${process.argv[1]}`) {
+const invokedPath = process.argv[1] || '';
+if (invokedPath.endsWith('langfuse-demo.ts') || invokedPath.endsWith('langfuse-demo.js')) {
     runLangfuseExamples().catch(console.error);
 }

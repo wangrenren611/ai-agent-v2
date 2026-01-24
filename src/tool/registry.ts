@@ -1,4 +1,4 @@
-import { BaseTool } from "./base";
+import { BaseTool, ToolOutput } from "./base";
 
 /**
  * 工具注册表类
@@ -126,7 +126,7 @@ export class ToolRegistry {
      * @returns 执行结果
      * @throws 如果工具不存在或参数无效
      */
-    static async execute(name: string, args: unknown): Promise<string> {
+    static async execute(name: string, args: unknown): Promise<ToolOutput> {
         const tool = this.get(name);
         if (!tool) {
             return `Tool "${name}" not found`;
@@ -253,7 +253,12 @@ export class ToolRegistry {
             case 'ZodNullable':
             case 'ZodDefault':
                 // innerType 是 Zod 对象，需要获取其 _def
-                return this.zodTypeToJsonSchema(def.innerType._def, key);
+                const wrappedType = def.innerType || def.schema || def.type;
+                if (!wrappedType) {
+                    console.warn(`Missing wrapped type for field: ${key}, def:`, def);
+                    return {};
+                }
+                return this.zodTypeToJsonSchema(wrappedType._def || wrappedType, key);
 
             case 'ZodEnum':
                 return {
@@ -275,7 +280,12 @@ export class ToolRegistry {
 
             case 'ZodEffects':
                 // 处理带描述的字段
-                const innerSchema = this.zodTypeToJsonSchema(def.innerType._def, key);
+                const effectType = def.innerType || def.schema || def.type;
+                if (!effectType) {
+                    console.warn(`Missing effect inner type for field: ${key}, def:`, def);
+                    return {};
+                }
+                const innerSchema = this.zodTypeToJsonSchema(effectType._def || effectType, key);
                 if (def.description) {
                     return { ...innerSchema, description: def.description };
                 }

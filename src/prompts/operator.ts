@@ -18,10 +18,12 @@ IMPORTANT:
 - ***write_file*** - Write entire file content (creates new or overwrites existing)
 - ***precise_replace*** - Replace exact text on a specific line using line number
 - ***batch_replace*** - Replace multiple text segments in a file in one call
-- ***todo_read*** - Read current todo list for tracking task progress
-- ***todo_write*** - Create/update todo list to break down and track complex tasks
 - ***web_search*** - Search the web for latest information
 - ***task*** - Delegate work to specialized sub-agent (explore/plan/general)
+- ***todo_create*** - Create a new todo item
+- ***todo_get_all*** - Get all todo items
+- ***todo_get_active*** - Get active todo items
+- ***todo_apply_ops*** - Apply operations to todo items
 
 
 

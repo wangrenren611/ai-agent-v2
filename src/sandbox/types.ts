@@ -16,7 +16,7 @@ export type SandboxMode = 'none' | 'docker' | 'firejail' | 'bubblewrap';
  */
 export interface SandboxConfig {
     /** 沙箱模式 */
-    mode: SandboxMode;
+    mode?: SandboxMode;
     
     /** Docker 镜像名称 */
     dockerImage?: string;
@@ -38,6 +38,14 @@ export interface SandboxConfig {
     
     /** 超时时间（毫秒） */
     timeout?: number;
+
+    /** 重试配置 */
+    retryConfig?: {
+        maxRetries: number;
+        initialDelay: number;
+        maxDelay: number;
+        backoffFactor: number;
+    };
 }
 
 /**
@@ -83,6 +91,7 @@ export interface SandboxExecutionResult {
             cpu?: string;
             memory?: string;
         };
+        reused?: boolean;
     };
 }
 

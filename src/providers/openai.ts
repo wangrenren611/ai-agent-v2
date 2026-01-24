@@ -9,7 +9,7 @@
 import { LLMProvider, LLMOptions, LLMResponse, Message, type ProviderConfig } from './base'
 import json5 from 'json5';
 const parseJson5=json5.parse;
-
+import fs from 'node:fs';
 /**
  * 修复 LLM 生成的格式错误的 JSON
  *
@@ -269,8 +269,8 @@ export class OpenAIProvider extends LLMProvider {
         // 添加 tools 参数（如果提供）
         if (tools && tools.length > 0) {
           requestBody.tools = tools;
-        }
-
+        } 
+       fs.writeFileSync('./openai-request.json', JSON.stringify(requestBody, null, 2));
         const response = await fetch(`${this.baseURL}/chat/completions`, {
           method: 'POST',
           headers: {

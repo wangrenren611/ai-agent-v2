@@ -51,22 +51,9 @@ export class SessionManager {
 
   addMessage(message: Message) {
     this.messageList.push(message);
-    // 即发即忘：加入保存队列，不阻塞调用方
     this.save(message);
   }
 
-  async compact() {
-    const compaction = new Compaction({
-      maxOutputTokens: this.maxOutputTokens,
-      maxTokens: this.maxTokens,
-      llmProvider: this.llmProvider
-    });
-
-    const token = compaction.getToken(this.messageList);
-    console.log(`TOKEN: ${token.totalUsed}/${token.usableLimit}\n`);
-    
-    return await compaction.compact(this.messageList);
-  }
 
   private save(message: Message) {
     // 使用 Promise 链确保保存顺序，防止竞态条件
@@ -88,18 +75,6 @@ export class SessionManager {
   }
 
   async getMessages(): Promise<Message[]> {
-    // if (this.messageList.length < 10) {
-    //   return this.messageList;
-    // }
-
-    const result = await this.compact();
-
-    this.messageList = result.list;
-
-    if (result.isCompacted && result.summaryMessage) {
-      this.save(result.summaryMessage)
-    }
-
     return this.messageList
   }
 

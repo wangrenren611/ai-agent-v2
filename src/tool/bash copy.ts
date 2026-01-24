@@ -58,6 +58,7 @@ export default class BashTool extends BaseTool<typeof schema> {
     timeout: number = 60000;
 
     constructor() {
+        super();
         // 读取环境变量配置
         this.sandboxMode = (process.env.SANDBOX_MODE as 'none' | 'docker' | 'auto') || 'auto';
         
@@ -71,7 +72,6 @@ export default class BashTool extends BaseTool<typeof schema> {
             },
         });
         
-        super();
     }
 
     /**

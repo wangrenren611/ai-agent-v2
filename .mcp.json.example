@@ -1,29 +1,18 @@
 {
   "$schema": "./mcp-schema.json",
   "mcpServers": [
-    {
-      "name": "filesystem",
+   {
+    "name":"sequential-thinking",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/wrr/work/ai-agent-v2"],
-      "enabled": true
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
     },
     {
-      "name": "brave-search",
+      "name":"chrome-devtools",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
-      "env": {
-        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
-      },
-      "enabled": false
-    },
-    {
-      "name": "github",
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
-      },
-      "enabled": false
+      "args": ["-y", "chrome-devtools-mcp@latest"]
     }
   ]
 }

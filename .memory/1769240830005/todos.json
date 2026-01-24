@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "content": "Read package.json to extract all declared dependencies",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "2",
+    "content": "Search codebase for import/require statements",
+    "status": "in_progress",
+    "priority": "high"
+  },
+  {
+    "id": "3",
+    "content": "Compare dependencies vs actual usage",
+    "status": "in_progress",
+    "priority": "high"
+  },
+  {
+    "id": "4",
+    "content": "Report unused dependencies",
+    "status": "pending",
+    "priority": "high"
+  }
+]

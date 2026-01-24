@@ -1,16 +1,19 @@
 import z from 'zod';
-import { BaseTool } from './base';
+import { BaseTool, ToolOutput } from './base';
 import { DESCRIPTION_WRITE } from './todowrite';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { ToolRegistry } from './registry';
+const Status = z.enum(['pending', 'in_progress', 'completed', 'cancelled']);
+const Priority = z.enum(['high', 'medium', 'low']);
 
 const TodoInfo = z.object({
-  content: z.string().describe('Brief description of the task'),
-  status: z.string().describe('Current status of the task: pending, in_progress, completed, cancelled'),
-  priority: z.string().describe('Priority level of the task: high, medium, low'),
-  id: z.string().describe('Unique identifier for the todo item'),
-});
+  id: z.string().min(1),           
+  content: z.string().min(1).max(200),
+  status: Status.default('pending'),
+  priority: Priority.default('medium'),
+}).strict();
+
 
 type TodoItem = z.infer<typeof TodoInfo>;
 
@@ -49,48 +52,42 @@ async function saveTodos(sessionId: string, sessionPath: string | undefined, tod
   todoCache.set(sessionId, todos);
 }
 
-export class TodoWriteTool extends BaseTool<any> {
-  schema = z.object({
-    todos: z.array(TodoInfo).describe('The updated todo list'),
-  });
+export class TodoCreateTool extends BaseTool<any> {
+  schema =  z.object({
+    todos: z.array(TodoInfo).describe('The list of todo operations to perform'),
+  }).strict();
 
-  name = 'todo_write';
+  name = 'todo_create';
 
   description = DESCRIPTION_WRITE;
 
-  async execute({ todos }: { todos: TodoItem[] }): Promise<string> {
+  async execute({ todos }: { todos: TodoItem[] }): Promise<ToolOutput> {
     const context = ToolRegistry.getContext();
+
     if (context.sessionId) {
       await saveTodos(context.sessionId, context.sessionPath, todos);
     } else {
       todoList = todos;
     }
 
-    return `
-        todos: ${JSON.stringify(todos, null, 2)}
-     `;
+    return {
+       metadata:{
+          count: todos.length,
+          todos,
+          ok: true,
+       },
+       output: JSON.stringify(todos,null,2),
+    };
   }
 }
 
-export class TodoReadTool extends BaseTool<any> {
+export class TodoGetAllTool extends BaseTool<any> {
   schema = z.object({});
 
-  name = 'todo_read';
+  name = 'todo_get_all';
 
-  description = `Use this tool to read the current to-do list for the session. This tool should be used proactively and frequently to ensure that you are aware of
- the status of the current task list. You should make use of this tool as often as possible, especially in the following situations:
-- At the beginning of conversations to see what's pending
-- Before starting new tasks to prioritize work
-- When the user asks about previous tasks or plans
-- Whenever you're uncertain about what to do next
-- After completing tasks to update your understanding of remaining work
-- After every few messages to ensure you're on track
+  description = 'List todos (optional filters)';
 
-Usage:
-- This tool takes in no parameters. So leave the input blank or empty. DO NOT include a dummy object, placeholder string or a key like "input" or "empty". LEAVE IT BLANK.
-- Returns a list of todo items with their status, priority, and content
-- Use this information to track progress and plan next steps
-- If no todos exist yet, an empty list will be returned`;
 
   async execute() {
     const context = ToolRegistry.getContext();
@@ -99,11 +96,194 @@ Usage:
       : todoList;
 
     if (todos.length === 0) {
-      return 'Your todo list is empty';
+      return {
+        metadata: {
+          todos,
+        },
+        output: 'Your todo list is empty',
+      };
     }
 
-    return `
-        todos: ${JSON.stringify(todos, null, 2)}
-     `;
+    return {
+      metadata: {
+         count: todos.length,
+         todos,
+         ok: true,
+      },
+      output: JSON.stringify(todos, null, 2),
+    };
   }
 }
+
+
+export class TodoGetActiveTool extends BaseTool<any> {
+  schema = z.object({
+    limit: z.number().int().min(1).max(200).default(50),
+    sort_by: z.enum(['priority', 'status', 'none']).default('priority'),
+    fields: z.array(z.enum(['id', 'content', 'status', 'priority']))
+      .min(1)
+      .default(['id', 'content', 'status', 'priority']),
+  }).strict();
+
+  name = 'todo_get_active';
+  description = 'List active todos (pending/in_progress). Optional limit/sort/fields.';
+
+  async execute({ limit, sort_by, fields }: { limit: number; sort_by: 'priority'|'status'|'none'; fields: string[] }) {
+    const context = ToolRegistry.getContext();
+    const todos: TodoItem[] = context.sessionId
+      ? await loadTodos(context.sessionId, context.sessionPath)
+      : todoList;
+
+    const active = todos.filter(t => t.status === 'pending' || t.status === 'in_progress');
+
+    const priorityRank: Record<string, number> = { high: 0, medium: 1, low: 2 };
+    const statusRank: Record<string, number> = { in_progress: 0, pending: 1 };
+
+    let resultList = active.slice();
+    if (sort_by === 'priority') {
+      resultList.sort((a, b) => priorityRank[a.priority] - priorityRank[b.priority]);
+    } else if (sort_by === 'status') {
+      resultList.sort((a, b) => statusRank[a.status] - statusRank[b.status]);
+    }
+
+    resultList = resultList.slice(0, limit);
+
+    const trimmed = resultList.map(t => {
+      const o: any = {};
+      for (const f of fields) o[f] = (t as any)[f];
+      return o;
+    });
+
+    const result = {
+      count_total_active: active.length,
+      returned: trimmed.length,
+      todos: trimmed,
+      ok: true,
+    };
+
+    // output 尽量短，避免重复塞 JSON
+    return { metadata: result, output: JSON.stringify(result, null, 2) };
+  }
+}
+
+
+const NonEmptyPatch = z.object({
+  content: z.string().min(1).max(200).optional(),
+  status: Status.optional(),
+  priority: Priority.optional(),
+}).strict().refine(p => Object.keys(p).length > 0, {
+  message: 'patch must include at least one field',
+});
+
+const TodoOp = z.discriminatedUnion('op', [
+  z.object({
+    op: z.literal('add'),
+    item: TodoInfo.omit({ id: true }).extend({
+      id: z.string().min(1).optional(), // 允许模型不填，你后端生成
+    }).strict(),
+  }).strict(),
+
+  z.object({
+    op: z.literal('update'),
+    id: z.string().min(1),
+    patch: NonEmptyPatch,
+  }).strict(),
+
+  z.object({
+    op: z.literal('delete'),
+    id: z.string().min(1),
+  }).strict(),
+]);
+
+type TodoOpType = z.infer<typeof TodoOp>;
+
+export class TodoApplyOpsTool extends BaseTool<any> {
+  name = 'todo_apply_ops';
+  description = 'Apply todo operations (add/update/delete).';
+
+  schema = z.object({
+    ops: z.array(TodoOp).min(1).max(20),
+  }).strict();
+
+  async execute({ ops }: { ops: TodoOpType[] }) {
+    const context = ToolRegistry.getContext();
+    const todos: TodoItem[] = context.sessionId
+      ? await loadTodos(context.sessionId, context.sessionPath)
+      : todoList;
+
+    const byId = new Map(todos.map(t => [t.id, t]));
+    const updated_ids: string[] = [];
+    const added_ids: string[] = [];
+    const deleted_ids: string[] = [];
+    const warnings: Array<{ code: string; message?: string; id?: string }> = [];
+
+    for (const op of ops) {
+      if (op.op === 'add') {
+        const id = op.item.id ?? `t_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+        if (byId.has(id)) {
+          warnings.push({ code: 'DUPLICATE_ID', id, message: 'id already exists; skipped' });
+          continue;
+        }
+        const item: TodoItem = {
+          id,
+          content: op.item.content,
+          status: op.item.status ?? 'pending',
+          priority: op.item.priority ?? 'medium',
+        };
+        byId.set(id, item);
+        added_ids.push(id);
+      } else if (op.op === 'update') {
+        const item = byId.get(op.id);
+        if (!item) {
+          warnings.push({ code: 'NOT_FOUND', id: op.id, message: 'todo not found; skipped' });
+          continue;
+        }
+        const next = { ...item, ...op.patch };
+        byId.set(op.id, next);
+        updated_ids.push(op.id);
+      } else if (op.op === 'delete') {
+        if (!byId.has(op.id)) {
+          warnings.push({ code: 'NOT_FOUND', id: op.id, message: 'todo not found; skipped' });
+          continue;
+        }
+        byId.delete(op.id);
+        deleted_ids.push(op.id);
+      }
+    }
+
+    const nextTodos = Array.from(byId.values());
+
+    if (context.sessionId) {
+      await saveTodos(context.sessionId, context.sessionPath, nextTodos);
+    } else {
+      todoList = nextTodos;
+    }
+
+    // tool 返回：短 + 结构化（不要返回整表）
+    const result = {
+      count: nextTodos.length,
+      added_ids,
+      updated_ids,
+      deleted_ids,
+      warnings,
+      ok: true,
+    };
+
+    return {
+      metadata: result,
+      output: JSON.stringify(result),
+    };
+  }
+}
+
+
+const TodoTools =()=>{
+  return [
+    new TodoCreateTool(),
+    new TodoGetAllTool(),
+    new TodoGetActiveTool(),
+    new TodoApplyOpsTool(),
+  ]
+}
+
+export default TodoTools;

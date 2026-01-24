@@ -13,12 +13,12 @@
  */
 
 import Docker from 'dockerode';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
+import { PassThrough } from 'node:stream';
 import type {
     ISandboxExecutor,
     SandboxConfig,
     SandboxExecutionResult,
-    SandboxNetwork,
     SandboxResources,
 } from './types';
 import { ScopedLogger } from '../util/log';
@@ -80,7 +80,7 @@ interface ResourceUsage {
  * Docker 沙箱执行器（优化版）
  */
 export class DockerSandboxExecutor implements ISandboxExecutor {
-    private docker: Docker;
+    private docker: any;
     private logger: ScopedLogger;
     private containerId: string | null = null;
     
@@ -182,7 +182,7 @@ export class DockerSandboxExecutor implements ISandboxExecutor {
                 this.pullInProgress.delete(image);
                 this.logger.debug(`Image ${image} pulled successfully`);
             })
-            .catch((error) => {
+            .catch((error: unknown) => {
                 this.logger.error(`Failed to pull image ${image}: ${error}`);
                 this.pullInProgress.delete(image);
             });
@@ -246,14 +246,7 @@ export class DockerSandboxExecutor implements ISandboxExecutor {
                 async () => {
                     // 重新启动容器（如果需要）
                     await this.ensureContainerRunning(pooled.container);
-                    
-                    // 执行命令
-                    await this.docker.exec(pooled.container.id, {
-                        Cmd: ['/bin/sh', '-c', command],
-                        AttachStdin: true,
-                        AttachStdout: true,
-                        AttachStderr: true,
-                    });
+                    return this.execInContainer(pooled.container, command, options);
                 },
                 options
             );
@@ -286,6 +279,47 @@ export class DockerSandboxExecutor implements ISandboxExecutor {
                 duration,
             };
         }
+    }
+
+    private async execInContainer(
+        container: any,
+        command: string,
+        _options?: SandboxConfig
+    ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+        const execInstance = await container.exec({
+            Cmd: ['/bin/sh', '-c', command],
+            AttachStdout: true,
+            AttachStderr: true,
+        });
+
+        const stream = await execInstance.start({ hijack: true, stdin: false });
+        const stdoutChunks: Buffer[] = [];
+        const stderrChunks: Buffer[] = [];
+        const stdoutStream = new PassThrough();
+        const stderrStream = new PassThrough();
+
+        if (container.modem?.demuxStream) {
+            container.modem.demuxStream(stream, stdoutStream, stderrStream);
+            stdoutStream.on('data', (chunk: Buffer) => stdoutChunks.push(Buffer.from(chunk)));
+            stderrStream.on('data', (chunk: Buffer) => stderrChunks.push(Buffer.from(chunk)));
+        } else {
+            stream.on('data', (chunk: Buffer) => stdoutChunks.push(Buffer.from(chunk)));
+        }
+
+        await new Promise<void>((resolve, reject) => {
+            stream.on('end', resolve);
+            stream.on('close', resolve);
+            stream.on('error', reject);
+        });
+
+        const inspect = await execInstance.inspect();
+        const exitCode = typeof inspect.ExitCode === 'number' ? inspect.ExitCode : 0;
+
+        return {
+            exitCode,
+            stdout: Buffer.concat(stdoutChunks).toString('utf8').trimEnd(),
+            stderr: Buffer.concat(stderrChunks).toString('utf8').trimEnd(),
+        };
     }
 
     /**
@@ -383,7 +417,7 @@ export class DockerSandboxExecutor implements ISandboxExecutor {
         return await this.executeWithRetry(
             async () => {
                 return await this.docker.createContainer({
-                    name: `ai-agent-sandbox-${uuidv4()}`,
+                    name: `ai-agent-sandbox-${randomUUID()}`,
                     Image: image,
                     Cmd: ['/bin/sh', '-c', command],
                     WorkingDir: '/workspace',
@@ -521,7 +555,7 @@ export class DockerSandboxExecutor implements ISandboxExecutor {
      * 定期清理空闲容器
      */
     private startPoolCleanup(): void {
-        const cleanupInterval = setInterval(async () => {
+        setInterval(async () => {
             const now = Date.now();
             
             for (const [key, pooled] of this.pool.entries()) {

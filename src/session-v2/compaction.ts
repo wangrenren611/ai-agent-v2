@@ -7,7 +7,6 @@ export class Compaction {
   private readonly triggerRatio = 0.10; // 92% 触发压缩
 
   logger: ScopedLogger;
-  lastSummaryMessage: Message | null;
   private readonly llmProvider: LLMProvider;
 
   constructor(config: { maxTokens: number; maxOutputTokens: number; llmProvider: LLMProvider }) {
@@ -15,8 +14,6 @@ export class Compaction {
     this.maxOutputTokens = config.maxOutputTokens;
     this.llmProvider = config.llmProvider;
     this.logger = new ScopedLogger("Compaction");
-    this.lastSummaryMessage = null;
-
   }
 
    getToken(history: Message[]){
@@ -120,134 +117,92 @@ export class Compaction {
 
     if (toolMessagesInActive.length > 0) {
       // 收集所有需要保留的 assistant 消息和需要重新排序的 tool 回复
-      const assistantsToKeep: Map<string, { message: Message; index: number }> = new Map();
-      const toolsToKeep: Message[] = [];
+      // 修复：将 tool 回复与对应的 assistant 分组，确保消息顺序正确
+      const assistantsToKeep: Map<string, { message: Message; index: number; tools: Message[] }> = new Map();
       // 跟踪从 pendingMessages 移到 toolsToKeep 的 tool_call_id
       const movedToolCallIds = new Set<string>();
-      // 使用已处理的 assistant 索引集合，避免重复处理
-      const processedAssistants = new Set<number>();
 
-      // 为每个 tool 消息查找其配对的 assistant（使用 O(1) 索引查找）
+      // 计算分割点，用于判断 assistant 在哪个区域
+      // history[:splitPoint] = pendingMessages
+      // history[splitPoint:] = activeMessages
+      const splitPoint = history.length - KEEP_RECENT_COUNT;
+
+      // 修复：识别唯一需要处理的 assistant 索引
+      // 这确保我们只处理每个 assistant 一次，但会收集该 assistant 的所有 tools
+      const uniqueAssistantIndices = new Set<number>();
       for (const toolMessage of toolMessagesInActive) {
         const toolCallId = toolMessage.tool_call_id;
         if (!toolCallId) continue;
-
-        // O(1) 查找：使用预构建的索引
         const assistantIndex = toolCallToAssistantIndex.get(toolCallId);
-
-        if (assistantIndex === undefined) {
-          continue; // 没有找到配对的 assistant
+        if (assistantIndex !== undefined) {
+          uniqueAssistantIndices.add(assistantIndex);
         }
+      }
 
-        // 跳过已处理的 assistant
-        if (processedAssistants.has(assistantIndex)) {
-          continue;
-        }
-
-        // assistant 可能在 pendingMessages 中，也可能在 activeMessages 中
-        const assistantInPending = assistantIndex < pendingMessages.length;
-
-        // 无论 assistant 在哪里，都从 history 中获取
+      // 为每个唯一的 assistant 处理一次，收集其所有 tools
+      for (const assistantIndex of uniqueAssistantIndices) {
+        // 从 history 中获取 assistant 消息
         const assistantMessage = history[assistantIndex];
-
         if (!assistantMessage || !assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
           continue;
         }
 
         const assistantKey = assistantIndex.toString();
-        processedAssistants.add(assistantIndex);
-
-        // 检查这个 assistant 有多少个 tool_calls
         const toolCalls = assistantMessage.tool_calls?.filter(call => call.id) || [];
-        const toolCallCount = toolCalls.length;
 
-        // 性能优化：使用 Set 和预构建的 Map，避免嵌套循环 O(n*m)
-        const matchedToolCallIds = new Set<string>();
-        for (const call of toolCalls) {
-          if (activeToolMap.has(call.id)) {
-            matchedToolCallIds.add(call.id);
+        // 收集该 assistant 的所有 tools（从两个区域按 tool_calls 顺序收集）
+        const allTools: Message[] = [];
+        for (const toolCall of toolCalls) {
+          // 先检查 active 区域，再检查 pending 区域
+          let toolMessage = activeToolMap.get(toolCall.id);
+          if (!toolMessage) {
+            toolMessage = pendingToolMap.get(toolCall.id);
+            if (toolMessage) {
+              movedToolCallIds.add(toolCall.id); // 跟踪从 pending 移动的 tool
+            }
+          }
+          if (toolMessage) {
+            allTools.push(toolMessage);
           }
         }
 
-        this.logger.info(
-          `[Compaction] 检测到 assistant（索引 ${assistantIndex}）有 ${toolCallCount} 个 tool_calls，` +
-          `但只有 ${matchedToolCallIds.size} 个 tool 回复在保护区内`
-        );
+        const toolCallIds = toolCalls.map(c => c.id);
 
-        // 场景1：有缺失的 tool 回复（在 pendingMessages 中）
-        if (toolCallCount > matchedToolCallIds.size) {
-          // 按 tool_calls 的原始顺序从 pendingMessages 中添加 tool 回复
-          for (const toolCall of toolCalls) {
-            // 只添加缺失的（不在 active 中的）
-            if (!matchedToolCallIds.has(toolCall.id)) {
-              // O(1) 查找：使用预构建的 Map
-              const toolMessage = pendingToolMap.get(toolCall.id);
-              if (toolMessage) {
-                toolsToKeep.push(toolMessage);
-                // 跟踪已移动的 tool_call_id，稍后从 pendingMessages 中过滤
-                movedToolCallIds.add(toolCall.id);
-              }
-            }
-          }
+        // 无论 assistant 在哪个区域，都从 activeMessages 中移除它的 tools（稍后会重新添加）
+        // 这避免 tools 在 activeMessages 中被重复计算
+        activeMessages = activeMessages.filter(m => {
+          // 如果 assistant 在 active 区域，也要移除它
+          if (assistantIndex >= splitPoint && m === assistantMessage) return false;
+          // 移除这些 tool 回复（无论 assistant 在哪，都要移除 active 中的 tools）
+          if (m.role === 'tool' && toolCallIds.includes(m.tool_call_id || '')) return false;
+          return true;
+        });
 
-          this.logger.info(
-            `[Compaction] 已为 assistant（索引 ${assistantIndex}）找回 ${toolCallCount - matchedToolCallIds.size} 个缺失的 tool 回复`
-          );
-
-          // 如果 assistant 在 pendingMessages 中，标记需要保留
-          if (assistantInPending) {
-            assistantsToKeep.set(assistantKey, {
-              message: assistantMessage,
-              index: assistantIndex,
-            });
-          }
-        } else {
-          // 场景2：所有 tool 回复都在 activeMessages 中，但顺序可能不对
-          // 同时，assistant 本身也在 activeMessages 中，需要一起处理
-
-          // 按 tool_calls 的顺序从 activeMessages 中提取 tool 回复
-          for (const toolCall of toolCalls) {
-            // O(1) 查找：使用预构建的 Map
-            const toolReply = activeToolMap.get(toolCall.id);
-            if (toolReply) {
-              toolsToKeep.push(toolReply);
-            }
-          }
-
-          // 从 activeMessages 中移除这些 tool 回复和 assistant 本身
-          // 因为后面会把 assistant 和 tool 回复重新添加到前面
-          const toolCallIds = toolCalls.map(c => c.id);
-          activeMessages = activeMessages.filter(m => {
-            // 移除这个 assistant
-            if (m === assistantMessage) return false;
-            // 移除这些 tool 回复
-            if (m.role === 'tool' && toolCallIds.includes(m.tool_call_id || '')) return false;
-            return true;
-          });
-
-          this.logger.info(
-            `[Compaction] 已为 assistant（索引 ${assistantIndex}）重新排序 ${toolsToKeep.length} 个 tool 回复`
-          );
-        }
-
-        // 标记这个 assistant 需要保留（无论在 pendingMessages 还是 activeMessages 中）
+        // 记录这个 assistant 需要保留，以及它的所有 tools
         assistantsToKeep.set(assistantKey, {
           message: assistantMessage,
           index: assistantIndex,
+          tools: allTools,
         });
+
+        this.logger.info(
+          `[Compaction] 处理 assistant（索引 ${assistantIndex}）：` +
+          `${toolCalls.length} 个 tool_calls，收集到 ${allTools.length} 个 tool 回复`
+        );
       }
 
       // 将需要保留的 assistant 和 tool 回复按正确顺序加入保护区
-      if (assistantsToKeep.size > 0 || toolsToKeep.length > 0) {
+      if (assistantsToKeep.size > 0) {
         // 按索引排序 assistants（保持原始顺序）
-        const sortedAssistants = Array.from(assistantsToKeep.values())
-          .sort((a, b) => a.index - b.index)
-          .map(item => item.message);
+        const sortedAssistantsWithTools = Array.from(assistantsToKeep.values())
+          .sort((a, b) => a.index - b.index);
 
         // 从 pendingMessages 中移除这些 assistants（如果它们在 pendingMessages 中）
-        // 同时移除已移动到 toolsToKeep 的 tool 消息
+        // 同时移除已移动的 tool 消息
+        // 修复：使用 splitPoint 而不是 pendingMessages.length
+        // item.index 是原 history 数组的索引，需要与 splitPoint 比较
         const indicesToRemove = Array.from(assistantsToKeep.values())
-          .filter(item => item.index < pendingMessages.length)
+          .filter(item => item.index < splitPoint)
           .map(item => item.index);
 
         if (indicesToRemove.length > 0 || movedToolCallIds.size > 0) {
@@ -260,13 +215,17 @@ export class Compaction {
           });
         }
 
-        // 构建新的 activeMessages：[assistants, tools, 原activeMessages]
-        // toolsToKeep 已经按 tool_calls 的顺序排列
-        let newActiveMessages: Message[] = [
-          ...sortedAssistants,
-          ...toolsToKeep,
-          ...activeMessages,
-        ];
+        // 构建新的 activeMessages，将每个 assistant 与它的 tools 交错排列
+        // 正确的结构应该是：Assistant1, Tool1, Tool2, Assistant2, Tool3, Tool4, ...
+        const newActiveMessages: Message[] = [];
+
+        for (const { message: assistantMsg, tools: assistantTools } of sortedAssistantsWithTools) {
+          newActiveMessages.push(assistantMsg);
+          newActiveMessages.push(...assistantTools);
+        }
+
+        // 添加剩余的 activeMessages
+        newActiveMessages.push(...activeMessages);
 
         // 检查是否超过最大限制
         if (newActiveMessages.length > MAX_ACTIVE_SIZE) {
@@ -275,17 +234,26 @@ export class Compaction {
             `(超过最大限制 ${MAX_ACTIVE_SIZE})，将进行裁剪`
           );
 
+          // 计算 assistants 和 tools 的总消息数
+          const totalAssistantsAndTools = sortedAssistantsWithTools.reduce(
+            (sum, item) => sum + 1 + item.tools.length, 0);
+
           // 裁剪：保留前面的 assistants 和 tools，裁剪后面的原始 activeMessages
           const overflow = newActiveMessages.length - MAX_ACTIVE_SIZE;
-          if (overflow > 0 && sortedAssistants.length + toolsToKeep.length < MAX_ACTIVE_SIZE) {
+          if (overflow > 0 && totalAssistantsAndTools < MAX_ACTIVE_SIZE) {
             // 可以安全地裁剪后面的消息
-            newActiveMessages = newActiveMessages.slice(0, MAX_ACTIVE_SIZE);
+            newActiveMessages.length = MAX_ACTIVE_SIZE;
           }
         }
 
         activeMessages = newActiveMessages;
+
+        // 计算统计信息
+        const totalAssistants = sortedAssistantsWithTools.length;
+        const totalTools = sortedAssistantsWithTools.reduce((sum, item) => sum + item.tools.length, 0);
+
         this.logger.info(
-          `[Compaction] 已将 ${sortedAssistants.length} 个 assistant 和 ${toolsToKeep.length} 个 tool 回复移到保护区` +
+          `[Compaction] 已将 ${totalAssistants} 个 assistant 和 ${totalTools} 个 tool 回复移到保护区` +
           `（保护区大小：${activeMessages.length}）`
         );
       }

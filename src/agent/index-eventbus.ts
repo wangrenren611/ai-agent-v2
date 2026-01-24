@@ -9,6 +9,7 @@ import { formatToolResult } from "../util/log-format";
 import { SessionManager } from "../session-v2";
 import { SYSTEM_PROMPT } from "../prompts/system";
 import { ToolRegistry } from "../tool/registry";
+import type { ToolOutput } from "../tool/base";
 import { typedEventBus, createLoggingMiddleware } from "../util/event-bus";
 import { AgentHook, AgentHookConfig, AgentHookRegistration } from "../util/event-bus-agent";
 
@@ -476,7 +477,7 @@ export default class Agent extends EventEmitter {
 
             const spinner = this.logger.spinner(`Tool ${fn.name}(...)`);
 
-            let result: string;
+            let result: ToolOutput;
             try {
                 result = await this.withTimeout(
                     ToolRegistry.execute(fn.name, args),
@@ -489,8 +490,10 @@ export default class Agent extends EventEmitter {
                 throw error;
             }
 
+            const normalizedResult = typeof result === 'string' ? result : result.output;
+
             if (!options?.silent) {
-                this.logger.info(`Tool ${fn.name} result: ${formatToolResult(fn.name, result)}`);
+                this.logger.info(`Tool ${fn.name} result: ${formatToolResult(fn.name, normalizedResult)}`);
             }
 
             const toolDuration = Date.now() - toolStartTime;
@@ -499,7 +502,7 @@ export default class Agent extends EventEmitter {
 
             await this.triggerHook(AgentHook.AFTER_TOOL_CALL, {
                 toolName: fn.name,
-                result,
+                result: normalizedResult,
                 duration: toolDuration,
                 toolCallId: id,
                 iteration,
@@ -507,13 +510,13 @@ export default class Agent extends EventEmitter {
 
             await this.eventBus.emit('agent.tool.call.complete', {
                 toolName: fn.name,
-                result,
+                result: normalizedResult,
                 duration: toolDuration,
                 toolCallId: id,
                 iteration,
             });
 
-            return { toolCall, result, error: undefined };
+            return { toolCall, result: normalizedResult, error: undefined };
         } catch (error) {
             const errorMsg = error instanceof Error ? error.message : String(error);
 

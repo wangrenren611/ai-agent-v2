@@ -32,7 +32,7 @@ async function initializeApp(config) {
         baseURL: config.deepseekBaseUrl,
     });
     const sessionManager = new session_v2_1.SessionManager({
-        sessionId: "1769055456060", //new Date().getTime().toString(),
+        sessionId: new Date().getTime().toString(),
         llmProvider,
     });
     await sessionManager.init();

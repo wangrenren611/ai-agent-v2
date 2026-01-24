@@ -286,7 +286,7 @@ export default class Agent extends EventEmitter {
 
                             const spinner = this.logger.spinner(`Tool ${fn.name}(...)`);
                             // 执行工具
-                            let result: string;
+                            let result: any;
                             try {
                                 result = await this.withTimeout(
                                     ToolRegistry.execute(fn.name, args),
@@ -297,12 +297,20 @@ export default class Agent extends EventEmitter {
                             } catch (error) {
                                 spinner.fail(`Tool ${fn.name} failed`);
                                 throw error;
-                            }
+                            } 
+
+                            
+                            if(typeof result !== 'string'){
+                                result=JSON.stringify(result.metadata);
+                            }  
 
                             if (!options?.silent) {
                                 this.logger.info(`Tool ${fn.name} result: ${formatToolResult(fn.name, result)}`);
                             }
 
+                            
+                         
+                          
                             // 返回成功结果
                             return { toolCall, result, error: undefined ,id};
                         } catch (error) {

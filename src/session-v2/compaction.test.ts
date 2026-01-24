@@ -1,17 +1,24 @@
 import { describe, it, expect } from 'vitest';
 import { Compaction } from './compaction';
-import type { Message, LLMProvider } from '../providers/base';
+import { LLMProvider } from '../providers/base';
+import type { Message } from '../providers/base';
 
 // Mock LLM Provider
-class MockLLMProvider implements LLMProvider {
+class MockLLMProvider extends LLMProvider {
+  maxOutputTokens = 2000;
+  maxTokens = 8000;
+
+  constructor() {
+    super({});
+  }
+
   async generate(_messages: Message[], _options?: any) {
     return {
       content: 'Summary: conversation about testing',
-      role: 'assistant',
+      role: 'assistant' as const,
       usage: { prompt_tokens: 1000, completion_tokens: 100, total_tokens: 1100 },
     };
   }
-  config = {};
 }
 
 describe('Compaction - 并发工具调用修复验证', () => {

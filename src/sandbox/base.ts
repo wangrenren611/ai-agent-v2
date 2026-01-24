@@ -121,7 +121,7 @@ export class SandboxExecutorFactory {
 
         // 自动模式：优先 Docker，降级到直接执行
         const { createDockerSandbox } = await import('./docker-executor');
-        const dockerExecutor = new createDockerSandbox();
+        const dockerExecutor = createDockerSandbox();
 
         if (await dockerExecutor.isAvailable()) {
             return dockerExecutor;
@@ -136,7 +136,6 @@ export class SandboxExecutorFactory {
      */
     private getDirectExecutor(): ISandboxExecutor {
         if (!this.directInstance) {
-            const { DirectExecutor } = require('./base');
             this.directInstance = new DirectExecutor();
         }
         return this.directInstance;
@@ -148,7 +147,7 @@ export class SandboxExecutorFactory {
     private async getDockerExecutor(): Promise<ISandboxExecutor> {
         if (!this.dockerInstance) {
             const { createDockerSandbox } = await import('./docker-executor');
-            this.dockerInstance = new createDockerSandbox();
+            this.dockerInstance = createDockerSandbox();
         }
         return this.dockerInstance;
     }
