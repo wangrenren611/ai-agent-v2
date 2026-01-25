@@ -1,0 +1,129 @@
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "当前目录有什么"
+}
+```
+```
+{
+  "content": "<think>\n用户问当前目录有什么。我应该查看当前目录的文件结构。根据指导，我应该使用 explore 工具来进行目录结构探索。\n</think>\n\n\n",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [
+    {
+      "id": "call_function_38er3x8956sr_1",
+      "type": "function",
+      "function": {
+        "name": "glob",
+        "arguments": "{\"pattern\": \"*\"}"
+      }
+    },
+    {
+      "id": "call_function_38er3x8956sr_2",
+      "type": "function",
+      "function": {
+        "name": "glob",
+        "arguments": "{"
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "finishReason": "tool_calls"
+}
+```
+```
+{
+  "role": "assistant",
+  "type": "text",
+  "content": "LLM error: Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+}
+```
+```
+{
+  "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id: call_function_38er3x8956sr_2 (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c57002971932bbdf7d2ff64beb200f\"}",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [],
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "finishReason": "error"
+}
+```
+```
+{
+  "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id: call_function_38er3x8956sr_2 (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c5700232a274297e4b786168205408\"}",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [],
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "finishReason": "error"
+}
+```
+```
+{
+  "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id: call_function_38er3x8956sr_2 (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c57002e6bc097728b65843620325bd\"}",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [],
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "finishReason": "error"
+}
+```
+```
+{
+  "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id: call_function_38er3x8956sr_2 (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c570024e753e6922eac50c3c464658\"}",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [],
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "finishReason": "error"
+}
+```
+```
+{
+  "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id: call_function_38er3x8956sr_2 (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c570021556937c55963fd33610666c\"}",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [],
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "finishReason": "error"
+}
+```
+```
+{
+  "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id: call_function_38er3x8956sr_2 (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c57002ccff314d45f72ec48b9e8dda\"}",
+  "role": "assistant",
+  "type": "text",
+  "tool_calls": [],
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "finishReason": "error"
+}
+```

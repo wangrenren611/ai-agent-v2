@@ -130,12 +130,12 @@ export class ToolRegistry {
         const tool = this.get(name);
 
         if (!tool) {
-            throw new Error(`Tool "${name}" not found`);
+           return `Tool "${name}" not found`;
         }
 
         const allowed = this.context.allowedTools;
         if (allowed && !allowed.includes(name)) {
-           throw new Error(`Tool "${name}" is not allowed in this context`);
+           return `Tool "${name}" is not allowed in this context`;
         }
         
         
@@ -147,7 +147,7 @@ export class ToolRegistry {
         const parsed = tool.schema.safeParse(argsObj);
        
         if (!parsed.success) {
-             throw new Error(`Invalid arguments  ${parsed.error.errors.map((e: { message: string }) => e.message).join(', ')}`);
+           return `Invalid arguments  ${parsed.error.errors.map((e: { message: string }) => e.message).join(', ')}`;
         }
         
        return await tool.execute(parsed.data);
@@ -282,9 +282,40 @@ export class ToolRegistry {
 
             case 'ZodUnion':
             case 'ZodDiscriminatedUnion':
-                return {
-                    anyOf: def.options?.map((opt: any) => this.zodTypeToJsonSchema(opt._def || opt)),
-                };
+                // 使用 oneOf 替代 anyOf，LLM 理解更好
+                const options = def.options?.map((opt: any) => this.zodTypeToJsonSchema(opt._def || opt));
+                const result: Record<string, unknown> = { oneOf: options };
+
+                // 为 discriminated union 添加示例，帮助 LLM 理解
+                if (def.discriminator && options?.length > 0) {
+                    const examples: unknown[] = [];
+                    for (const opt of options) {
+                        if (opt && typeof opt === 'object' && 'properties' in opt) {
+                            const example: Record<string, unknown> = {};
+                            const props = opt.properties as Record<string, unknown>;
+                            const required = (opt as any).required as string[] || [];
+
+                            // 为必需字段生成示例
+                            for (const key of required) {
+                                example[key] = this.generateExampleValue(props[key], key);
+                            }
+                            // 也为一些重要的可选字段生成示例
+                            for (const [key, schema] of Object.entries(props)) {
+                                if (!(key in example) && ['content', 'status', 'priority'].includes(key)) {
+                                    example[key] = this.generateExampleValue(schema, key);
+                                }
+                            }
+
+                            if (Object.keys(example).length > 0) {
+                                examples.push(example);
+                            }
+                        }
+                    }
+                    if (examples.length > 0) {
+                        result.examples = examples;
+                    }
+                }
+                return result;
 
             case 'ZodEffects':
                 // 处理带描述的字段
@@ -308,6 +339,70 @@ export class ToolRegistry {
                 }
                 return {};
         }
+    }
+
+    /**
+     * 从 JSON Schema 生成示例值
+     */
+    private static generateExampleValue(schema: unknown, key: string): unknown {
+        if (!schema || typeof schema !== 'object') {
+            return null;
+        }
+
+        const s = schema as Record<string, unknown>;
+
+        // 如果有 const 值，直接使用
+        if ('const' in s) {
+            return s.const;
+        }
+
+        // 如果有示例值，直接使用
+        if ('example' in s) {
+            return s.example;
+        }
+
+        // 如果是 enum，使用第一个值
+        if ('enum' in s && Array.isArray(s.enum) && s.enum.length > 0) {
+            return s.enum[0];
+        }
+
+        // 根据类型生成示例
+        if ('type' in s) {
+            switch (s.type) {
+                case 'string':
+                    // 根据字段名生成更合理的示例
+                    if (key === 'content') return 'Complete task documentation';
+                    if (key === 'status') return 'pending';
+                    if (key === 'priority') return 'medium';
+                    if (key === 'id') return 't_1';
+                    if (key === 'op') return 'add';
+                    return `example_${key}`;
+                case 'number':
+                    return 1;
+                case 'boolean':
+                    return true;
+                case 'array':
+                    return [];
+                case 'object':
+                    // 递归生成嵌套对象的示例
+                    if ('properties' in s && s.properties && typeof s.properties === 'object' && !Array.isArray(s.properties)) {
+                        const nestedExample: Record<string, unknown> = {};
+                        const required = (s.required || []) as string[];
+                        for (const [k, v] of Object.entries(s.properties)) {
+                            // 只为必需字段或常见字段生成示例
+                            if (required.includes(k) || ['content', 'status', 'priority'].includes(k)) {
+                                nestedExample[k] = this.generateExampleValue(v, k);
+                            }
+                        }
+                        return nestedExample;
+                    }
+                    return {};
+                default:
+                    return null;
+            }
+        }
+
+        return null;
     }
 
 

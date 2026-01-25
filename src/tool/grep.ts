@@ -250,7 +250,7 @@ export default class GrepTool extends BaseTool<typeof schema> {
       // exit code: 0=found, 1=not found, 2=error :contentReference[oaicite:12]{index=12}
       if (exitCode === 1 && fileMap.size === 0 && !timedOut) {
         return {
-          metadata: { ok: true, countFiles: 0, countMatches: 0 },
+          metadata: { ok: true, countFiles: 0, countMatches: 0, message: 'No matches found' },
           output: 'No matches found',
         };
       }
@@ -259,7 +259,7 @@ export default class GrepTool extends BaseTool<typeof schema> {
         return {
           metadata: {
             ok: false,
-            error: (stderr || 'ripgrep exited with code 2').trim(),
+            message: (stderr || 'ripgrep exited with code 2').trim(),
             exitCode,
             tookMs: Date.now() - startedAt,
           },
@@ -296,6 +296,7 @@ export default class GrepTool extends BaseTool<typeof schema> {
           countMatches: totalMatchesKept,
           truncated,
           result: results,
+          message: 'Grep search completed successfully',
         },
         output: JSON.stringify(results, null, 2),
       };
@@ -303,7 +304,7 @@ export default class GrepTool extends BaseTool<typeof schema> {
       return {
         metadata: {
           ok: false,
-          error: error?.message || String(error),
+          message: error?.message || String(error),
           stderr: (stderr || '').trim() || undefined,
         },
         output: error?.message || String(error),

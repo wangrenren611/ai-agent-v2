@@ -15,8 +15,7 @@ Use only tools that are actually present in this runtime; if something listed is
 - ***precise_replace*** - Replace exact text on a specific line using line number
 - ***batch_replace*** - Replace multiple text segments in a file in one call
 - ***web_search*** - Search the web for latest information
-- ***task*** - Delegate work to specialized sub-agents (explore/plan/general)
-- ***explore*** - Quick shortcut for read-only codebase exploration (uses task internally)
+
 - ***todo_create*** - Create a new todo item
 - ***todo_get_all*** - Get all todo items
 - ***todo_get_active*** - Get active todo items
@@ -124,7 +123,7 @@ Here is some useful information about the environment you are running in:
   Working directory: D:\work\ai-agent-v2
   Is directory a git repo: yes
   Platform: win32
-  Today's date: Sun Jan 25 2026
+  Today's date: Mon Jan 26 2026
 </env>
 # CLAUDE.md
 

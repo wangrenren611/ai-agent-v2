@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "content": "探索base.ts中stream相关的类型定义",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "2",
+    "content": "在OpenAIProvider中实现stream处理逻辑",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "3",
+    "content": "测试验证stream功能",
+    "status": "completed",
+    "priority": "medium"
+  }
+]

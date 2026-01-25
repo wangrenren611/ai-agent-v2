@@ -1,0 +1,69 @@
+[
+  {
+    "role": "user",
+    "type": "text",
+    "content": "当前目录有什么"
+  },
+  {
+    "content": "<think>\n用户想了解当前目录的结构。我应该使用 explore 工具来探索项目结构。\n</think>\n\n\n",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [
+      {
+        "id": "call_function_78xehoa12hr9_1",
+        "type": "function",
+        "function": {
+          "name": "bash",
+          "arguments": "{\"command\": \"ls -la"
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "tool_calls"
+  },
+  {
+    "role": "assistant",
+    "type": "text",
+    "content": "LLM error: Unterminated string in JSON at position 19 (line 1 column 20)"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id: call_function_78xehoa12hr9_1 (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c57dc73440f32f7b9b211fada454f4\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id: call_function_78xehoa12hr9_1 (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c57dc8ea2ce4e05fc7a290a13d58cc\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id: call_function_78xehoa12hr9_1 (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c57dc816181777324158c4696ad817\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  }
+]

@@ -13,11 +13,13 @@ export abstract class BaseTool<T extends z.ZodType> {
   abstract description: string;
   abstract schema: T;
   abstract execute(args?: z.infer<T>): Promise<ToolOutput>|ToolOutput;
+  sessionId?: string;
   protected getContext(): ToolContext {
     return {
       environment: process.cwd(),
       platform: process.platform,
       time: new Date().toISOString(),
+      sessionId: this?.sessionId,
     };
   }
 }

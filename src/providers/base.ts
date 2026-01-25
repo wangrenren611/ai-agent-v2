@@ -18,13 +18,37 @@ export interface ToolSchema {
   };
 }
 
+/** Stream chunk type for streaming responses */
+export type StreamChunk = {
+  content?: string;
+  tool_calls?: Array<{
+    index: number;
+    delta: {
+      type?: 'function';
+      function?: {
+        name?: string;
+        arguments?: string;
+      };
+    };
+  }>;
+  finish_reason?: string;
+}
+
+/** Stream callback type for receiving chunks */
+export type StreamCallback = (chunk: StreamChunk) => void
+
 export interface LLMOptions {
   model?: string
   max_tokens?: number
   temperature?: number,
   system_prompt?: string
   tools?: ToolSchema[]
+  /** Enable streaming response */
+  stream?: boolean
+  /** Callback for receiving streaming chunks */
+  streamCallback?: StreamCallback
 }
+
 export type Message = {
   role: 'user' | 'system' | 'assistant' | 'tool';
   content: string;
@@ -50,12 +74,13 @@ export type ToolCall = {
     arguments: string;
   };
 }
+
 export type LLMResponse = {
   content: string;
   role:'assistant';
   type?: 'text' | 'tool' | 'tool_call';
   tool_calls?: ToolCall[];
- finishReason?: string;
+  finishReason?: string;
   /** Token usage metrics */
   usage: {
     prompt_tokens: number;
@@ -63,16 +88,18 @@ export type LLMResponse = {
     total_tokens: number;
   };
 }
+
 export abstract class LLMProvider{
    protected constructor(
     protected readonly config: ProviderConfig
   ) {}
-  
+
   abstract maxOutputTokens:number;
   abstract maxTokens:number;
   /**
    * 从提供商生成响应
-   * @param prompt The input prompt for the model
+   * @param messages The messages for the model
+   * @param options Optional parameters including stream callback
    * @returns A promise that resolves to the model's response
    */
   abstract generate(messages: Message[], options?: LLMOptions): Promise<LLMResponse|null>

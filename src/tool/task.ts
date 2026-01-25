@@ -25,7 +25,7 @@
 import { z } from 'zod';
 import { SubAgentTool, SubAgentConfig } from './subagent';
 import { EXPLORE_CONFIG } from './explore';
-import { ToolOutput } from './base';
+import { BaseTool, ToolOutput } from './base';
 
 /**
  * 可用的子代理配置
@@ -50,46 +50,72 @@ const SUBAGENTS: SubAgentConfig[] = [
 ];
 
 const DESCRIPTION_TEMPLATE = `
-Launch a specialized sub-agent to handle complex, multi-step tasks autonomously.
+Launch a new agent to handle complex, multistep tasks autonomously.
 
-Available agent types and their tools:
+Available agent types and the tools they have access to:
 {agents}
 
-## Agent Selection Guide
+When using the Task tool, you must specify a subagent_type parameter to select which agent type to use.
 
-### explore (Read-only, Fast)
-- Purpose: Quick codebase exploration and searching
-- Use when: ONLY need to find/read/search without any edits
-- Tools: glob, grep, read_file, web_search (NO write)
-- Examples: "Find all API endpoints", "Where is auth implemented?"
-- **Shortcut**: Use the dedicated \`explore\` tool directly
+When to use the Task tool:
+- When you are instructed to execute custom slash commands. Use the Task tool with the slash command invocation as the entire prompt. The slash command can take arguments. For example: Task(description="Check the file", prompt="/check-file path/to/file.py")
 
-### plan (Read-only, Planning) - Coming Soon
-- Purpose: Produce a concise ordered plan before executing
-- Use when: Need structured steps, dependencies, and risks/assumptions
+When NOT to use the Task tool:
+- If you want to read a specific file path, use the Read or Glob tool instead of the Task tool, to find the match more quickly
+- If you are searching for a specific class definition like "class Foo", use the Glob tool instead, to find the match more quickly
+- If you are searching for code within a specific file or set of 2-3 files, use the Read tool instead of the Task tool, to find the match more quickly
+- Other tasks that are not related to the agent descriptions above
 
-### general (Full Access, Multi-step) - Coming Soon
-- Purpose: Tasks that WRITE/MODIFY code, run builds/tests, or execute workflows
-- Use when: Any edits, commands, migrations, refactors, or fixes are needed
-
-Decision flow:
-1) Trivial single-file Q&A only? -> skip this tool
-2) Read/search only? -> explore (or use the explore tool directly)
-3) Planning only? -> plan (coming soon)
-4) Any edits/commands/tests OR uncertain? -> general (coming soon)
 
 Usage notes:
-1) Always set subagent_type using the guide above
-2) Provide a clear prompt, expected outputs, and whether edits are allowed
-3) Each call creates its own session; reuse session_id to continue a prior run
+1. Launch multiple agents concurrently whenever possible, to maximize performance; to do that, use a single message with multiple tool uses
+2. When the agent is done, it will return a single message back to you. The result returned by the agent is not visible to the user. To show the user the result, you should send a text message back to the user with a concise summary of the result.
+3. Each agent invocation is stateless unless you provide a session_id. Your prompt should contain a highly detailed task description for the agent to perform autonomously and you should specify exactly what information the agent should return back to you in its final and only message to you.
+4. The agent's outputs should generally be trusted
+5. Clearly tell the agent whether you expect it to write code or just to do research (search, file reads, web fetches, etc.), since it is not aware of the user's intent
+6. If the agent description mentions that it should be used proactively, then you should try your best to use it without the user having to ask for it first. Use your judgement.
+
+Example usage (NOTE: The agents below are fictional examples for illustration only - use the actual agents listed above):
+
+<example_agent_descriptions>
+"code-reviewer": use this agent after you are done writing a significant piece of code
+"greeting-responder": use this agent when to respond to user greetings with a friendly joke
+</example_agent_description>
+
+<example>
+user: "Please write a function that checks if a number is prime"
+assistant: Sure let me write a function that checks if a number is prime
+assistant: First let me use the Write tool to write a function that checks if a number is prime
+assistant: I'm going to use the Write tool to write the following code:
+<code>
+function isPrime(n) {
+  if (n <= 1) return false
+  for (let i = 2; i * i <= n; i++) {
+    if (n % i === 0) return false
+  }
+  return true
+}
+</code>
+<commentary>
+Since a significant piece of code was written and the task was completed, now use the code-reviewer agent to review the code
+</commentary>
+assistant: Now let me use the code-reviewer agent to review the code
+assistant: Uses the Task tool to launch the code-reviewer agent
+</example>
+
+<example>
+user: "Hello"
+<commentary>
+Since the user is greeting, use the greeting-responder agent to respond with a friendly joke
+</commentary>
+assistant: "I'm going to use the Task tool to launch the with the greeting-responder agent"
+</example>
 `.trim();
 
 const parameters = z.object({
   description: z.string().describe('A short (3-5 words) description of the task'),
   prompt: z.string().describe('The task for the agent to perform'),
   subagent_type: z.string().describe('The type of specialized agent to use for this task'),
-  session_id: z.string().describe('Existing Task session to continue').optional(),
-  command: z.string().describe('The command that triggered this task').optional(),
 });
 
 function buildDescription(): string {
@@ -107,63 +133,23 @@ function buildDescription(): string {
  * 可以动态选择不同的子代理类型来处理任务。
  * explore 子代理也可以直接使用独立的 explore 工具。
  */
-export class TaskTool extends SubAgentTool<typeof parameters> {
+export class TaskTool extends BaseTool<typeof parameters> {
   name = 'task';
 
   description = buildDescription();
 
   schema = parameters;
 
-  private lastArgs?: z.infer<typeof parameters>;
 
-  /**
-   * 获取子代理配置
-   * 根据参数中的 subagent_type 动态选择配置
-   */
-  protected getConfig(): SubAgentConfig {
-    const subagent = SUBAGENTS.find((a) => a.name === this.lastArgs?.subagent_type);
-    if (!subagent) {
-      const available = SUBAGENTS.map((a) => a.name).join(', ');
-      throw new Error(
-        `Unknown subagent_type: ${this.lastArgs?.subagent_type}. Available: ${available || '(none)'}`,
-      );
-    }
-    return subagent;
-  }
-
-  protected getSessionId(args: z.infer<typeof parameters>): string | undefined {
-    return args.session_id;
-  }
-
-  protected buildTaskPrompt(args: z.infer<typeof parameters>): string {
-    return [
-      `Task: ${args.description}`,
-      args.command ? `Command trigger: ${args.command}` : null,
-      'Work autonomously using the allowed tools. Do not ask the user follow-up questions.',
-      'Return a concise final summary with key findings, file:line references, and any remaining gaps.',
-      args.prompt,
-    ]
-      .filter(Boolean)
-      .join('\n\n');
-  }
+  
 
   /**
    * 执行任务
    * 验证 subagent_type 后调用基类的 execute 方法
    */
   async execute(args: z.infer<typeof parameters>): Promise<ToolOutput> {
-    const subagent = SUBAGENTS.find((a) => a.name === args.subagent_type);
-    if (!subagent) {
-      const available = SUBAGENTS.map((a) => a.name).join(', ');
-      throw new Error(
-        `Unknown subagent_type: ${args.subagent_type}. Available: ${available || '(none)'}`,
-      );
-    }
 
-    this.lastArgs = args;
-
-    // 调用基类的 execute 方法
-    return super.execute(args);
+  
   }
 }
 

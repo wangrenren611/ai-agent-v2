@@ -13,7 +13,7 @@
  * ```
  */
 
-import { BaseTool } from './base';
+import { BaseTool, ToolOutput } from './base';
 import { z } from 'zod';
 import { getBashParser } from './bash-parser';
 import { getPlatform, execCommandAsync } from '../util/platform-cmd';
@@ -62,7 +62,7 @@ export default class BashTool extends BaseTool<typeof schema> {
      * @param args - 包含命令的参数
      * @returns 执行结果
      */
-    async execute(args: z.infer<typeof this.schema>): Promise<string> {
+    async execute(args: z.infer<typeof this.schema>): Promise<ToolOutput> {
         const { command, language, code, args: scriptArgs, stdin } = args;
         const validationError = this.validateArgs({ command, language, code, args: scriptArgs, stdin });
         if (validationError) {
@@ -79,17 +79,35 @@ export default class BashTool extends BaseTool<typeof schema> {
             const parser = await getBashParser();
             const result = parser.parse(execution.command);
             if (!result.valid) {
-                return 'Command not executed due to syntax error';
+                return {
+                    metadata: {
+                        ok:false,
+                        message: 'Command not executed due to syntax error',
+                    },
+                    output: 'ERROR: ' + result.error,
+                };
             }
         } else {
             const maybeDangerous = /(^|\s)(format|shutdown|reg\s+delete|rmdir\s+\/s|rd\s+\/s|del\s+\/f)(\s|$)/i;
             if (maybeDangerous.test(execution.command)) {
-                return 'Command not executed due to safety policy';
+                return {
+                    metadata: {
+                        ok:false,
+                        message: 'Command not executed due to safety policy',
+                    },
+                    output: '',
+                };
             }
         }
-
-        // 执行命令
-        return await this.runCommand(execution.command, execution.input);
+       const result = await this.runCommand(execution.command, execution.input);
+        return {
+            metadata: {
+                ok: true,
+                result,
+                message: 'Command executed successfully',
+            },
+            output: result,
+        };
     }
     /**
      * 执行 bash 命令

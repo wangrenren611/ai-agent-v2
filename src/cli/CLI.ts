@@ -103,14 +103,30 @@ export class CLI {
     }
 
     /**
-     * 处理对话输入（带加载动画）
+     * 处理对话输入（带流式输出）
      */
     private async handleChat(input: string): Promise<void> {
         try {
-            const response = await this.agent.run(input, { silent: true });
-            if (response) {
-                this.logger.info(`\n🤖 Agent:\n${response.content}\n`);
-            } else {
+            // 输出标题
+            console.log('\n🤖 Agent:');
+
+            // 流式响应
+            const response = await this.agent.run(input, {
+                silent: true,
+                stream: true,
+                streamCallback: (chunk) => {
+                    // 打印内容增量（直接输出到 stdout 以避免缓冲）
+                    if (chunk.content) {
+                        process.stdout.write(chunk.content);
+                    }
+                    // 处理结束
+                    if (chunk.finish_reason) {
+                        process.stdout.write('\n\n');
+                    }
+                },
+            });
+
+            if (!response) {
                 this.logger.error('❌ Agent failed to respond');
             }
         } catch (error) {

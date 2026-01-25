@@ -196,12 +196,53 @@ const TodoOp = z.discriminatedUnion('op', [
 
 type TodoOpType = z.infer<typeof TodoOp>;
 
+// 为 TodoOp 的每个变体添加示例
+const TODO_OP_EXAMPLES = [
+  // add 操作示例
+  {
+    op: 'add',
+    item: {
+      id: 't_1',
+      content: '完成项目文档',
+      status: 'pending',
+      priority: 'high'
+    }
+  },
+  // update 操作示例
+  {
+    op: 'update',
+    id: 't_1',
+    patch: {
+      status: 'in_progress'
+    }
+  },
+  // delete 操作示例
+  {
+    op: 'delete',
+    id: 't_1'
+  }
+] as const;
+
 export class TodoApplyOpsTool extends BaseTool<any> {
   name = 'todo_apply_ops';
-  description = 'Apply todo operations (add/update/delete).';
+  description = `Apply todo operations (add/update/delete).
+
+Supported operations:
+- add: Create a new todo item with optional id, content, status, priority
+- update: Modify an existing todo by id using patch object
+- delete: Remove a todo by id
+
+Example usage:
+{
+  "ops": [
+    {"op": "add", "item": {"content": "Fix bug", "status": "pending", "priority": "high"}},
+    {"op": "update", "id": "t_1", "patch": {"status": "completed"}},
+    {"op": "delete", "id": "t_2"}
+  ]
+}`;
 
   schema = z.object({
-    ops: z.array(TodoOp).describe('The list of todo operations to perform'),
+    ops: z.array(TodoOp).describe('Array of todo operations (add/update/delete)'),
   }).strict();
 
   async execute({ ops }: { ops: TodoOpType[] }) {
@@ -266,6 +307,7 @@ export class TodoApplyOpsTool extends BaseTool<any> {
       deleted_ids,
       warnings,
       ok: true,
+      message: 'Todo operations applied successfully',
     };
 
     return {

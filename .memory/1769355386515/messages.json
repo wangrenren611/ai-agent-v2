@@ -1,0 +1,487 @@
+[
+  {
+    "role": "user",
+    "type": "text",
+    "content": "当前目录有什么"
+  },
+  {
+    "content": "<think>\n用户询问当前目录有什么。我应该先探索一下当前目录的结构，看看有什么文件和文件夹。\n</think>\n\n\n",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [
+      {
+        "function": {
+          "arguments": " -la\"}"
+        },
+        "index": 0
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "tool_calls"
+  },
+  {
+    "role": "tool",
+    "type": "text",
+    "content": "Error: Tool name is empty"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b80d3590008669610598ae8dd80\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b80a7e216e94954fcc48a52913d\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b80b258b2a04fa84b8a86324b6b\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b8168739185b93d1141d4f2e5f1\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b811b7156eeb1b8ec2159b3b2f1\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b81771d4a031b3ad72c9c0084c9\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b81cd81338aa3f3a9f9b0e362bd\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b810e31bd5a7ded80705e6a52f8\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b816b0dd70c03f62749fd3d09b8\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b81812eab8b0600415409f1933c\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b813ebb034a2a438eb2dc86e1b0\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b815711532edcf789e36151ab6a\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b8100789ae60abae122429c9446\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b810a990812c08f6a42231985bf\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b81c2750fe47d71ed1a82556953\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b8169f6f9bd0dfde934026e7d38\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b81b8538d3cb92165cd6d3c4daf\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b824165904e258cc86625b664a6\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b8275edf458c81ae748d1c14e5e\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b82d90f24ab40165c715553c467\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b829a334b6ffdcf91b83046b89d\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b82133be3437ec0592568f39589\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b82ea7111dac0f545e4bd38e146\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b826f224e01ea42ad86c6296fea\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b824c4a41cbc01bc85d306c2ad4\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b82438f44f815f8aafd5ea02b6e\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b82eeb2a937e8e1f7587abfb9df\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b82cb7437fb4a6522f662974931\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b833e2021f6324077af4212f001\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b8326563a1cf5316808e6f3060d\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b83efa83eaeb254ac792c3744c0\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b8314d3444e32cfca2400f922d1\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b83ac0610fa88647994f8be2907\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b8373d01067d50022cbd34c34aa\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b83aead067b5088948c6de6cb0a\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b83f2015108465d6fa2ceac3882\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b839fdd5e9f621af633b53893d6\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  },
+  {
+    "content": "LLM API error: API request failed: 400 Bad Request\n{\"type\":\"error\",\"error\":{\"type\":\"bad_request_error\",\"message\":\"invalid params, invalid function arguments json string, tool_call_id:  (2013)\",\"http_code\":\"400\"},\"request_id\":\"05c56b83b5cf32381a948704d5a5c499\"}",
+    "role": "assistant",
+    "type": "text",
+    "tool_calls": [],
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "finishReason": "error"
+  }
+]

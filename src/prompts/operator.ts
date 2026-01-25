@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs";
-
+// - ***explore*** - Quick shortcut for read-only codebase exploration (uses task internally)
+//- ***task*** - Delegate work to specialized sub-agents (explore/plan/general)
 export const operatorPrompt = ({ directory, vcs }: { directory: string, vcs: string }) => {
     const provider = `
 You are QPSCode, the best coding agent on the planet.
@@ -20,8 +21,7 @@ Use only tools that are actually present in this runtime; if something listed is
 - ***precise_replace*** - Replace exact text on a specific line using line number
 - ***batch_replace*** - Replace multiple text segments in a file in one call
 - ***web_search*** - Search the web for latest information
-- ***task*** - Delegate work to specialized sub-agents (explore/plan/general)
-- ***explore*** - Quick shortcut for read-only codebase exploration (uses task internally)
+
 - ***todo_create*** - Create a new todo item
 - ***todo_get_all*** - Get all todo items
 - ***todo_get_active*** - Get active todo items

@@ -25,7 +25,7 @@
  */
 
 import { z } from 'zod';
-import { SubAgentTool, SubAgentConfig } from './subagent';
+import { BaseTool, ToolOutput } from './base';
 
 /**
  * Explore 子代理配置
@@ -33,7 +33,7 @@ import { SubAgentTool, SubAgentConfig } from './subagent';
  */
 
 
-export const EXPLORE_CONFIG: SubAgentConfig = {
+export const EXPLORE_CONFIG = {
   name: 'explore',
   description: 'Fast READ-ONLY explorer for searching and understanding codebases',
   tools: ['grep', 'glob', 'read_file'],
@@ -73,34 +73,27 @@ const schema = z.object({
  * 专门用于代码库的只读探索，无写入权限。
  * 这是默认的探索工具，可以直接调用 explore({ prompt: '...' })
  */
-export class ExploreTool extends SubAgentTool<typeof schema> {
+export class ExploreTool extends BaseTool<typeof schema> {
+
   name = 'explore';
 
   description = `
-Fast READ-ONLY explorer for searching and understanding codebases.
+For quickly searching and understanding the codebase
 
-Use this for:
-- Finding files using glob patterns
-- Searching code with regex patterns
-- Reading and analyzing file contents
-- Quick codebase navigation and understanding
+When not to use:
+- When browsing a given file path, you should not use it; you should use the Read or Glob tool instead
+- When searching for specific keywords, function names, variables, etc., you should not use it; you should use grep, Glob tool, or other quick search tools instead
 
-Tools: glob, grep, read_file (NO write access)
-
-Examples:
-- "Find all API endpoints"
-- "Where is auth implemented?"
-- "Show me all TypeScript files in src/"
+When to use:
+-  Finding all API endpoints
+-  Where is authentication implemented?
+-  Researching the project
   `.trim();
 
   schema = schema;
 
-  protected getConfig(): SubAgentConfig {
-    return EXPLORE_CONFIG;
-  }
-
-  protected getSessionId(args: z.infer<typeof schema>): string | undefined {
-    return args.session_id;
+  execute(args?: { prompt: string; session_id?: string | undefined; } | undefined): Promise<ToolOutput> {
+    
   }
 
   protected buildTaskPrompt(args: z.infer<typeof schema>): string {

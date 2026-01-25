@@ -1,0 +1,44 @@
+[
+  {
+    "id": "1",
+    "content": "探索项目整体结构和文件组织",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "2",
+    "content": "分析核心领域模型和接口定义",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "3",
+    "content": "研究应用层架构和服务实现",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "4",
+    "content": "分析基础设施层和数据持久化",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "5",
+    "content": "研究 CLI 层和命令系统",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "6",
+    "content": "分析 LLM Provider 和 Agent 实现",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "7",
+    "content": "生成完整的分析文档",
+    "status": "in_progress",
+    "priority": "high"
+  }
+]

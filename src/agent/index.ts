@@ -6,7 +6,7 @@
  * 要启用 EventBus 功能，请导入 './index-eventbus' 而不是此文件
  */
 import EventEmitter from "events";
-import { LLMProvider, LLMResponse, Message, ToolCall, ToolSchema } from "../providers/base";
+import { LLMProvider, LLMResponse, Message, ToolCall, ToolSchema, StreamChunk } from "../providers/base";
 import { ScopedLogger } from "../util/log";
 import { SessionManager } from "../session-v2";
 import { ToolRegistry } from "../tool/registry";
@@ -29,6 +29,15 @@ export interface AgentConfig {
     toolTimeoutMs?: number;
     /** 连续错误次数上限，默认 2 */
     noProgressLimit?: number;
+}
+
+export interface AgentRunOptions {
+    silent?: boolean;
+    tools?: ToolSchema[];
+    /** 启用流式响应 */
+    stream?: boolean;
+    /** 流式回调函数 */
+    streamCallback?: (chunk: StreamChunk) => void;
 }
 
 export interface AgentResponse {
@@ -135,11 +144,14 @@ export default class Agent extends EventEmitter {
      */
     async run(
         query: string,
-        options?: { silent?: boolean; tools?: ToolSchema[] }
+        options?: AgentRunOptions
     ): Promise<AgentResponse | null> {
         const tools = options?.tools ?? this.defaultTools ?? [];
         let consecutiveErrorCount = 0;
         let i = 0;
+        const streamEnabled = options?.stream ?? false;
+        const streamCallback = options?.streamCallback;
+
         // 添加用户消息
         this.sessionManager.addMessage({
             role: 'user',
@@ -159,9 +171,22 @@ export default class Agent extends EventEmitter {
             }
 
             const llmMessages = await this.sessionManager.getMessages();
-            const spinner = this.logger.spinner(`Thinking-${i + 1}...`);
+            const spinner = this.logger.spinner(`Thinking-${i}...`);
 
             try {
+                // 构建包装的流式回调，用于停止 spinner
+                let spinnerStopped = false;
+                const wrappedStreamCallback = streamCallback ? (chunk: StreamChunk) => {
+                    if (!spinnerStopped) {
+                        spinner.stop();
+                        spinnerStopped = true;
+                    }
+                    // 调用原始回调
+                    streamCallback(chunk);
+                    // 发送事件
+                    this.emit('stream-chunk', chunk);
+                } : undefined;
+
                 const llmResponse = await this.llmProvider.generate(
                     [
                         { role: 'system', content: this.systemPrompt },
@@ -171,11 +196,13 @@ export default class Agent extends EventEmitter {
                         model: process.env.AI_MODEL,
                         tools: tools.length > 0 ? tools : undefined,
                         max_tokens: this.maxOutputTokens,
+                        stream: streamEnabled,
+                        streamCallback: wrappedStreamCallback,
                     }
                 );
 
                 if (!llmResponse) {
-                     throw new Error('LLM response is null');
+                    throw new Error('LLM response is null');
                 }
 
                 this.sessionManager.addMessage(llmResponse);
@@ -189,18 +216,18 @@ export default class Agent extends EventEmitter {
 
                     if (!validEnd) {
                         spinner.fail(`Unexpected finishReason: ${llmResponse.finishReason}`);
+                        consecutiveErrorCount++;
+                        continue;
+                    } else {
+
+                        spinner.succeed(llmResponse?.content ?? '');
+
                         return {
-                            content: `Unexpected finishReason: ${llmResponse.finishReason}`,
+                            content: llmResponse?.content ?? '',
                             role: 'assistant',
-                        };
+                        }
                     }
 
-                    spinner.succeed(llmResponse?.content ?? '');
-                    return {
-                        content: llmResponse?.content ?? '',
-                        role: 'assistant',
-                        type: 'text',
-                    };
                 }
 
                 // 工具调用成功，重置连续错误计数
