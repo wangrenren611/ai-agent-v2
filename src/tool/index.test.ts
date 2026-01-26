@@ -14,7 +14,7 @@ const createTestTool = () => {
         schema = schema;
 
         async execute(args: z.infer<typeof this.schema>) {
-            return `Test: ${args.message}`;
+            return this.success({ response: `Test: ${args.message}` });
         }
     };
 };
@@ -133,19 +133,24 @@ describe('ToolRegistry', () => {
         const tool = new TestToolClass();
         ToolRegistry.register(tool);
 
-        const result = await ToolRegistry.execute('test', '{ message: "hello" }');
-        expect(result).toBe('Test: hello');
+        const result = await ToolRegistry.execute('test', '{ "message": "hello" }');
+        expect(result.success).toBe(true);
+        expect(result.data).toEqual({ response: 'Test: hello' });
     });
 
-    it('should throw when executing non-existent tool', async () => {
-        await expect(ToolRegistry.execute('nonexistent', '{}')).rejects.toThrow('not found');
+    it('should return error for non-existent tool', async () => {
+        const result = await ToolRegistry.execute('nonexistent', '{}');
+        expect(result.success).toBe(false);
+        expect(result.error).toContain('not found');
     });
 
-    it('should throw when executing with invalid args', async () => {
+    it('should return error for invalid args', async () => {
         const tool = new TestToolClass();
         ToolRegistry.register(tool);
 
-        await expect(ToolRegistry.execute('test', JSON.stringify({ message: 123 }))).rejects.toThrow('Invalid arguments');
+        const result = await ToolRegistry.execute('test', JSON.stringify({ message: 123 }));
+        expect(result.success).toBe(false);
+        expect(result.error).toContain('Invalid arguments');
     });
 
     it('should report correct size', () => {

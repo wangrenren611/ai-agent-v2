@@ -7,10 +7,7 @@ import { OpenAIProvider } from './providers/openai';
 import Agent from './agent';
 import { CLI } from './cli';
 import { registerDefaultToolsAsync, ToolRegistry } from './tool';
-import { SessionManager } from './session-v2';
 import { operatorPrompt } from './prompts/operator';
-import path from 'path';
-import fs from 'fs';
 
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}`, override: true });
@@ -27,65 +24,47 @@ interface AppConfig {
  * 初始化应用
  */
 async function initializeApp(config: AppConfig) {
-    // 1. 连接数据库
-    // await connectDB();
-
-    // 2. 初始化工具（包括 MCP 工具）
+    // 初始化工具（包括 MCP 工具）
     await registerDefaultToolsAsync();
 
- 
-    // 5. 初始化 LLM Provider
+    // 初始化 LLM Provider
     const llmProvider = new OpenAIProvider({
         apiKey: config.deepseekApiKey,
         baseURL: config.deepseekBaseUrl,
     });
-      
-
-   const sessionManager = new SessionManager({
-       sessionId:new Date().getTime().toString(),
-       llmProvider,
-   });
-   
-  await sessionManager.init();
-
-    ToolRegistry.setContext({
-        sessionId: sessionManager.id,
-        sessionPath: sessionManager.sessionPath,
-    });
-
 
     const customPrompt = operatorPrompt({
         directory: process.cwd(),
         vcs: "git",
+        language: "Chinese",
     });
 
     console.log(`Available tools:\n${ToolRegistry.getSchemas().map(tool => `'${tool.function.name}'`).join("\n")}`);
 
-    fs.writeFileSync(path.resolve(process.cwd(), 'customPrompt.md'), customPrompt);
+    const sessionId = new Date().getTime().toString();
+
     const agent = new Agent({
         llmProvider,
-        sessionManager,
         systemPrompt: customPrompt,
         defaultTools: ToolRegistry.getSchemas(),
+        sessionId,
     });
-
-    return { agent, sessionManager };
+    agent.start();
+    return { agent, sessionId };
 }
 
 /**
  * 启动 CLI 交互模式
  */
-async function startCLI(agent: Agent, sessionManager: SessionManager): Promise<void> {
+async function startCLI(agent: Agent, sessionId: string): Promise<void> {
     const cli = new CLI({
         agent,
-        sessionManager,
-        sessionId: sessionManager.id,
+        sessionId,
         prompt: '>',
     });
 
     await cli.start();
 }
-
 
 /**
  * 主函数
@@ -104,21 +83,13 @@ async function main() {
     }
 
     // 初始化应用
-    const { agent, sessionManager } = await initializeApp({
+    const { agent, sessionId } = await initializeApp({
         deepseekApiKey,
         deepseekBaseUrl,
     });
 
-    // 检查命令行参数
-    const args = process.argv.slice(2);
-    const mode = args[0] || 'cli';
-
-    switch (mode) {
-        case 'cli':
-        default:
-            await startCLI(agent, sessionManager);
-            break;
-    }
+    // 启动 CLI
+    await startCLI(agent, sessionId);
 }
 
 main().catch(console.error);

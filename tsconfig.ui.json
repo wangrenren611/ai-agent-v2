@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "module": "ES2020"
+  },
+  "include": [
+    "./src/cli/ui/**/*"
+  ]
+}

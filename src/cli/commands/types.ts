@@ -6,9 +6,9 @@ import type { SessionManager } from '../../session-v2';
 
 export interface CommandContext {
     agent: Agent;
+    sessionManager: SessionManager;
     running: { value: boolean };
     sessionId: { value: string };
-    sessionManager: SessionManager;
 }
 
 export interface CommandHandler {

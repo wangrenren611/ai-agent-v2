@@ -2,14 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import { isBinaryFile } from 'isbinaryfile';
 import { z } from 'zod';
-import { BaseTool, ToolOutput } from './base';
+import { BaseTool, ToolResult } from './base';
 import { getBackupManager } from '../util/backup-manager';
-
 
 const readFileSchema = z.object({
     filePath: z.string(),
-    startLine: z.number().optional().describe("The line number to start reading from (0-based)"),
-    endLine: z.number().optional().describe("The number of lines to read (defaults to 2000)")
+    startLine: z.number().optional().describe("The line number to start reading from (1-based, defaults to 1)"),
+    endLine: z.number().optional().describe("The ending line number to read to (1-based, inclusive)")
 })
 
 export class ReadFileTool extends BaseTool<typeof readFileSchema> {
@@ -30,59 +29,78 @@ Path formats supported:
 
   schema = readFileSchema;
 
-  async execute(args: { filePath: string; startLine?: number; endLine?: number; }): Promise<ToolOutput> {
+  async execute(args: { filePath: string; startLine?: number; endLine?: number; }): Promise<ToolResult> {
     const { filePath, startLine, endLine } = args;
+    const fullPath = this.resolvePath(filePath);
 
-    // 规范化路径以支持跨平台
-    // Windows: D:\work\file.ts -> D:\work\file.ts
-    // Unix: /home/user/file.ts -> /home/user/file.ts
-    // Relative: src/file.ts -> /current/dir/src/file.ts
-    const normalizedPath = filePath.replace(/\\/g, '/');
-    const fullPath = path.resolve(process.cwd(), normalizedPath);
-
-    // 检查路径是否存在
+    // === 业务错误：文件不存在 ===
     if (!fs.existsSync(fullPath)) {
-      return {
-        metadata: { ok: false, message: 'FILE_NOT_FOUND', filePath },
-        output: `Error: File not found at path: ${filePath}\nResolved path: ${fullPath}`,
-      };
+      return this.fail('FILE_NOT_FOUND', { filePath, resolvedPath: fullPath });
     }
 
-    // 检查路径是否是文件（不是目录）
+    // === 业务错误：路径是目录 ===
     const stats = fs.statSync(fullPath);
     if (!stats.isFile()) {
-      return {
-        metadata: { ok: false, message: 'NOT_A_FILE', pathType: 'directory', filePath },
-        output: `Error: Path provided is not a file. It is a directory.\nPath: ${filePath}\nHint: To read a file, specify the full file path including the filename.`,
-      };
+      return this.fail('PATH_IS_DIRECTORY', { filePath });
     }
 
-    // 检查是否是二进制文件
+    // === 业务错误：二进制文件 ===
     if (await isBinaryFile(fullPath)) {
-      return {
-        metadata: { ok: false, message: 'BINARY_FILE', filePath },
-        output: `Error: Cannot read binary file. Path: ${filePath}`,
-      };
+      return this.fail('BINARY_FILE', { filePath });
     }
 
-    const content = fs.readFileSync(fullPath, 'utf-8');
+    // === 底层异常：读取文件失败 ===
+    let content: string;
+    try {
+      content = fs.readFileSync(fullPath, 'utf-8');
+    } catch (error) {
+      throw new Error(`Failed to read file: ${error}`);
+    }
+
     const lines = content.split('\n');
+    const totalLines = lines.length;
 
-    const start = (startLine || 1) - 1;
-    const end = endLine || lines.length;
+    // 将 1-based 行号转换为 0-based 数组索引
+    // startLine 默认为 1（第一行）
+    const startIndex = (startLine !== undefined && startLine > 0) ? startLine - 1 : 0;
 
-    const numbered = lines.slice(start, end).map((l, i) => `${start + i + 1} | ${l}`).join('\n');
-    return{
-       metadata: {
-        ok: true,
+    // endLine 是结束行号（1-based，inclusive），默认为文件末尾
+    // 如果指定了 endLine，需要转换为 0-based 索引并 +1（因为 slice 的 end 是 exclusive）
+    const endIndex = (endLine !== undefined && endLine > 0) ? endLine : totalLines;
+
+    // 验证行号范围
+    if (startIndex >= totalLines) {
+      return this.fail('START_LINE_OUT_OF_RANGE', {
         filePath,
-        startLine:start+1,
-        endLine:end,
-        content:numbered,
-        message: 'File content read successfully',
-       },
-       output: `--- FILE: ${filePath} ---\nRange: ${start+1} - ${end}\n\n${numbered}`,
+        startLine,
+        totalLines
+      });
     }
+
+    if (endIndex < startIndex) {
+      return this.fail('INVALID_LINE_RANGE', {
+        filePath,
+        startLine,
+        endLine
+      });
+    }
+
+    const selectedLines = lines.slice(startIndex, endIndex);
+    const numbered = selectedLines.map((l, i) => `${startIndex + i + 1} | ${l}`).join('\n');
+
+    return this.success(
+      {
+        filePath,
+        content: numbered,
+        range: { startLine: startIndex + 1, endLine: endIndex },
+      },
+      { truncated: content.length > 50000 }
+    );
+  }
+
+  private resolvePath(filePath: string): string {
+    const normalizedPath = filePath.replace(/\\/g, '/');
+    return path.resolve(process.cwd(), normalizedPath);
   }
 }
 
@@ -120,49 +138,42 @@ export class WriteFileTool extends BaseTool<typeof writeFileSchema> {
 
   schema = writeFileSchema;
 
-  async execute({ filePath, content }: z.infer<typeof writeFileSchema>): Promise<ToolOutput> {
-    // 规范化路径以支持跨平台
-    const normalizedPath = filePath.replace(/\\/g, '/');
-    const fullPath = path.resolve(process.cwd(), normalizedPath);
+  async execute({ filePath, content }: z.infer<typeof writeFileSchema>): Promise<ToolResult> {
+    const fullPath = this.resolvePath(filePath);
 
-    // 检查路径是否已存在
+    // === 业务错误：路径是目录 ===
     if (fs.existsSync(fullPath)) {
       const stats = fs.statSync(fullPath);
-
-      // 检查是否是目录
       if (stats.isDirectory()) {
-        return {
-          metadata: { ok: false, message: 'IS_DIRECTORY', filePath },
-          output: `Error: Cannot write to a directory. Path: ${filePath}\nHint: Specify a file name, e.g., ${path.join(filePath, 'example.txt')}`,
-        };
+        return this.fail('PATH_IS_DIRECTORY', { filePath });
       }
-
-      // 检查是否是二进制文件
+      // === 业务错误：二进制文件 ===
       if (await isBinaryFile(fullPath)) {
-        return {
-          metadata: { ok: false, message: 'BINARY_FILE', filePath },
-          output: `Error: Cannot write to binary file. Path: ${filePath}`,
-        };
+        return this.fail('CANNOT_WRITE_BINARY_FILE', { filePath });
       }
     }
 
-    // 在写入前备份现有文件（如果存在）
+    // === 备份 ===
     const backupManager = getBackupManager();
     await backupManager.initialize();
     const backupId = await backupManager.backup(fullPath);
 
-    // 确保目录存在
-    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
-    fs.writeFileSync(fullPath, content);
-
-    const backupInfo = backupId ? ` (backup: ${backupId})` : '';
-    return{
-       metadata: {
-        ok: true,
-        filePath,
-        message: `File written successfully`,
-       },
-       output: `File ${filePath} written successfully.${backupInfo}`,
+    // === 底层异常：写入文件失败 ===
+    try {
+      fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+      fs.writeFileSync(fullPath, content);
+    } catch (error) {
+      throw new Error(`Failed to write file: ${error}`);
     }
+
+    return this.success(
+      { filePath, backupId },
+      { fileSize: content.length }
+    );
+  }
+
+  private resolvePath(filePath: string): string {
+    const normalizedPath = filePath.replace(/\\/g, '/');
+    return path.resolve(process.cwd(), normalizedPath);
   }
 }

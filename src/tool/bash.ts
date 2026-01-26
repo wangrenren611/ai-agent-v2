@@ -5,15 +5,9 @@
  * - 语法验证和解析
  * - 安全分析
  * - 命令执行
- *
- * @example
- * ```ts
- * const tool = new BashTool();
- * const result = await tool.execute({ command: 'ls -la' });
- * ```
  */
 
-import { BaseTool, ToolOutput } from './base';
+import { BaseTool, ToolResult } from './base';
 import { z } from 'zod';
 import { getBashParser } from './bash-parser';
 import { getPlatform, execCommandAsync } from '../util/platform-cmd';
@@ -33,16 +27,10 @@ const schema = z.object({
     stdin: z.string().describe('Optional stdin for the command').optional(),
 });
 
-
 // =============================================================================
 // BashTool 类
 // =============================================================================
 
-/**
- * Bash 命令执行工具
- *
- * 在执行前对命令进行解析和安全分析
- */
 export default class BashTool extends BaseTool<typeof schema> {
     name = 'bash';
     private cwd = process.cwd();
@@ -59,14 +47,17 @@ export default class BashTool extends BaseTool<typeof schema> {
     /**
      * 执行 bash 命令
      *
-     * @param args - 包含命令的参数
-     * @returns 执行结果
+     * 错误分类：
+     * - 业务错误（参数验证、安全检查）→ return this.fail()
+     * - 底层异常（执行失败）→ throw 供 Registry 捕获
      */
-    async execute(args: z.infer<typeof this.schema>): Promise<ToolOutput> {
+    async execute(args: z.infer<typeof this.schema>): Promise<ToolResult> {
         const { command, language, code, args: scriptArgs, stdin } = args;
+
+        // === 业务错误：参数验证 ===
         const validationError = this.validateArgs({ command, language, code, args: scriptArgs, stdin });
         if (validationError) {
-            return validationError;
+            return this.fail(validationError, { code: 'VALIDATION_ERROR' });
         }
 
         const hasCode = Boolean(code?.trim());
@@ -74,82 +65,88 @@ export default class BashTool extends BaseTool<typeof schema> {
             ? { command: this.buildInlineCommand(language as ScriptLanguage, scriptArgs), input: code }
             : { command: command as string, input: stdin };
 
+        // === 业务错误：语法检查 ===
         const platform = getPlatform();
         if (platform !== 'windows') {
             const parser = await getBashParser();
-            const result = parser.parse(execution.command);
-            if (!result.valid) {
-                return {
-                    metadata: {
-                        ok:false,
-                        message: 'Command not executed due to syntax error',
-                    },
-                    output: 'ERROR: ' + result.error,
-                };
+            const parseResult = parser.parse(execution.command);
+            if (!parseResult.valid) {
+                return this.fail(
+                    'Command not executed due to syntax error',
+                    { code: 'SYNTAX_ERROR', details: parseResult.error }
+                );
             }
         } else {
-            const maybeDangerous = /(^|\s)(format|shutdown|reg\s+delete|rmdir\s+\/s|rd\s+\/s|del\s+\/f)(\s|$)/i;
-            if (maybeDangerous.test(execution.command)) {
-                return {
-                    metadata: {
-                        ok:false,
-                        message: 'Command not executed due to safety policy',
-                    },
-                    output: '',
-                };
+            const dangerousPattern = /(^|\s)(format|shutdown|reg\s+delete|rmdir\s+\/s|rd\s+\/s|del\s+\/f)(\s|$)/i;
+            if (dangerousPattern.test(execution.command)) {
+                return this.fail(
+                    'Command not executed due to safety policy',
+                    { code: 'SAFETY_POLICY_VIOLATION' }
+                );
             }
         }
-       const result = await this.runCommand(execution.command, execution.input);
-        return {
-            metadata: {
-                ok: true,
-                result,
-                message: 'Command executed successfully',
-            },
-            output: result,
-        };
+
+        // === 执行命令 ===
+        const result = await this.runCommand(execution.command, execution.input);
+        return result;
     }
+
     /**
      * 执行 bash 命令
      *
-     * 使用 platform-cmd 模块的跨平台执行函数
-     * 自动处理编码差异（Windows GBK / Unix UTF-8）
-     * 超时保护通过 timeout 参数传递
-     *
-     * @param command - 要执行的命令
-     * @returns Promise<string> - 执行结果
+     * 错误分类：
+     * - cd 解析失败 → return fail()（业务错误）
+     * - 命令执行异常 → throw（底层异常）
      */
-    private async runCommand(command: string, input?: string): Promise<string> {
+    private async runCommand(command: string, input?: string): Promise<ToolResult> {
+        // 处理 cd 命令（业务错误）
+        const cdError = this.tryHandleCd(command);
+        if (cdError) {
+            return this.fail(`Command failed: ${cdError}`, { code: 'CD_FAILED' });
+        }
+
         const normalizedCommand = this.normalizeCommand(command);
-        const cdOutput = this.tryHandleCd(normalizedCommand);
-        if (cdOutput !== null) return this.truncateOutput( `ERROR: Command failed: ${cdOutput}`);
 
-        const result = await execCommandAsync(normalizedCommand, {
-            timeout: this.timeout,
-            cwd: this.cwd,
-            input,
-        });
+        try {
+            // === 底层异常：命令执行 ===
+            const result = await execCommandAsync(normalizedCommand, {
+                timeout: this.timeout,
+                cwd: this.cwd,
+                input,
+            });
 
-        if (result.exitCode === 0) {
-            return this.truncateOutput(result.stdout || `Command exited successfully`);
-        } else {
-            // 命令失败时返回 stderr
-            return this.truncateOutput(result.stderr || `Command failed with exit code ${result.exitCode}`);
+            if (result.exitCode === 0) {
+                return this.success(
+                    { output: result.stdout || 'Command exited successfully' },
+                    { truncated: result.stdout.length > 12000 }
+                );
+            } else {
+                return this.fail(
+                    result.stderr || `Command failed with exit code ${result.exitCode}`,
+                    { code: 'COMMAND_FAILED', exitCode: result.exitCode }
+                );
+            }
+        } catch (error) {
+            // 底层异常，让 Registry 统一捕获
+            throw new Error(`Failed to execute command: ${error}`);
         }
     }
 
+    /**
+     * 处理 cd 命令
+     * @returns 错误信息，null 表示成功
+     */
     private tryHandleCd(command: string): string | null {
         const platform = getPlatform();
-        // 检测复杂命令（包含管道、重定向、命令连接符等），不做 cd 特殊处理
         if (/[|;&<>]|\|\||&&/.test(command)) {
-            return null;
+            return null; // 复杂命令不做 cd 处理
         }
 
         const cdMatch = command.match(/^\s*cd(?:\s+\/d)?\s+(.+)\s*$/i);
         if (!cdMatch) return null;
 
         const rawTarget = cdMatch[1]?.trim();
-        if (!rawTarget) return null;
+        if (!rawTarget) return 'cd target is empty';
 
         const target = rawTarget.replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1');
         const resolved = platform === 'windows'
@@ -157,7 +154,7 @@ export default class BashTool extends BaseTool<typeof schema> {
             : require('path').resolve(this.cwd, target);
 
         this.cwd = resolved;
-        return this.cwd;
+        return null;
     }
 
     private normalizeCommand(command: string): string {
@@ -250,23 +247,24 @@ export default class BashTool extends BaseTool<typeof schema> {
     }): string | null {
         const hasCommand = Boolean(input.command?.trim());
         const hasCode = Boolean(input.code?.trim());
+
         if (!hasCommand && !hasCode) {
-            return 'Command not executed: missing "command" or "code".';
+            return 'missing "command" or "code"';
         }
         if (hasCommand && hasCode) {
-            return 'Command not executed: provide either "command" or "code", not both.';
+            return 'provide either "command" or "code", not both';
         }
         if (hasCode && !input.language) {
-            return 'Command not executed: "language" is required when using "code".';
+            return '"language" is required when using "code"';
         }
         if (!hasCode && input.language) {
-            return 'Command not executed: "language" is only valid with "code".';
+            return '"language" is only valid with "code"';
         }
         if (!hasCode && input.args?.length) {
-            return 'Command not executed: "args" is only valid with "code".';
+            return '"args" is only valid with "code"';
         }
         if (hasCode && input.stdin !== undefined) {
-            return 'Command not executed: "stdin" cannot be used with "code".';
+            return '"stdin" cannot be used with "code"';
         }
         return null;
     }
@@ -302,11 +300,4 @@ export default class BashTool extends BaseTool<typeof schema> {
         const escaped = arg.replace(/'/g, "'\\''");
         return `'${escaped}'`;
     }
-
-    private truncateOutput(output: string): string {
-        const maxChars = 12000;
-        if (output.length <= maxChars) return output;
-        return `${output.slice(0, maxChars)}\n... (truncated, ${output.length - maxChars} more chars)`;
-    }
- 
 }

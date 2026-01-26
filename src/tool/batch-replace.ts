@@ -1,20 +1,23 @@
 import fs from 'fs';
 import path from 'path';
 import { z } from 'zod';
-import { BaseTool } from './base';
+import { BaseTool, ToolResult } from './base';
 import chalk from 'chalk';
 import { getBackupManager } from '../util/backup-manager';
 
 /**
- * BatchReplaceTool - 批量替换工具
+ * 批量替换工具
  *
- * 允许在单个调用中替换同一文件的多个位置，提高效率
+ * 行为说明：
+ * - 每次替换基于原始行内容，而非累积替换
+ * - 只替换每行中第一个匹配的 oldText
+ * - 不支持跨行替换
+ * - 保留原文件的换行符类型（\r\n 或 \n）
  */
 export class BatchReplaceTool extends BaseTool<any> {
-
   name = "batch_replace";
 
-  description = "Replace multiple text segments in a single file call. Ideal for batch edits such as translating multiple comments, updating related JSDoc blocks, or performing coordinated changes across several lines without multiple tool invocations.";
+  description = "Replace multiple text segments in a single file call.";
 
   schema = z.object({
     filePath: z.string().describe("Path to the file to modify"),
@@ -25,67 +28,144 @@ export class BatchReplaceTool extends BaseTool<any> {
     })).describe("Array of replacements to apply in order")
   });
 
-  async execute({ filePath, replacements }: z.infer<typeof this.schema>): Promise<string> {
+  async execute({ filePath, replacements }: z.infer<typeof this.schema>): Promise<ToolResult> {
+    // === 边界条件：空替换数组 ===
+    if (replacements.length === 0) {
+      return this.fail('EMPTY_REPLACEMENTS', { filePath });
+    }
 
     const fullPath = path.resolve(process.cwd(), filePath);
 
+    // === 业务错误：文件不存在 ===
     if (!fs.existsSync(fullPath)) {
-      return `Error: File not found: ${filePath}`;
+      return this.fail('FILE_NOT_FOUND', { filePath });
     }
 
-    // 在修改前备份文件
+    // === 备份 ===
     const backupManager = getBackupManager();
     await backupManager.initialize();
     const backupId = await backupManager.backup(fullPath);
 
-    const content = fs.readFileSync(fullPath, 'utf-8');
-    const lines = content.split('\n');
+    // === 读取文件并检测换行符类型 ===
+    let content: string;
+    try {
+      content = fs.readFileSync(fullPath, 'utf-8');
+    } catch (error) {
+      throw new Error(`Failed to read file: ${error}`);
+    }
 
-    const results: string[] = [];
+    // 检测换行符类型：\r\n (Windows) 或 \n (Unix)
+    const hasCrLf = content.includes('\r\n');
+    const lineBreak = hasCrLf ? '\r\n' : '\n';
+
+    // 统一按 \n 分割进行处理
+    const normalizedContent = content.replace(/\r\n/g, '\n');
+    const lines = normalizedContent.split('\n');
+
+    // 计算有效行数：如果原文件以换行符结尾，末尾空字符串不计为有效行
+    const endsWithLineBreak = normalizedContent.endsWith('\n');
+    const effectiveLineCount = endsWithLineBreak ? lines.length - 1 : lines.length;
+
+    const results: Array<{ line: number; success: boolean; message?: string }> = [];
+    const processedLines = new Set<number>();
+    // 保存每行的原始内容，确保多次替换同一行时基于原始内容
+    const originalLines = new Map<number, string>();
     let modifiedCount = 0;
-
-    // 按行号（降序）排序替换项，避免行号偏移问题
-    // 实际上，对于基于行的替换且无偏移，我们可以按任意顺序处理
-    // since we're replacing text within lines, not adding/removing lines
 
     for (const repl of replacements) {
       const { line, oldText, newText } = repl;
 
-      if (line < 1 || line > lines.length) {
-        results.push(`❌ Line ${line}: out of range (file has ${lines.length} lines)`);
+      // === 业务错误：行号越界 ===
+      if (line < 1 || line > effectiveLineCount) {
+        results.push({
+          line,
+          success: false,
+          message: `Line ${line} is out of range (file has ${effectiveLineCount} lines)`
+        });
         continue;
       }
 
       const targetLineIdx = line - 1;
-      const originalLine = lines[targetLineIdx];
 
+      // 获取原始行内容（第一次访问时保存）
+      if (!originalLines.has(line)) {
+        originalLines.set(line, lines[targetLineIdx]);
+      }
+      const originalLine = originalLines.get(line)!;
+
+      // === 警告：同一行多次替换 ===
+      if (processedLines.has(line)) {
+        console.log(chalk.yellow(`[Warning] Multiple replacements on line ${line}. Each uses the original line content.`));
+      }
+      processedLines.add(line);
+
+      // === 业务错误：oldText 不匹配 ===
       if (!originalLine.includes(oldText)) {
-        results.push(`❌ Line ${line}: "${oldText}" not found. Content: "${originalLine.trim()}"`);
+        results.push({
+          line,
+          success: false,
+          message: `Text "${oldText}" not found on line ${line}`
+        });
         continue;
       }
 
-      const newLine = originalLine.replace(oldText, newText);
+      // === 执行替换 ===
+      // 使用 replaceAll 的替代方案：转义 newText 中的特殊字符
+      const escapedNewText = this.escapeReplacementString(newText);
+      const newLine = originalLine.replace(oldText, escapedNewText);
       lines[targetLineIdx] = newLine;
       modifiedCount++;
+
+      results.push({ line, success: true });
 
       console.log(chalk.yellow(`[Batch Edit] ${filePath}:${line}`));
       console.log(chalk.red(`- ${originalLine.trim()}`));
       console.log(chalk.green(`+ ${newLine.trim()}`));
     }
 
-    // 一次性写入所有更改
+    // === 写入文件（保留原换行符类型）===
+    // 注意：如果原文件以换行符结尾，split('\n') 会产生末尾空字符串元素
+    // lines.join(lineBreak) 会自动保留正确的换行符结尾，无需额外添加
     if (modifiedCount > 0) {
-      fs.writeFileSync(fullPath, lines.join('\n'));
+      try {
+        const newContent = lines.join(lineBreak);
+        fs.writeFileSync(fullPath, newContent, 'utf-8');
+      } catch (error) {
+        throw new Error(`Failed to write file: ${error}`);
+      }
     }
 
-    const backupInfo = backupId ? ` (backup: ${backupId})` : '';
-    const summary = `\n✅ Modified ${modifiedCount}/${replacements.length} replacements in ${filePath}${backupInfo}`;
+    const failedCount = results.filter(r => !r.success).length;
+    const summary = `\nModified ${modifiedCount}/${replacements.length} replacements in ${filePath}`;
     console.log(chalk.green(summary));
 
-    if (results.length > 0) {
-      return `${summary}\n\nDetails:\n${results.join('\n')}`;
+    // === 返回结果 ===
+    if (failedCount > 0) {
+      return this.success(
+        { filePath, backupId, results, modifiedCount, failedCount },
+        { hasErrors: true }
+      );
     }
 
-    return summary;
+    return this.success({ filePath, backupId, results, modifiedCount });
+  }
+
+  /**
+   * 转义 replace() 方法中替换字符串的特殊字符
+   *
+   * String.replace() 的 replacement 参数中：
+   * - $$ 插入一个 $
+   * - $& 插入匹配的子字符串
+   * - $` 插入匹配子字符串之前的文本
+   * - $' 插入匹配子字符串之后的文本
+   * - $n/$nn 插入第 n/nn 个捕获组
+   *
+   * 为了避免这些特殊字符被误解析，需要将 $ 替换为 $$
+   *
+   * 注意：必须使用函数替换的形式，因为在字符串替换中 $$ 本身就需要转义
+   * 使用 replacer 函数可以避免这个问题：函数的返回值不会被二次解析
+   */
+  private escapeReplacementString(text: string): string {
+    return text.replace(/\$/g, () => '$$');
   }
 }

@@ -1,12 +1,16 @@
 export interface ProviderConfig {
   /** API key or credentials */
-  apiKey?: string
+  apiKey?: string;
   /** Base URL for API */
-  baseURL?: string
+  baseURL?: string;
   /** Model name */
-  model?: string
+  model?: string;
+  /** Maximum tokens */
+  maxTokens?: number;
+  /** Temperature */
+  temperature?: number;
   /** Additional options */
-  [key: string]: unknown
+  [key: string]: unknown;
 }
 export interface ToolSchema {
   type: 'function';
@@ -47,6 +51,8 @@ export interface LLMOptions {
   stream?: boolean
   /** Callback for receiving streaming chunks */
   streamCallback?: StreamCallback
+  /** Abort signal for cancelling the request */
+  abortSignal?: AbortSignal
 }
 
 export type Message = {
@@ -92,15 +98,15 @@ export type LLMResponse = {
 export abstract class LLMProvider{
    protected constructor(
     protected readonly config: ProviderConfig
-  ) {}
+   ) {}
 
-  abstract maxOutputTokens:number;
-  abstract maxTokens:number;
-  /**
-   * 从提供商生成响应
-   * @param messages The messages for the model
-   * @param options Optional parameters including stream callback
-   * @returns A promise that resolves to the model's response
-   */
-  abstract generate(messages: Message[], options?: LLMOptions): Promise<LLMResponse|null>
+   abstract maxOutputTokens:number;
+   abstract maxTokens:number;
+   /**
+    * 从提供商生成响应
+    * @param messages The messages for the model
+    * @param options Optional parameters including stream callback
+    * @returns A promise that resolves to the model's response
+    */
+   abstract generate(messages: Message[], options?: LLMOptions): Promise<LLMResponse|null>
 }

@@ -1,19 +1,19 @@
 import z from 'zod';
-import { BaseTool, ToolOutput } from './base';
+import { BaseTool, ToolResult } from './base';
 import { DESCRIPTION_WRITE } from './todowrite';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { ToolRegistry } from './registry';
+
 const Status = z.enum(['pending', 'in_progress', 'completed', 'cancelled']);
 const Priority = z.enum(['high', 'medium', 'low']);
 
 const TodoInfo = z.object({
-  id: z.string().min(1),           
+  id: z.string().min(1),
   content: z.string().min(1).max(200),
   status: Status.default('pending'),
   priority: Priority.default('medium'),
 }).strict();
-
 
 type TodoItem = z.infer<typeof TodoInfo>;
 
@@ -33,87 +33,88 @@ async function loadTodos(sessionId: string, sessionPath?: string): Promise<TodoI
   }
 
   const filePath = resolveTodoPath(sessionId, sessionPath);
+
+  // === 底层异常：读取文件失败 ===
+  let raw: string;
   try {
-    const raw = await fs.readFile(filePath, 'utf-8');
-    const parsed = JSON.parse(raw.trim() || '[]');
-    const list = Array.isArray(parsed) ? parsed : [];
-    todoCache.set(sessionId, list);
-    return list;
-  } catch (_error) {
-    todoCache.set(sessionId, []);
-    return [];
+    raw = await fs.readFile(filePath, 'utf-8');
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      // 文件不存在，返回空列表
+      todoCache.set(sessionId, []);
+      return [];
+    }
+    throw new Error(`Failed to read todo file: ${error}`);
   }
+
+  // === 业务错误：JSON 解析失败 ===
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw.trim() || '[]');
+  } catch (error) {
+    throw new Error(`Failed to parse todo file: ${error}`);
+  }
+
+  if (!Array.isArray(parsed)) {
+    throw new Error('Todo file contains invalid format');
+  }
+
+  todoCache.set(sessionId, parsed);
+  return parsed;
 }
 
 async function saveTodos(sessionId: string, sessionPath: string | undefined, todos: TodoItem[]): Promise<void> {
   const filePath = resolveTodoPath(sessionId, sessionPath);
-  await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, JSON.stringify(todos, null, 2));
+
+  // === 底层异常：写入文件失败 ===
+  try {
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
+    await fs.writeFile(filePath, JSON.stringify(todos, null, 2));
+  } catch (error) {
+    throw new Error(`Failed to save todo file: ${error}`);
+  }
+
   todoCache.set(sessionId, todos);
 }
 
 export class TodoCreateTool extends BaseTool<any> {
-  schema =  z.object({
+  schema = z.object({
     todos: z.array(TodoInfo).describe('The list of todo operations to perform'),
   }).strict();
 
   name = 'todo_create';
-
   description = DESCRIPTION_WRITE;
 
-  async execute({ todos }: { todos: TodoItem[] }): Promise<ToolOutput> {
+  async execute({ todos }: { todos: TodoItem[] }): Promise<ToolResult> {
     const context = ToolRegistry.getContext();
 
+    // === 底层异常：保存失败 ===
     if (context.sessionId) {
       await saveTodos(context.sessionId, context.sessionPath, todos);
     } else {
       todoList = todos;
     }
 
-    return {
-       metadata:{
-          count: todos.length,
-          ok: true,
-       },
-       output: JSON.stringify(todos,null,2),
-    };
+    return this.success({ count: todos.length, todos });
   }
 }
 
 export class TodoGetAllTool extends BaseTool<any> {
   schema = z.object({});
-
   name = 'todo_get_all';
+  description = 'List all todos';
 
-  description = 'List todos (optional filters)';
-
-
-  async execute() {
+  async execute(): Promise<ToolResult> {
     const context = ToolRegistry.getContext();
+
+    // === 底层异常：加载失败 ===
     const todos = context.sessionId
       ? await loadTodos(context.sessionId, context.sessionPath)
       : todoList;
 
-    if (todos.length === 0) {
-      return {
-        metadata: {
-          todos,
-        },
-        output: 'Your todo list is empty',
-      };
-    }
-
-    return {
-      metadata: {
-         count: todos.length,
-         todos,
-         ok: true,
-      },
-      output: JSON.stringify(todos, null, 2),
-    };
+    return this.success({ count: todos.length, todos });
   }
 }
-
 
 export class TodoGetActiveTool extends BaseTool<any> {
   schema = z.object({
@@ -125,10 +126,12 @@ export class TodoGetActiveTool extends BaseTool<any> {
   }).strict();
 
   name = 'todo_get_active';
-  description = 'List active todos (pending/in_progress). Optional limit/sort/fields.';
+  description = 'List active todos (pending/in_progress).';
 
-  async execute({ limit, sort_by, fields }: { limit: number; sort_by: 'priority'|'status'|'none'; fields: string[] }) {
+  async execute({ limit, sort_by, fields }: { limit: number; sort_by: 'priority'|'status'|'none'; fields: string[] }): Promise<ToolResult> {
     const context = ToolRegistry.getContext();
+
+    // === 底层异常：加载失败 ===
     const todos: TodoItem[] = context.sessionId
       ? await loadTodos(context.sessionId, context.sessionPath)
       : todoList;
@@ -153,18 +156,13 @@ export class TodoGetActiveTool extends BaseTool<any> {
       return o;
     });
 
-    const result = {
+    return this.success({
       count_total_active: active.length,
       returned: trimmed.length,
       todos: trimmed,
-      ok: true,
-    };
-
-    // output 尽量短，避免重复塞 JSON
-    return { metadata: result, output: JSON.stringify(result, null, 2) };
+    });
   }
 }
-
 
 const NonEmptyPatch = z.object({
   content: z.string().min(1).max(200).optional(),
@@ -178,16 +176,14 @@ const TodoOp = z.discriminatedUnion('op', [
   z.object({
     op: z.literal('add'),
     item: TodoInfo.omit({ id: true }).extend({
-      id: z.string().min(1).optional(), // 允许模型不填，你后端生成
+      id: z.string().min(1).optional(),
     }).strict(),
   }).strict(),
-
   z.object({
     op: z.literal('update'),
     id: z.string().min(1),
     patch: NonEmptyPatch,
   }).strict(),
-
   z.object({
     op: z.literal('delete'),
     id: z.string().min(1),
@@ -196,57 +192,32 @@ const TodoOp = z.discriminatedUnion('op', [
 
 type TodoOpType = z.infer<typeof TodoOp>;
 
-// 为 TodoOp 的每个变体添加示例
-const TODO_OP_EXAMPLES = [
-  // add 操作示例
-  {
-    op: 'add',
-    item: {
-      id: 't_1',
-      content: '完成项目文档',
-      status: 'pending',
-      priority: 'high'
-    }
-  },
-  // update 操作示例
-  {
-    op: 'update',
-    id: 't_1',
-    patch: {
-      status: 'in_progress'
-    }
-  },
-  // delete 操作示例
-  {
-    op: 'delete',
-    id: 't_1'
-  }
-] as const;
-
 export class TodoApplyOpsTool extends BaseTool<any> {
   name = 'todo_apply_ops';
   description = `Apply todo operations (add/update/delete).
 
-Supported operations:
-- add: Create a new todo item with optional id, content, status, priority
-- update: Modify an existing todo by id using patch object
-- delete: Remove a todo by id
+## Operation Types
 
-Example usage:
-{
-  "ops": [
-    {"op": "add", "item": {"content": "Fix bug", "status": "pending", "priority": "high"}},
-    {"op": "update", "id": "t_1", "patch": {"status": "completed"}},
-    {"op": "delete", "id": "t_2"}
-  ]
-}`;
+### add
+Add a new todo item. ID is auto-generated if not provided.
+Example: {"op": "add", "item": {"content": "Implement feature X", "priority": "high", "status": "pending"}}
+
+### update
+Update an existing todo. The 'id' specifies which todo to update. The 'patch' contains fields to update.
+Example: {"op": "update", "id": "t_1", "patch": {"content": "New content", "status": "completed", "priority": "high"}}
+
+### delete
+Delete a todo by ID.
+Example: {"op": "delete", "id": "t_1"}`;
 
   schema = z.object({
-    ops: z.array(TodoOp).describe('Array of todo operations (add/update/delete)'),
+    ops: z.array(TodoOp).describe('Array of todo operations'),
   }).strict();
 
-  async execute({ ops }: { ops: TodoOpType[] }) {
+  async execute({ ops }: { ops: TodoOpType[] }): Promise<ToolResult> {
     const context = ToolRegistry.getContext();
+
+    // === 底层异常：加载失败 ===
     const todos: TodoItem[] = context.sessionId
       ? await loadTodos(context.sessionId, context.sessionPath)
       : todoList;
@@ -255,13 +226,14 @@ Example usage:
     const updated_ids: string[] = [];
     const added_ids: string[] = [];
     const deleted_ids: string[] = [];
-    const warnings: Array<{ code: string; message?: string; id?: string }> = [];
+    const errors: Array<{ op: string; id?: string; message: string }> = [];
 
     for (const op of ops) {
       if (op.op === 'add') {
         const id = op.item.id ?? `t_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+        // === 业务错误：ID 重复 ===
         if (byId.has(id)) {
-          warnings.push({ code: 'DUPLICATE_ID', id, message: 'id already exists; skipped' });
+          errors.push({ op: 'add', id, message: 'id already exists' });
           continue;
         }
         const item: TodoItem = {
@@ -273,17 +245,19 @@ Example usage:
         byId.set(id, item);
         added_ids.push(id);
       } else if (op.op === 'update') {
+        // === 业务错误：ID 不存在 ===
         const item = byId.get(op.id);
         if (!item) {
-          warnings.push({ code: 'NOT_FOUND', id: op.id, message: 'todo not found; skipped' });
+          errors.push({ op: 'update', id: op.id, message: 'todo not found' });
           continue;
         }
         const next = { ...item, ...op.patch };
         byId.set(op.id, next);
         updated_ids.push(op.id);
       } else if (op.op === 'delete') {
+        // === 业务错误：ID 不存在 ===
         if (!byId.has(op.id)) {
-          warnings.push({ code: 'NOT_FOUND', id: op.id, message: 'todo not found; skipped' });
+          errors.push({ op: 'delete', id: op.id, message: 'todo not found' });
           continue;
         }
         byId.delete(op.id);
@@ -293,32 +267,31 @@ Example usage:
 
     const nextTodos = Array.from(byId.values());
 
+    // === 底层异常：保存失败 ===
     if (context.sessionId) {
       await saveTodos(context.sessionId, context.sessionPath, nextTodos);
     } else {
       todoList = nextTodos;
     }
 
-    // tool 返回：短 + 结构化（不要返回整表）
-    const result = {
+    // 有错误时返回部分成功
+    if (errors.length > 0) {
+      return this.fail(
+        `Some operations failed: ${errors.map(e => e.message).join(', ')}`,
+        { code: 'PARTIAL_FAILURE', errors, added_ids, updated_ids, deleted_ids }
+      );
+    }
+
+    return this.success({
       count: nextTodos.length,
       added_ids,
       updated_ids,
       deleted_ids,
-      warnings,
-      ok: true,
-      message: 'Todo operations applied successfully',
-    };
-
-    return {
-      metadata: result,
-      output: JSON.stringify(result),
-    };
+    });
   }
 }
 
-
-const TodoTools =()=>{
+const TodoTools = () => {
   return [
     new TodoCreateTool(),
     new TodoGetAllTool(),

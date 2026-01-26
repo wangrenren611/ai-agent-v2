@@ -1,0 +1,57 @@
+/**
+ * 权限管理命令
+ * 使用 Ink 组件提供交互式权限管理界面
+ */
+import type { CommandHandler, CommandContext } from './types';
+import { startPermissionCLI } from '../ui';
+
+export const handler: CommandHandler = {
+    name: 'permission',
+    description: '打开权限管理界面',
+    usage: '/permission',
+    aliases: ['/perm', '/permissions'],
+
+    async execute(context: CommandContext, args: string[]): Promise<void> {
+        const { agent, sessionManager } = context;
+
+        // 从会话中获取权限数据（这里模拟从数据库获取）
+        const permissions = await loadPermissionsFromSession(sessionManager);
+
+        // 启动权限管理 CLI
+        console.log('\n🔒 启动权限管理界面...');
+        console.log('提示: 按 Ctrl+C 或 Esc 退出\n');
+
+        const { waitUntilExit } = startPermissionCLI(permissions);
+
+        // 等待权限管理界面退出
+        await waitUntilExit();
+
+        console.log('\n已返回主 CLI');
+    },
+};
+
+/**
+ * 从会话加载权限数据
+ */
+async function loadPermissionsFromSession(sessionManager: any) {
+    // 这里可以实现从数据库或会话中加载权限数据
+    // 目前返回示例数据
+    return [
+        {
+            id: 'perm_1',
+            name: '读取用户信息',
+            resource: 'user',
+            action: 'read',
+            description: '允许读取用户基本信息',
+            enabled: true,
+        },
+        {
+            id: 'perm_2',
+            name: '创建文章',
+            resource: 'post',
+            action: 'create',
+            description: '允许创建新文章',
+            enabled: true,
+        },
+    ];
+}

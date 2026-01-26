@@ -1,0 +1,44 @@
+Fetch the content of a webpage from a URL and return it in the specified format.
+
+## Capabilities
+
+- Retrieves HTML content from a given URL
+- Converts HTML to Markdown or plain text as needed
+- Respects the response size limit (5MB maximum)
+- Supports configurable timeout (default 30s, max 120s)
+
+## Output Formats
+
+- **markdown**: HTML is converted to Markdown format
+- **text**: HTML is stripped to plain text (scripts, styles, and other non-content elements are removed)
+- **html**: Returns the raw HTML content
+
+## Usage
+
+```typescript
+// Fetch a webpage and get its content in markdown format
+const result = await webfetch({
+  url: "https://example.com",
+  format: "markdown"
+});
+
+// Get plain text content
+const textResult = await webfetch({
+  url: "https://example.com/article",
+  format: "text",
+  timeout: 60
+});
+
+// Get raw HTML
+const htmlResult = await webfetch({
+  url: "https://example.com",
+  format: "html"
+});
+```
+
+## Notes
+
+- The URL must start with http:// or https://
+- Large pages (> 5MB) will be rejected
+- Scripts, styles, and other non-content elements are automatically removed for text format
+- Markdown conversion preserves headings, links, lists, code blocks, and basic formatting

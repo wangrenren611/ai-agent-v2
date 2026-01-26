@@ -1,8 +1,9 @@
 {
-  "exclude": ["dist", "__tests__", "node_modules"],
+  "exclude": ["dist", "__tests__", "node_modules", "src/cli/ui/**/*.tsx"],
   "compilerOptions": {
     "lib": ["ESNext"],
     "module": "CommonJS",
+    "moduleResolution": "node",
     "types": ["node"],
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
@@ -19,6 +20,7 @@
     "./src/**/*",
     "./typings",
     "./typing.d.ts",
-    "src/tools/todowrite.ts"
-, "test-model.js"  ]
+    "src/tools/todowrite.ts",
+    "test-model.js"
+  ]
 }

@@ -24,7 +24,7 @@ function showCommands(): void {
     console.log('\n📖 Available Commands:\n');
 
     commands.forEach(cmd => {
-        const aliases = cmd.aliases ? ` (${cmd.aliases.join(', ')})` : '';
+        const aliases = cmd.aliases ? `(${cmd.aliases.join(', ')})` : '';
         console.log(`  ${cmd.name}${aliases.padEnd(15)} ${cmd.description}`);
     });
 
@@ -65,10 +65,12 @@ export async function smartInput(options: SmartInputOptions): Promise<SmartInput
             });
         });
 
-        // 监听 SIGINT (Ctrl+C)
+        // 修复：抛出错误而不是直接退出，让上层处理
         rl.on('SIGINT', () => {
             rl.close();
-            process.exit(0);
+            const cancelError = new Error('user cancelled');
+            (cancelError as any).cancelled = true;
+            reject(cancelError);
         });
 
         rl.on('error', (err) => {
@@ -137,9 +139,12 @@ export async function readWithCommandCompletion(
             resolve({ value: trimmed, history });
         });
 
+        // 修复：抛出错误而不是直接退出，让上层处理
         rl.on('SIGINT', () => {
             rl.close();
-            process.exit(0);
+            const cancelError = new Error('user cancelled');
+            (cancelError as any).cancelled = true;
+            reject(cancelError);
         });
 
         rl.on('error', reject);

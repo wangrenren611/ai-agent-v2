@@ -1,4 +1,7 @@
-import { BaseTool, ToolOutput } from "./base";
+import { BaseTool, ToolResult } from "./base";
+
+// 重新导出供外部使用
+export { BaseTool, ToolResult };
 
 /**
  * 工具注册表类
@@ -20,15 +23,6 @@ export class ToolRegistry {
      *
      * @param tool - 工具实例或工具数组
      * @throws 如果工具名称已存在
-     *
-     * @example
-     * ```ts
-     * // 注册单个工具
-     * ToolRegistry.register(new BashTool());
-     *
-     * // 批量注册工具
-     * ToolRegistry.register([new BashTool(), new GrepTool()]);
-     * ```
      */
     static register<T extends BaseTool<any>>(tool: T | T[]): void {
         const tools = Array.isArray(tool) ? tool : [tool];
@@ -122,35 +116,72 @@ export class ToolRegistry {
      * 执行指定工具
      *
      * @param name - 工具名称
-     * @param args - 工具参数
-     * @returns 执行结果
-     * @throws 如果工具不存在或参数无效
+     * @param args - 工具参数（字符串或对象形式）
+     * @returns 统一的工具执行结果
      */
-    static async execute(name: string, args: string): Promise<ToolOutput> {
+    static async execute(name: string, args: string | Record<string, unknown>): Promise<ToolResult> {
+        // 如果是字符串，解析为对象
+        const argsObj = typeof args === 'string' ? JSON.parse(args) : args;
         const tool = this.get(name);
 
         if (!tool) {
-           return `Tool "${name}" not found`;
+            return {
+                success: false,
+                error: `Tool "${name}" not found`,
+                metadata: { toolName: name },
+            };
         }
 
         const allowed = this.context.allowedTools;
         if (allowed && !allowed.includes(name)) {
-           return `Tool "${name}" is not allowed in this context`;
+            return {
+                success: false,
+                error: `Tool "${name}" is not allowed in this context`,
+                metadata: { toolName: name },
+            };
         }
-        
-        
-        
-       
-        const argsObj = JSON.parse(args);
-        
-        // 验证参数
-        const parsed = tool.schema.safeParse(argsObj);
-       
-        if (!parsed.success) {
-           return `Invalid arguments  ${parsed.error.errors.map((e: { message: string }) => e.message).join(', ')}`;
+
+        const startTime = Date.now();
+
+        try {
+            // 验证参数
+            const parsed = tool.schema.safeParse(argsObj);
+
+            if (!parsed.success) {
+                const errors = parsed.error.errors.map((e: { message: string }) => e.message).join(', ');
+                return {
+                    success: false,
+                    error: `Invalid arguments: ${errors}`,
+                    metadata: {
+                        toolName: name,
+                        duration: Date.now() - startTime,
+                    },
+                };
+            }
+
+            const result = await tool.execute(parsed.data);
+            const duration = Date.now() - startTime;
+
+            return {
+                ...result,
+                metadata: {
+                    ...result.metadata,
+                    toolName: name,
+                    duration,
+                },
+            };
+        } catch (error) {
+            const duration = Date.now() - startTime;
+            const errorMsg = error instanceof Error ? error.message : String(error);
+            return {
+                success: false,
+                error: `Tool execution error: ${errorMsg}`,
+                metadata: {
+                    toolName: name,
+                    duration,
+                },
+            };
         }
-        
-       return await tool.execute(parsed.data);
     }
 
 

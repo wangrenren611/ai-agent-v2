@@ -9,11 +9,23 @@ import EventEmitter from "events";
 import { LLMProvider, LLMResponse, Message, ToolCall, ToolSchema, StreamChunk } from "../providers/base";
 import { ScopedLogger } from "../util/log";
 import { SessionManager } from "../session-v2";
-import { ToolRegistry } from "../tool/registry";
+import { ToolRegistry, ToolResult } from "../tool/registry";
+import { Compaction } from "../session-v2/compaction";
 
+
+
+class ToolError extends Error {
+    constructor(data: Message) {
+        super(data.content || 'Tool execution failed');
+        this.name = 'ToolError';
+        this.data = data;
+    }
+
+    /** 工具执行结果数据 */
+    data: Message;
+}
 export interface AgentConfig {
     llmProvider: LLMProvider;
-    sessionManager: SessionManager;
     systemPrompt: string;
     /** 默认工具列表（可选），不传则使用 ToolRegistry 中所有工具 */
     defaultTools?: ToolSchema[];
@@ -29,6 +41,8 @@ export interface AgentConfig {
     toolTimeoutMs?: number;
     /** 连续错误次数上限，默认 2 */
     noProgressLimit?: number;
+    /** 会话 ID */
+    sessionId?: string;
 }
 
 export interface AgentRunOptions {
@@ -38,6 +52,8 @@ export interface AgentRunOptions {
     stream?: boolean;
     /** 流式回调函数 */
     streamCallback?: (chunk: StreamChunk) => void;
+    /** Abort signal for cancelling the request */
+    abortSignal?: AbortSignal;
 }
 
 export interface AgentResponse {
@@ -46,85 +62,178 @@ export interface AgentResponse {
     type?: Message['type'];
 }
 
+/**
+ * 检测是否为网络错误（可重试）
+ */
+function isNetworkError(error: unknown): boolean {
+    const msg = error instanceof Error ? error.message : String(error);
+    return (
+        msg.includes('fetch') ||
+        msg.includes('network') ||
+        msg.includes('ECONNRESET') ||
+        msg.includes('ETIMEDOUT') ||
+        msg.includes('socket hang up') ||
+        msg.includes('Failed to fetch') ||
+        msg.includes('Service Unavailable') ||
+        msg.includes('429') // Rate limit
+    );
+}
+
+/**
+ * 检测是否为取消错误
+ */
+function isAbortError(error: unknown): boolean {
+    const msg = error instanceof Error ? error.message : String(error);
+    return (
+        msg.includes('abort') ||
+        msg.includes('cancelled') ||
+        msg.includes('Aborted')
+    );
+}
+
 export default class Agent extends EventEmitter {
     private llmProvider: LLMProvider;
     private logger: ScopedLogger;
-    private sessionManager: SessionManager;
+    public readonly sessionManager: SessionManager;
     private systemPrompt: string;
     private defaultTools: ToolSchema[] | undefined;
     private maxLoop: number | null | undefined;
     private maxOutputTokens: number;
     private maxTokens: number;
     private noProgressLimit: number;
+    private compaction: Compaction;
 
     constructor(config: AgentConfig) {
         super();
         this.llmProvider = config.llmProvider;
-        this.sessionManager = config.sessionManager;
+        this.sessionManager = new SessionManager({
+            sessionId: config.sessionId || new Date().getTime().toString(),
+            llmProvider: this.llmProvider,
+        });
         this.systemPrompt = config.systemPrompt;
         this.defaultTools = config.defaultTools;
         this.logger = new ScopedLogger('Agent');
         this.maxLoop = config.maxLoop;
-
         const providerMaxOutput = this.llmProvider.maxOutputTokens;
         const providerMaxTokens = this.llmProvider.maxTokens;
         this.maxOutputTokens = Math.min(config.maxOutputTokens ?? providerMaxOutput, providerMaxOutput);
         this.maxTokens = Math.min(config.maxTokens ?? providerMaxTokens, providerMaxTokens);
         this.noProgressLimit = Math.max(0, config.noProgressLimit ?? 2);
-
         this.sessionManager.maxOutputTokens = this.maxOutputTokens;
         this.sessionManager.maxTokens = this.maxTokens;
+        this.compaction = new Compaction({
+            maxTokens: this.maxTokens,
+            maxOutputTokens: this.maxOutputTokens,
+            llmProvider: this.llmProvider,
+        });
+    }
+
+    start() {
+        this.sessionManager.init();
     }
 
     /**
      * 执行单个工具调用
+     * @returns 工具结果消息，如果执行失败返回包含错误的消息
      */
     private async executeToolCall(toolCall: ToolCall): Promise<Message> {
         const { name, arguments: args } = toolCall.function;
         if (!name) {
-            return {
+            throw new ToolError({
                 role: 'tool',
                 type: 'text',
                 content: 'Error: Tool name is empty',
                 tool_call_id: toolCall.id,
+            });
+        }
+
+        try {
+            const result = await ToolRegistry.execute(name, args);
+            const content = this.formatToolResult(result);
+
+            return {
+                role: 'tool',
+                type: 'text',
+                content,
+                tool_call_id: toolCall.id,
             };
+        } catch (error) {
+            // 工具执行错误不向上抛出，而是返回错误消息
+            const errorMsg = error instanceof Error ? error.message : String(error);
+            this.logger.error(`Tool "${name}" execution failed: ${errorMsg}`);
+
+            throw new ToolError({
+                role: 'tool',
+                type: 'text',
+                content: `Error: Tool execution failed - ${errorMsg}`,
+                tool_call_id: toolCall.id,
+            });
         }
+    }
 
-        const result = await ToolRegistry.execute(name, args);
-
-        let content: string;
-        if (typeof result === 'string') {
-            content = result;
+    /**
+     * 格式化工具结果为字符串内容
+     */
+    private formatToolResult(result: ToolResult): string {
+        if (result.success) {
+            // 成功：优先返回 data，其次返回 metadata
+            if (result.data !== undefined) {
+                if (typeof result.data === 'string') {
+                    return result.data;
+                }
+                return JSON.stringify(result.data, null, 2);
+            }
+            if (result.metadata) {
+                return JSON.stringify(result.metadata, null, 2);
+            }
+            return 'Tool executed successfully';
         } else {
-            content = JSON.stringify(result?.metadata ?? result ?? {});
+            // 失败：返回错误信息
+            return `Error: ${result.error || 'Unknown error'}`;
         }
-
-        return {
-            role: 'tool',
-            type: 'text',
-            content,
-            tool_call_id: toolCall.id,
-        };
     }
 
     /**
      * 处理工具调用，返回是否有工具被调用
+     * @returns { hasToolCalls: boolean, hasError: boolean }
      */
     private async handleToolCalls(
         llmResponse: LLMResponse,
         spinner: ReturnType<ScopedLogger['spinner']>
-    ): Promise<boolean> {
+    ): Promise<{ hasToolCalls: boolean; hasError: boolean }> {
         if (!llmResponse.tool_calls || llmResponse.tool_calls.length === 0) {
-            return false;
+            return { hasToolCalls: false, hasError: false };
         }
+        
+        const toolResults: Message[] = [];
+        let hasExecutionError = false;
+       
 
-        const toolResults = await Promise.all(
-            llmResponse.tool_calls.map(call => this.executeToolCall(call))
-        );
+        // 顺序执行工具调用（避免并发导致的资源竞争问题）
+        for (const call of llmResponse.tool_calls) {
+            try {
+                const result = await this.executeToolCall(call);
+                toolResults.push(result);
+                // 检查是否是错误结果
+            } catch (error:any) {
+                if (error instanceof ToolError) {
+                    toolResults.push(error.data);
+                    hasExecutionError = true;
+                } else {
+                    // 其他未知错误继续抛出
+                    toolResults.push({
+                        role: 'tool',
+                        type: 'text',
+                        content: `Error: Unknown tool execution error - ${error?.message}`,
+                        tool_call_id: call.id,
+                    });
+                }
+            }
+        }
 
         this.sessionManager.addMessage(toolResults);
 
-        // Bug修复：提取content字段进行拼接，而非直接join对象数组
+        // 提取 content 字段进行拼接
         const summaries = toolResults
             .map(r => {
                 const content = r.content ?? '';
@@ -132,8 +241,23 @@ export default class Agent extends EventEmitter {
             })
             .join(', ');
 
-        spinner.succeed(`Tool calls: ${summaries}`);
-        return true;
+        if (hasExecutionError) {
+            spinner.warn(`Tool calls completed with errors: ${summaries}`);
+        } else {
+            spinner.succeed(`Tool calls: ${summaries}`);
+        }
+
+        return { hasToolCalls: true, hasError: hasExecutionError };
+    }
+
+    /**
+     * 格式化错误消息，用于添加到对话历史
+     */
+    private formatErrorForHistory(error: Error, isNetworkError: boolean): string {
+        if (isNetworkError) {
+            return `[Network Error] Temporary connectivity issue. Previous task was interrupted. Please analyze the context and continue from the last valid state.`;
+        }
+        return `[Error] ${error.message}`;
     }
 
     /**
@@ -148,9 +272,11 @@ export default class Agent extends EventEmitter {
     ): Promise<AgentResponse | null> {
         const tools = options?.tools ?? this.defaultTools ?? [];
         let consecutiveErrorCount = 0;
+        let networkErrorCount = 0;
         let i = 0;
         const streamEnabled = options?.stream ?? false;
         const streamCallback = options?.streamCallback;
+        const externalAbortSignal = options?.abortSignal;
 
         // 添加用户消息
         this.sessionManager.addMessage({
@@ -170,8 +296,29 @@ export default class Agent extends EventEmitter {
                 };
             }
 
-            const llmMessages = await this.sessionManager.getMessages();
+            const meessages = this.sessionManager.getMessages();
+            const { totalUsed, usableLimit } = this.compaction.getToken(meessages);
+
+            this.logger.info(`totalUsed: ${totalUsed}/${usableLimit}`);
+
+            const { isCompacted, list: llmMessages } = await this.compaction.compact(meessages);
+
+            if (isCompacted) {
+                this.sessionManager.setMessages(llmMessages);
+            }
+
             const spinner = this.logger.spinner(`Thinking-${i}...`);
+
+            // 创建 AbortController 用于取消请求
+            const abortController = new AbortController();
+            const currentAbortSignal = externalAbortSignal || abortController.signal;
+
+            // 如果有外部 abortSignal，监听它以同步内部的 abortController
+            if (externalAbortSignal) {
+                externalAbortSignal.addEventListener('abort', () => {
+                    abortController.abort();
+                });
+            }
 
             try {
                 // 构建包装的流式回调，用于停止 spinner
@@ -198,6 +345,7 @@ export default class Agent extends EventEmitter {
                         max_tokens: this.maxOutputTokens,
                         stream: streamEnabled,
                         streamCallback: wrappedStreamCallback,
+                        abortSignal: currentAbortSignal,
                     }
                 );
 
@@ -207,48 +355,116 @@ export default class Agent extends EventEmitter {
 
                 this.sessionManager.addMessage(llmResponse);
 
-                const hasToolCalls = await this.handleToolCalls(llmResponse, spinner);
+                const { hasToolCalls, hasError: toolHasError } = await this.handleToolCalls(llmResponse, spinner);
+
+                if (toolHasError) {
+                    // 工具调用出现错误，LLM 需要根据错误信息决定下一步
+                    this.logger.warn('Tool execution had errors, continuing for LLM to handle');
+                    // 不增加 consecutiveErrorCount，因为工具错误是预期的处理流程
+                    continue;
+                }
 
                 if (!hasToolCalls) {
                     // 单次无工具调用即返回，无需继续循环
                     // 正常结束状态：'stop'、'eos'、undefined；其他值可能是异常
-                    const validEnd = ['stop', 'eos', undefined].includes(llmResponse.finishReason as string);
+                    const messages = this.sessionManager.getMessages();
+                    const lastMessageRole = messages[messages.length - 1].role;
+                    const lastMessageType = messages[messages.length - 1].type;
 
+                    const validEnd = ['stop', 'eos', undefined].includes(llmResponse.finishReason as string);
                     if (!validEnd) {
                         spinner.fail(`Unexpected finishReason: ${llmResponse.finishReason}`);
                         consecutiveErrorCount++;
+
+                        if (consecutiveErrorCount > this.noProgressLimit) {
+                            return {
+                                content: `Max error limit reached: unexpected finishReason "${llmResponse.finishReason}"`,
+                                role: 'assistant',
+                            };
+                        }
+                        // 继续循环，尝试让 LLM 恢复
                         continue;
-                    } else {
+                    } else if (lastMessageRole === 'assistant' && lastMessageType === 'text') {
 
-                        spinner.succeed(llmResponse?.content ?? '');
-
+                        spinner.succeed('\nTask success!');
+                        spinner.clear();
                         return {
                             content: llmResponse?.content ?? '',
                             role: 'assistant',
-                        }
+                        };
+                    } else if (lastMessageRole === 'assistant' && lastMessageType === 'summary') {
+                        continue;
                     }
-
                 }
 
                 // 工具调用成功，重置连续错误计数
                 consecutiveErrorCount = 0;
+                networkErrorCount = 0;
 
             } catch (error) {
                 const errorMsg = error instanceof Error ? error.message : String(error);
-                spinner.fail(errorMsg);
+                const isNetError = isNetworkError(error);
+                const isAbort = isAbortError(error);
+
+                // 处理取消
+                if (isAbort) {
+                    spinner.fail('Task cancelled');
+                    this.logger.info('Task cancelled by user');
+                    this.sessionManager.addMessage({
+                        role: 'assistant',
+                        type: 'text',
+                        content: '\n[Task cancelled - press Enter to continue]',
+                        tool_calls: undefined,
+                    });
+                    return {
+                        content: '[Task cancelled]',
+                        role: 'assistant',
+                    };
+                }
+
+                if (isNetError) {
+                    networkErrorCount++;
+                    spinner.warn(`Network error (attempt ${networkErrorCount}): ${errorMsg}`);
+
+                    // 网络错误：指数退避重试
+                    const maxNetworkRetries = 3;
+                    if (networkErrorCount > maxNetworkRetries) {
+                        this.logger.error(`Network error after ${maxNetworkRetries} retries`);
+                        this.sessionManager.addMessage({
+                            role: 'assistant',
+                            type: 'text',
+                            content: this.formatErrorForHistory(error instanceof Error ? error : new Error(errorMsg), true),
+                        });
+                        return {
+                            content: `Network error after ${maxNetworkRetries} attempts. Please check your connection.`,
+                            role: 'assistant',
+                        };
+                    }
+
+                    // 指数退避
+                    const backoffMs = Math.pow(2, networkErrorCount) * 1000;
+                    spinner.start(`Retrying in ${backoffMs / 1000}s...`);
+                    await new Promise(resolve => setTimeout(resolve, backoffMs));
+
+                    // 网络错误不增加 consecutiveErrorCount
+                    continue;
+                }
+
+                // 非网络错误
+                spinner.fail(`Error: ${errorMsg}`);
                 this.logger.error(`LLM call failed: ${errorMsg}`);
 
                 this.sessionManager.addMessage({
                     role: 'assistant',
                     type: 'text',
-                    content: `LLM error: ${errorMsg}`,
+                    content: this.formatErrorForHistory(error instanceof Error ? error : new Error(errorMsg), false),
                 });
 
                 consecutiveErrorCount++;
 
                 if (consecutiveErrorCount > this.noProgressLimit) {
                     return {
-                        content: `Max error limit reached: ${errorMsg}`,
+                        content: `Max error limit reached (${this.noProgressLimit} consecutive errors). Last error: ${errorMsg}`,
                         role: 'assistant',
                     };
                 }

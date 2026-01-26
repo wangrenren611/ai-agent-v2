@@ -2,6 +2,7 @@
  * 使用 Node.js 原生 readline 实现的输入处理器
  * 支持上/下箭头浏览历史记录
  * 输入 "/" 后显示可选择命令菜单
+ * 多行输入：直接粘贴 JSON/多行内容，以空行结束
  */
 import readline from 'readline';
 import { InputHistory } from './input';
@@ -15,6 +16,26 @@ export interface ReaderOptions {
 export interface ReaderResult {
     value: string;
     history: InputHistory;
+}
+
+/**
+ * 判断是否应该进入多行模式
+ */
+function shouldEnterMultiline(line: string): boolean {
+    const trimmed = line.trim();
+    // JSON 对象或数组开头
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+        return true;
+    }
+    // Python/Rust 等语言的闭包/函数开头
+    if (trimmed.endsWith(':') || trimmed.endsWith('{') || trimmed.endsWith('[')) {
+        return true;
+    }
+    // 显式的三引号标记
+    if (trimmed === '"""' || trimmed === "'''") {
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -137,9 +158,40 @@ export function createReader(options: ReaderOptions): Promise<ReaderResult> {
             tabSize: 2,
         });
 
+        let multilineMode = false;
+        let multilineContent: string[] = [];
+        const originalPrompt = options.prompt;
+
         rl.prompt();
 
         rl.on('line', (line: string) => {
+            // 多行模式
+            if (multilineMode) {
+                // 空行结束多行输入
+                if (line.trim() === '') {
+                    const multilineResult = multilineContent.join('\n');
+                    rl.close();
+                    resolve({
+                        value: multilineResult,
+                        history: options.history,
+                    });
+                    return;
+                }
+                // 收集内容
+                multilineContent.push(line);
+                rl.prompt();
+                return;
+            }
+
+            // 检测是否应该进入多行模式
+            if (shouldEnterMultiline(line)) {
+                multilineMode = true;
+                multilineContent = [line];
+                rl.setPrompt('      '); // 使用缩进提示符
+                rl.prompt();
+                return;
+            }
+
             const trimmed = line.trim();
 
             // 输入 "/" 时显示可选择命令菜单
@@ -154,6 +206,7 @@ export function createReader(options: ReaderOptions): Promise<ReaderResult> {
                         });
                     } else {
                         // 用户取消，继续等待输入
+                        rl.setPrompt(originalPrompt);
                         rl.prompt();
                     }
                 });
@@ -171,9 +224,12 @@ export function createReader(options: ReaderOptions): Promise<ReaderResult> {
             });
         });
 
+        // 处理 Ctrl+C
         rl.on('SIGINT', () => {
             rl.close();
-            process.exit(0);
+            const cancelError = new Error('user cancelled');
+            (cancelError as any).cancelled = true;
+            reject(cancelError);
         });
 
         rl.on('error', (err) => {

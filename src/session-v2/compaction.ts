@@ -1,28 +1,30 @@
 import { Message, LLMProvider } from "../providers/base";
+import { OpenAIProvider } from "../providers/openai";
 import { ScopedLogger } from "../util/log";
 
 export class Compaction {
   private readonly maxTokens: number;
   private readonly maxOutputTokens: number;
-  private readonly triggerRatio = 0.10; // 92% 触发压缩
-
+  private readonly triggerRatio = 0.92; // 92% 触发压缩
+  private  keepMessagesNum: number = 40; 
   logger: ScopedLogger;
-  private readonly llmProvider: LLMProvider;
+  llmProvider: LLMProvider;
 
-  constructor(config: { maxTokens: number; maxOutputTokens: number; llmProvider: LLMProvider }) {
+  constructor(config: { maxTokens: number; maxOutputTokens: number; llmProvider: LLMProvider;keepMessagesNum?:number }) {
     this.maxTokens = config.maxTokens;
     this.maxOutputTokens = config.maxOutputTokens;
-    this.llmProvider = config.llmProvider;
     this.logger = new ScopedLogger("Compaction");
+    this.llmProvider = config.llmProvider;
+    this.keepMessagesNum =config.keepMessagesNum||this.keepMessagesNum;
   }
 
-   getToken(history: Message[]){
+  getToken(history: Message[]) {
     const totalUsed = this.calculateTotalUsage(history);
     const usableLimit = this.maxTokens - this.maxOutputTokens;
-    console.log(totalUsed)
+
     return {
       totalUsed,
-     usableLimit:usableLimit*this.triggerRatio
+      usableLimit: usableLimit * this.triggerRatio
     }
   }
 
@@ -71,7 +73,7 @@ export class Compaction {
     return map;
   }
 
- 
+
 
   async compact(history: Message[]): Promise<{
     isCompacted: boolean,
@@ -80,9 +82,9 @@ export class Compaction {
   }> {
     const totalUsed = this.calculateTotalUsage(history);
     const usableLimit = this.maxTokens - this.maxOutputTokens;
-    const KEEP_RECENT_COUNT = 6;
+
     // 如果没达到 92% 的阈值，直接返回原数据
-    if (totalUsed < usableLimit * this.triggerRatio || history.length <= KEEP_RECENT_COUNT) {
+    if (totalUsed < usableLimit * this.triggerRatio || history.length <= this.keepMessagesNum) {
       return {
         isCompacted: false,
         summaryMessage: null,
@@ -96,11 +98,11 @@ export class Compaction {
       `[Compaction] 触发压缩。当前 Token: ${totalUsed}, 阈值: ${Math.floor(usableLimit * this.triggerRatio)}`
     );
 
-    let activeMessages = history.slice(-KEEP_RECENT_COUNT); // 保护区
-    let pendingMessages = history.slice(0, -KEEP_RECENT_COUNT); // 待压缩区
+    let activeMessages = history.slice(-this.keepMessagesNum); // 保护区
+    let pendingMessages = history.slice(0, -this.keepMessagesNum); // 待压缩区
 
     // 限制保护区的最大膨胀倍数（防止从 6 条膨胀到 100+ 条）
-    const MAX_ACTIVE_SIZE = KEEP_RECENT_COUNT * 2;
+    const MAX_ACTIVE_SIZE = this.keepMessagesNum * 2;
 
     // 检查保护区的所有 tool 消息，确保它们的配对 assistant 以及所有相关的 tool 回复都被保留
     // 需要处理多个 assistant 的情况（连续多次工具调用）
@@ -125,7 +127,7 @@ export class Compaction {
       // 计算分割点，用于判断 assistant 在哪个区域
       // history[:splitPoint] = pendingMessages
       // history[splitPoint:] = activeMessages
-      const splitPoint = history.length - KEEP_RECENT_COUNT;
+      const splitPoint = history.length - this.keepMessagesNum;
 
       // 修复：识别唯一需要处理的 assistant 索引
       // 这确保我们只处理每个 assistant 一次，但会收集该 assistant 的所有 tools
@@ -230,7 +232,7 @@ export class Compaction {
         // 检查是否超过最大限制
         if (newActiveMessages.length > MAX_ACTIVE_SIZE) {
           this.logger.warn(
-            `[Compaction] 保护区膨胀：从 ${KEEP_RECENT_COUNT} 条增长到 ${newActiveMessages.length} 条` +
+            `[Compaction] 保护区膨胀：从 ${this.keepMessagesNum} 条增长到 ${newActiveMessages.length} 条` +
             `(超过最大限制 ${MAX_ACTIVE_SIZE})，将进行裁剪`
           );
 
@@ -281,35 +283,31 @@ export class Compaction {
       .join("\n");
 
     // 5. 执行异步摘要
-    try {
+
       const newSummaryContent = await this.summarizer(
         textToSummarize,
         previousSummary,
       );
 
       const summaryMessage: Message = {
-        role: "system",
+        role: "assistant",
         type: "summary",
-        content: `[Historical Memory Snapshot]:\n${newSummaryContent}`,
+        content: `${newSummaryContent}`,
       };
 
       // 6. 重组历史
-      const newHistory = [summaryMessage, ...activeMessages];
+      const newHistory = [summaryMessage, ...activeMessages,{
+        role: "user" as const,
+        type: "text" as const,
+        content: "Confirm task completion. If the task is not finished, define the next actions and continue execution until all user requirements are satisfied.",
+      }];
 
       return {
         isCompacted: true,
         summaryMessage,
         list: newHistory
       };
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`[Compaction] 摘要生成失败: ${errorMsg}`);
-      return {
-        isCompacted: true,
-        summaryMessage: null,
-        list: history.slice(0, history.length - KEEP_RECENT_COUNT)
-      };
-    }
+  
   }
 
   /**
@@ -328,19 +326,22 @@ export class Compaction {
   private estimate(text: string): number {
     if (!text) return 0;
     return Math.ceil(
-      text.length/4,
+      text.length / 4,
     );
   }
 
   async summarizer(textToSummarize: string, previousSummary?: string) {
-    const spinner = this.logger.spinner("上下文压缩...");
 
-    try {
-      const llmResponse = await this.llmProvider.generate(
-        [
-          {
-            role: "user",
-            content: `You are an expert conversation compressor. Compress the conversation history into a structured summary organized in the following 8 sections:
+    
+
+    
+    const spinner = this.logger.spinner("上下文压缩...");
+  
+    const llmResponse = await this.llmProvider.generate(
+      [
+        {
+          role: "user",
+          content: `You are an expert conversation compressor. Compress the conversation history into a structured summary organized in the following 8 sections:
 1. **Primary Request and Intent**: What is the user's core goal?
 2. **Key Technical Concepts**: Frameworks, libraries, tech stacks, etc., involved in the conversation.
 3. **Files and Code Sections**: All file paths mentioned or modified.
@@ -350,9 +351,10 @@ export class Compaction {
 7. **Pending Tasks**: Work items that remain unfinished.
 8. **Current Work**: The progress at the point the conversation was interrupted.
 
-<previous_summary>
+${previousSummary?`<previous_summary>:
  ${previousSummary}
-</previous_summary>
+ </previous_summary>
+`:''}
 
 <current_mesage_history>
 ${textToSummarize}
@@ -363,21 +365,18 @@ ${textToSummarize}
 - Highlight key technical decisions and solutions
 - Ensure continuity of context
 - Retain all important file paths
-- Use concise English expression`,
-          },
-        ],
-        {
-          model: process.env.AI_MODEL,
-          max_tokens: 8000,
-          temperature: 0.3,
+- Use concise English expression
+`,
         },
-      );
-      spinner.succeed("上下文压缩成功");
-      return llmResponse?.content || '';
-    } catch (error: any) {
-      this.logger.error(error.toString());
+      ],
+      {
+        model: process.env.AI_MODEL,
+        max_tokens: 8000,
+        temperature: 0.3,
+      },
+    );
+    spinner.succeed("上下文压缩成功");
+    return llmResponse?.content || '';
 
-      spinner.fail("上下文压缩失败");
-    }
   }
 }

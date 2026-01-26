@@ -29,6 +29,7 @@ import { BatchReplaceTool } from './batch-replace';
 import TodoTools from './todo';
 import { initializeMcp } from '../mcp/index';
 import { WebSearchTool } from './web-search';
+import { WebFetchTool } from './web-fetch';
 import { SkillTool, initializeSkills } from '../skills';
 // import ExploreTool from './explore';
 // import TaskTool from './task';
@@ -59,6 +60,7 @@ export function registerDefaultTools(): void {
         new SurgicalEditTool(),
         new BatchReplaceTool(),
         new WebSearchTool(),
+        new WebFetchTool(),
         new SkillTool(),
         // new ExploreTool(),
         // new TaskTool(),

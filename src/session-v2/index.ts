@@ -1,7 +1,7 @@
 import path from "node:path";
 import { LLMProvider, Message } from "../providers/base";
 import fs, { mkdir } from 'node:fs/promises';
-import { Compaction } from "./compaction";
+
 
 export class SessionManager {
   id: string;
@@ -45,12 +45,11 @@ export class SessionManager {
       }
     } catch (_: any) {
       // 文件不存在或其他错误，忽略
-      console.log("NOT FOUND HISTORY")
+    //  console.log("NOT FOUND HISTORY")
     }
   }
 
   addMessage(message: Message | Message[]) {
-
     if (Array.isArray(message)) {
       for (const msg of message) {
         this.messageList.push(msg);
@@ -82,8 +81,16 @@ export class SessionManager {
     });
   }
 
-  async getMessages(): Promise<Message[]> {
+   getMessages(): Message[] {
     return this.messageList
+  }
+
+  async setMessages(messages: Message[]) {
+    this.messageList = messages;
+    await fs.writeFile(
+      path.join(this.sessionPath, 'messages.json'),
+      JSON.stringify(this.messageList, null, 2)
+    );
   }
 
   async clearAll() {

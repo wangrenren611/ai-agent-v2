@@ -24,6 +24,10 @@ export const handler: CommandHandler = {
         console.log('    /session list      List all sessions');
         console.log('    /session delete <id>  Delete a session');
         console.log('');
+        console.log('  Management Commands:');
+        console.log('    /permission, /perm  Open permission management interface');
+        console.log('    /session delete <id>  Delete a session');
+        console.log('');
         console.log('💡 Just type your message to chat with the agent!\n');
     },
 };

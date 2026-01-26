@@ -50,7 +50,8 @@
       "Bash(xargs kill:*)",
       "Bash(pnpm exec tsc:*)",
       "Bash(python3 -m json.tool:*)",
-      "Bash(pnpm vitest:*)"
+      "Bash(pnpm vitest:*)",
+      "Bash(npx vitest:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

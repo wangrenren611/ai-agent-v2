@@ -1,34 +1,27 @@
 import { z } from 'zod';
-import { BaseTool } from './base';
-
-/**
- * 定义特殊的结束信号
- * 外层循环捕获此异常以获取最终结果并跳出 while 循环
- */
+import { BaseTool, ToolResult } from './base';
 
 const schema = z.object({
-  finalAnswer: z.string()
-    .min(1, "Final answer cannot be empty.")
-    .describe('The final response to the user. Use this for both task results and simple greetings.'),
+  finalAnswer: z.string().min(1, "Final answer cannot be empty.").describe('The final response to the user'),
 });
 
 export default class CompleteTaskTool extends BaseTool<typeof schema> {
   name = 'complete_task';
-
-  description = 
-    "MANDATORY: Call this tool to deliver your final response and end the process. " +
-    "This includes answers to complex tasks, simple questions, or greetings.";
+  description = "MANDATORY: Call this tool to deliver your final response and end the process.";
 
   schema = schema;
 
-  async execute(input: z.infer<typeof schema>): Promise<string> {
-    const { finalAnswer} = input;
+  async execute(input: z.infer<typeof schema>): Promise<ToolResult> {
+    const { finalAnswer } = input;
 
-    // 1. 业务逻辑校验
-    if (!finalAnswer.length ) {
-      return "Error: The final answer is too short. Please provide a more complete response.";
+    // === 业务错误：答案太短 ===
+    if (!finalAnswer.length) {
+      return this.fail(
+        'ANSWER_TOO_SHORT',
+        { message: 'The final answer is too short. Please provide a more complete response.' }
+      );
     }
 
-    return finalAnswer;
+    return this.success({ finalAnswer });
   }
 }
