@@ -3559,3 +3559,16 @@
   "content": "The previous response was empty. Please continue with your task - describe what you were trying to do or ask for help."
 }
 ```
+```
+{
+  "content": "",
+  "role": "assistant",
+  "type": "text",
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "finishReason": "stop"
+}
+```
