@@ -10,6 +10,11 @@ import {
   LLMOptions,
   Message,
 } from './base';
+import {
+  LLMError,
+  createErrorFromStatus,
+  isAbortedError,
+} from './errors';
 
 // =============================================================================
 // 类型定义
@@ -212,24 +217,20 @@ export class OpenAIProvider extends LLMProvider {
       return null;
     }
 
-    try {
-      const requestBody = this.buildRequestBody({
-        messages,
-        model: options?.model,
-        maxTokens: options?.max_tokens,
-        temperature: options?.temperature,
-        tools: options?.tools,
-        stream: options?.stream,
-      });
+    const requestBody = this.buildRequestBody({
+      messages,
+      model: options?.model,
+      maxTokens: options?.max_tokens,
+      temperature: options?.temperature,
+      tools: options?.tools,
+      stream: options?.stream,
+    });
 
-      if (options?.stream) {
-        return await this.generateStream(requestBody, options.streamCallback, options?.abortSignal);
-      }
-
-      return await this.generateNonStream(requestBody, options?.abortSignal);
-    } catch (error) {
-      return this.handleError(error);
+    if (options?.stream) {
+      return await this.generateStream(requestBody, options.streamCallback, options?.abortSignal);
     }
+
+    return await this.generateNonStream(requestBody, options?.abortSignal);
   }
 
   private buildRequestBody(params: {
@@ -260,6 +261,11 @@ export class OpenAIProvider extends LLMProvider {
   private async fetchCompletion(body: Record<string, unknown>, abortSignal?: AbortSignal): Promise<Response> {
     const url = `${this.baseURL}${CHAT_COMPLETIONS_PATH}`;
 
+    // 打印请求详情用于调试
+    console.log('=== API Request ===');
+    console.log('URL:', url);
+    console.log('Model:', body.model);
+
     const response = await fetch(url, {
       method: 'POST',
       headers: createHeaders(this.config.apiKey || '', this.organization),
@@ -267,12 +273,32 @@ export class OpenAIProvider extends LLMProvider {
       signal: abortSignal,
     });
 
+    console.log('=== API Response ===');
+    console.log('Status:', response.status, response.statusText);
+
+    // 检查 HTTP 错误状态，并在非流式模式下抛出异常
+    // 流式模式下会在 generateStream 中单独处理
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error Response Body:', errorText);
+
+      // 检查是否是 AbortError
+      if (abortSignal?.aborted) {
+        const abortError = new LLMError('Request was aborted', 'ABORTED');
+        throw abortError;
+      }
+
+      // 根据状态码创建对应的错误
+      throw createErrorFromStatus(response.status, response.statusText, errorText);
+    }
+
     return response;
   }
 
   private async generateNonStream(requestBody: Record<string, unknown>, abortSignal?: AbortSignal): Promise<LLMResponse> {
+ 
     const response = await this.fetchCompletion(requestBody, abortSignal);
-
+  
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
@@ -289,10 +315,29 @@ export class OpenAIProvider extends LLMProvider {
     const content = message.content || choice.content || '';
     const finishReason = choice.finish_reason;
 
-    if(!content&&!message?.tool_calls?.length){
-      throw new Error('Empty content in response');
+    console.log(message);
+
+    // 🔧 P0 修复: 优先检测 Token 异常（更严重的 API 故障）
+    const promptTokens = data.usage?.prompt_tokens || 0;
+    const completionTokens = data.usage?.completion_tokens || 0;
+    const totalTokens = data.usage?.total_tokens || 0;
+
+    if (totalTokens === 0 || (promptTokens === 0 && completionTokens === 0)) {
+      throw new Error('API returned zero tokens - possible service malfunction or incomplete response');
     }
-    
+
+    // 🔧 修复: 只在完全无效时抛出错误（既没有 content 也没有 tool_calls 且 finishReason 不是 'stop'）
+    const hasToolCalls = message?.tool_calls?.length > 0;
+    if (!content && !hasToolCalls && finishReason !== 'stop') {
+      throw new Error('Empty content in response without tool calls or stop reason');
+    }
+
+    // 如果是空 content + finishReason: 'stop'，发出警告但不抛出错误
+    // 让 Agent 层的空响应处理逻辑来处理这种情况
+    if (!content && !hasToolCalls && finishReason === 'stop') {
+      console.warn('Empty response with finishReason: stop - this will be handled by Agent layer');
+    }
+
     return {
       content: content,
       role: 'assistant',
@@ -306,9 +351,9 @@ export class OpenAIProvider extends LLMProvider {
         },
       })),
       usage: {
-        prompt_tokens: data.usage?.prompt_tokens || 0,
-        completion_tokens: data.usage?.completion_tokens || 0,
-        total_tokens: data.usage?.total_tokens || 0,
+        prompt_tokens: promptTokens,
+        completion_tokens: completionTokens,
+        total_tokens: totalTokens,
       },
       finishReason: finishReason || undefined,
     };
@@ -319,12 +364,15 @@ export class OpenAIProvider extends LLMProvider {
     streamCallback?: LLMOptions['streamCallback'],
     abortSignal?: AbortSignal
   ): Promise<LLMResponse | null> {
-    const response = await this.fetchCompletion(requestBody, abortSignal);
 
+    const response = await this.fetchCompletion(requestBody, abortSignal);
+    // fetchCompletion 已经处理了 HTTP 错误，这里只需要检查 body
+    
     if (!response.body) {
-      throw new Error('Response body is not readable');
+      throw new LLMError('Response body is not readable', 'NO_BODY');
     }
 
+    
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
 
@@ -355,14 +403,30 @@ export class OpenAIProvider extends LLMProvider {
       });
     } catch (error) {
       console.error('Stream processing error:', error);
-      return this.handleError(error);
+      // 重新抛出异常，让上层 Agent 处理
+      throw error;
+    }
+
+    // 🔧 P0 修复: 只检测完全无效的响应（既没有 content 也没有 tool_calls 且 finishReason 不是 'stop'）
+    // 注意：空 content + finishReason: 'stop' 是有效的，由 Agent 层处理
+    const hasToolCalls = toolCallsMap.size > 0;
+    if (!accumulatedContent && !hasToolCalls && finishReason !== 'stop') {
+      // 完全空的响应且不是正常结束
+      console.warn('Stream ended with no content, no tool calls, and finishReason:', finishReason);
+      throw new Error('Empty content in response without tool calls or stop reason');
+    }
+
+    // 如果是空 content + finishReason: 'stop'，发出警告但不抛出错误
+    // 让 Agent 层的空响应处理逻辑来处理这种情况
+    if (!accumulatedContent && !hasToolCalls && finishReason === 'stop') {
+      console.warn('Stream ended with empty content and finishReason: stop - will be handled by Agent layer');
     }
 
     return {
-      content: accumulatedContent,
+      content: accumulatedContent || '',  // 确保返回空字符串而非 undefined
       role: 'assistant',
       type: 'text',
-      tool_calls: toolCallsMap.size > 0 ? [...toolCallsMap.values()] : undefined,
+      tool_calls: hasToolCalls ? [...toolCallsMap.values()] : undefined,
       usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
       finishReason,
     };
@@ -382,6 +446,7 @@ export class OpenAIProvider extends LLMProvider {
 
     while (!shouldStop) {
       const { done, value } = await reader.read();
+ 
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
@@ -390,8 +455,10 @@ export class OpenAIProvider extends LLMProvider {
 
       for (const line of lines) {
         const data = parseSseLine(line);
-        if (!data) continue;
 
+        if (!data) continue;
+        
+        
         if (isStreamEnd(data)) {
           shouldStop = true;
           break;
@@ -430,18 +497,5 @@ export class OpenAIProvider extends LLMProvider {
         }
       }
     }
-  }
-
-  private handleError(error: unknown): LLMResponse {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`OpenAI API error: ${errorMessage}`);
-
-    return {
-      content: `LLM API error: ${errorMessage}`,
-      role: 'assistant',
-      type: 'text',
-      finishReason: 'error',
-      usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-    };
   }
 }

@@ -1,0 +1,196 @@
+src/agent/index.test.ts(127,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(139,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(153,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(204,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(219,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(258,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(282,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(308,39): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(327,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(346,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(376,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(400,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(424,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(457,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(484,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(519,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(565,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(591,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(602,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(623,13): error TS2741: Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(645,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(664,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(699,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/agent/index.test.ts(721,35): error TS2345: Argument of type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' is not assignable to parameter of type 'LLMProvider'.
+  Property 'config' is missing in type '{ maxOutputTokens: number; maxTokens: number; generate: Mock<(_messages: Message[], _options?: any) => Promise<LLMResponse | null>>; getCallCount: () => number; reset: () => void; }' but required in type 'LLMProvider'.
+src/cli-ink/App.tsx(5,45): error TS2307: Cannot find module 'ink' or its corresponding type declarations.
+src/cli-ink/App.tsx(6,44): error TS6142: Module './context' was resolved to 'D:/work/ai-agent-v2/src/cli-ink/context.tsx', but '--jsx' is not set.
+src/cli-ink/App.tsx(7,23): error TS6142: Module './components/Input' was resolved to 'D:/work/ai-agent-v2/src/cli-ink/components/Input.tsx', but '--jsx' is not set.
+src/cli-ink/App.tsx(8,38): error TS6142: Module './components/MessageList' was resolved to 'D:/work/ai-agent-v2/src/cli-ink/components/MessageList.tsx', but '--jsx' is not set.
+src/cli-ink/App.tsx(10,25): error TS2307: Cannot find module '@inkjs/ui' or its corresponding type declarations.
+src/cli-ink/App.tsx(11,19): error TS2307: Cannot find module '../../agent' or its corresponding type declarations.
+src/cli-ink/App.tsx(61,34): error TS7006: Parameter 'chunk' implicitly has an 'any' type.
+src/cli-ink/App.tsx(93,15): error TS7006: Parameter 'input' implicitly has an 'any' type.
+src/cli-ink/App.tsx(93,22): error TS7006: Parameter 'key' implicitly has an 'any' type.
+src/cli-ink/App.tsx(100,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/App.tsx(102,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/App.tsx(105,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/App.tsx(109,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/App.tsx(110,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/App.tsx(110,42): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/App.tsx(111,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/App.tsx(116,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/App.tsx(123,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/App.tsx(124,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/commands.ts(5,31): error TS6142: Module './context' was resolved to 'D:/work/ai-agent-v2/src/cli-ink/context.tsx', but '--jsx' is not set.
+src/cli-ink/components/Input.tsx(5,45): error TS2307: Cannot find module 'ink' or its corresponding type declarations.
+src/cli-ink/components/Input.tsx(6,31): error TS2307: Cannot find module './context' or its corresponding type declarations.
+src/cli-ink/components/Input.tsx(7,32): error TS2307: Cannot find module './commands' or its corresponding type declarations.
+src/cli-ink/components/Input.tsx(8,25): error TS2307: Cannot find module '@inkjs/ui' or its corresponding type declarations.
+src/cli-ink/components/Input.tsx(28,15): error TS7006: Parameter 'input' implicitly has an 'any' type.
+src/cli-ink/components/Input.tsx(28,22): error TS7006: Parameter 'key' implicitly has an 'any' type.
+src/cli-ink/components/Input.tsx(119,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/Input.tsx(122,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/Input.tsx(124,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/Input.tsx(138,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/Input.tsx(139,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/Input.tsx(140,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/Input.tsx(142,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/Input.tsx(142,43): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(5,27): error TS2307: Cannot find module 'ink' or its corresponding type declarations.
+src/cli-ink/components/MessageList.tsx(6,31): error TS6142: Module '../context' was resolved to 'D:/work/ai-agent-v2/src/cli-ink/context.tsx', but '--jsx' is not set.
+src/cli-ink/components/MessageList.tsx(22,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(24,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(62,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(63,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(66,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(72,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(77,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(88,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(89,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(92,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(95,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(98,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/components/MessageList.tsx(99,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/context.tsx(5,24): error TS2307: Cannot find module '../../agent' or its corresponding type declarations.
+src/cli-ink/context.tsx(130,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/cli-ink/index.ts(4,18): error TS2305: Module '"./App"' has no exported member 'createInkCLI'.
+src/cli-ink/index.ts(4,38): error TS6142: Module './App' was resolved to 'D:/work/ai-agent-v2/src/cli-ink/App.tsx', but '--jsx' is not set.
+src/cli-ink/index.ts(5,44): error TS6142: Module './context' was resolved to 'D:/work/ai-agent-v2/src/cli-ink/context.tsx', but '--jsx' is not set.
+src/cli-ink/index.ts(6,23): error TS6142: Module './components/Input' was resolved to 'D:/work/ai-agent-v2/src/cli-ink/components/Input.tsx', but '--jsx' is not set.
+src/cli-ink/index.ts(7,38): error TS6142: Module './components/MessageList' was resolved to 'D:/work/ai-agent-v2/src/cli-ink/components/MessageList.tsx', but '--jsx' is not set.
+src/context/agent-context.ts(168,13): error TS2564: Property 'cacheConfig' has no initializer and is not definitely assigned in the constructor.
+src/tool/batch-replace.test.ts(99,27): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(100,27): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(118,27): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(190,27): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(191,27): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(217,27): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(333,27): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(334,27): error TS2339: Property 'results' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(347,27): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(360,27): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(361,27): error TS2339: Property 'results' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(378,27): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(379,27): error TS2339: Property 'results' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(396,27): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(397,27): error TS2339: Property 'results' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(412,27): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(413,27): error TS2339: Property 'results' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(426,27): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(439,27): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(456,27): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(457,27): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(717,27): error TS2339: Property 'backupId' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(733,27): error TS2339: Property 'backupId' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(749,27): error TS2339: Property 'results' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(750,27): error TS2339: Property 'results' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(751,27): error TS2339: Property 'results' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(756,27): error TS2339: Property 'results' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(807,27): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(839,27): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/batch-replace.test.ts(898,27): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(89,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(90,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(98,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(99,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(100,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(101,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(109,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(110,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(117,27): error TS2339: Property 'range' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(130,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(131,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(132,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(188,27): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(353,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(380,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(401,31): error TS2339: Property 'range' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(402,31): error TS2339: Property 'range' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(416,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(465,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(490,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(518,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(555,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(606,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(703,31): error TS2339: Property 'range' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(704,31): error TS2339: Property 'range' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(719,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(759,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(796,32): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(817,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(818,32): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(837,32): error TS2339: Property 'modifiedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(838,32): error TS2339: Property 'failedCount' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(866,27): error TS2339: Property 'backupId' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(887,27): error TS2339: Property 'backupId' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(909,32): error TS2339: Property 'backupId' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(913,30): error TS2339: Property 'content' does not exist on type '{}'.
+src/tool/file-and-batch-replace-integration.test.ts(916,39): error TS2339: Property 'backupId' does not exist on type '{}'.
+src/tool/surgical.test.ts(94,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(115,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(131,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(149,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(165,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(183,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(199,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(217,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(236,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(255,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(401,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(434,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(449,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(464,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(484,27): error TS2339: Property 'backupId' does not exist on type '{}'.
+src/tool/surgical.test.ts(500,27): error TS2339: Property 'backupId' does not exist on type '{}'.
+src/tool/surgical.test.ts(501,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(518,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(536,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(554,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(572,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(649,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(669,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(691,27): error TS2339: Property 'message' does not exist on type '{}'.
+src/tool/surgical.test.ts(711,27): error TS2339: Property 'message' does not exist on type '{}'.

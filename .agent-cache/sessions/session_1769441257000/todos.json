@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1",
+    "content": "探索项目整体结构和文件组织",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "2",
+    "content": "分析核心架构和设计模式",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "3",
+    "content": "审查依赖关系和技术栈",
+    "status": "completed",
+    "priority": "medium"
+  },
+  {
+    "id": "4",
+    "content": "分析代码质量和潜在问题",
+    "status": "completed",
+    "priority": "medium"
+  },
+  {
+    "id": "5",
+    "content": "总结项目特点和改进建议",
+    "status": "completed",
+    "priority": "medium"
+  }
+]

@@ -1,4 +1,5 @@
 import { BaseTool, ToolResult } from "./base";
+import { AgentContext } from "../context";
 
 // 重新导出供外部使用
 export { BaseTool, ToolResult };
@@ -12,9 +13,31 @@ export class ToolRegistry {
     /** 已注册的工具映射 */
     private static tools: Map<string, BaseTool<any>> = new Map();
     private static context: { sessionId?: string; sessionPath?: string; allowedTools?: string[] } = {};
+    /** AgentContext 实例 */
+    private static agentContext: AgentContext | null = null;
 
     /** 私有构造函数，防止外部实例化 */
     private constructor() {}
+
+    /**
+     * 设置 AgentContext 实例
+     */
+    static setAgentContext(context: AgentContext): void {
+        this.agentContext = context;
+
+        // 自动同步 sessionId
+        this.setContext({
+            sessionId: context.sessionId,
+            sessionPath: context.sessionDir,
+        });
+    }
+
+    /**
+     * 获取 AgentContext 实例
+     */
+    static getAgentContext(): AgentContext | null {
+        return this.agentContext;
+    }
 
     /**
      * 注册工具
@@ -31,6 +54,11 @@ export class ToolRegistry {
                 throw new Error(`Tool "${t.name}" is already registered`);
             }
             this.tools.set(t.name, t);
+
+            // 注入 context 到工具实例
+            if (this.agentContext) {
+                t.sessionId = this.agentContext.sessionId;
+            }
         }
     }
 
@@ -106,6 +134,11 @@ export class ToolRegistry {
             delete (next as any).allowedTools;
         }
         this.context = next;
+
+        // 同步到所有工具实例
+        for (const tool of this.tools.values()) {
+            tool.sessionId = next.sessionId;
+        }
     }
 
     static getContext(): { sessionId?: string; sessionPath?: string; allowedTools?: string[] } {
@@ -139,6 +172,21 @@ export class ToolRegistry {
                 error: `Tool "${name}" is not allowed in this context`,
                 metadata: { toolName: name },
             };
+        }
+
+        // 通过 AgentContext 检查是否需要确认
+        if (this.agentContext) {
+            const permission = await this.agentContext.canExecuteTool(name, argsObj);
+            if (!permission.allowed) {
+                return {
+                    success: false,
+                    error: permission.reason || `Tool "${name}" was not executed`,
+                    metadata: {
+                        toolName: name,
+                        requiresConfirmation: permission.requiresConfirmation,
+                    },
+                };
+            }
         }
 
         const startTime = Date.now();

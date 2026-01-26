@@ -287,6 +287,7 @@ Example: {"op": "delete", "id": "t_1"}`;
       added_ids,
       updated_ids,
       deleted_ids,
+      todos: nextTodos,
     });
   }
 }

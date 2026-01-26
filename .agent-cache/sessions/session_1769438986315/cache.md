@@ -1,0 +1,19 @@
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "深度测试当前项目核心逻辑"
+}
+```
+```
+{
+  "content": "",
+  "role": "assistant",
+  "type": "text",
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  }
+}
+```

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "t_1",
+    "content": "P0: 修复 TypedEventBus.createScopedBus 不存在问题",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "t_2",
+    "content": "P0: 修复中间件上下文传递不匹配",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "t_3",
+    "content": "P0: 修复超时中间件逻辑错误",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "t_4",
+    "content": "P0: 修复错误消息编码问题",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "id": "t_5",
+    "content": "P1: 优化测试断言逻辑",
+    "status": "completed",
+    "priority": "medium"
+  },
+  {
+    "id": "t_6",
+    "content": "P1: 调整性能测试期望值",
+    "status": "completed",
+    "priority": "medium"
+  },
+  {
+    "id": "t_7",
+    "content": "P1: 添加中间件优先级支持",
+    "status": "completed",
+    "priority": "medium"
+  },
+  {
+    "id": "t_8",
+    "content": "P2: 性能优化",
+    "status": "completed",
+    "priority": "low"
+  }
+]

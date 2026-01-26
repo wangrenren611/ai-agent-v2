@@ -34,7 +34,8 @@ export class CLI {
 
     constructor(config: CLIConfig) {
         this.agent = config.agent;
-        this.sessionId = { value: config.sessionId || 'session_10001' };
+        // 使用 AgentContext 中的 sessionId
+        this.sessionId = { value: config.sessionId || this.agent.context.sessionId };
         this.promptText = config.prompt || 'You';
         this.running = false;
         this.logger = new ScopedLogger('CLI');
@@ -227,6 +228,9 @@ export class CLI {
         // 更新运行状态
         this.running = context.running.value;
 
+        // 同步 sessionId 从 AgentContext
+        this.sessionId.value = this.agent.context.sessionId;
+
         if (!isCommand) {
             await this.handleChat(input);
         }
@@ -301,6 +305,8 @@ export class CLI {
             this.isProcessingTask = false;
             this.abortController = null;
             this.stopEscListener();
+            spinner?.stop();
+       
         }
     }
 
@@ -311,6 +317,8 @@ export class CLI {
         console.log('\n╔════════════════════════════════════════════════╗');
         console.log('║       AI Agent - Interactive Mode              ║');
         console.log('╚════════════════════════════════════════════════╝');
+        console.log(`Session: ${this.agent.context.sessionId}`);
+        console.log(`Cache: ${this.agent.context.cacheRoot}`);
         console.log('Type /help for available commands');
         console.log('Press ESC or Ctrl+C to cancel current task');
         console.log('Press Ctrl+C twice to exit');

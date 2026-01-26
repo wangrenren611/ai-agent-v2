@@ -8,6 +8,7 @@ import Agent from './agent';
 import { CLI } from './cli';
 import { registerDefaultToolsAsync, ToolRegistry } from './tool';
 import { operatorPrompt } from './prompts/operator';
+import { setAgentContext } from './context';
 
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}`, override: true });
@@ -41,16 +42,24 @@ async function initializeApp(config: AppConfig) {
 
     console.log(`Available tools:\n${ToolRegistry.getSchemas().map(tool => `'${tool.function.name}'`).join("\n")}`);
 
-    const sessionId = new Date().getTime().toString();
-
+    // 创建 Agent（内部会创建 AgentContext）
     const agent = new Agent({
         llmProvider,
         systemPrompt: customPrompt,
         defaultTools: ToolRegistry.getSchemas(),
-        sessionId,
+        sessionId:'session_1769441776991'
     });
+
+    // 设置全局 AgentContext 单例（供 ToolRegistry 等使用）
+    setAgentContext(agent.context);
+
     agent.start();
-    return { agent, sessionId };
+
+    console.log(`[App] Initialized with session: ${agent.context.sessionId}`);
+    console.log(`[App] Cache directory: ${agent.context.cacheRoot}`);
+    console.log(`[App] Session directory: ${agent.context.sessionDir}`);
+
+    return { agent, sessionId: agent.context.sessionId };
 }
 
 /**
@@ -79,7 +88,7 @@ async function main() {
     }
 
     if (!deepseekBaseUrl) {
-        throw new Error('DEEPSEEK_BASE_URL is not set');
+        throw new Error('DEEEPSEEK_BASE_URL is not set');
     }
 
     // 初始化应用

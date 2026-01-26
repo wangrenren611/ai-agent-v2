@@ -1,0 +1,1947 @@
+
+> ai-agent-v2@1.0.1 test D:\work\ai-agent-v2
+> vitest
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mD:/work/ai-agent-v2[39m
+
+[90mstderr[2m | src/providers/openai.test.ts[2m > [22m[2mOpenAIProvider[2m > [22m[2mgenerate - non-streaming[2m > [22m[2mshould handle API error response
+[22m[39mOpenAI API error: API request failed: 401 undefined - Invalid API key
+
+[90mstderr[2m | src/providers/openai.test.ts[2m > [22m[2mOpenAIProvider[2m > [22m[2mgenerate - non-streaming[2m > [22m[2mshould handle network error
+[22m[39mOpenAI API error: Network error
+
+[90mstderr[2m | src/providers/openai.test.ts[2m > [22m[2mOpenAIProvider[2m > [22m[2mgenerate - streaming[2m > [22m[2mshould handle empty response body
+[22m[39mOpenAI API error: Response body is not readable
+
+[90mstderr[2m | src/providers/openai.test.ts[2m > [22m[2mOpenAIProvider[2m > [22m[2merror handling[2m > [22m[2mshould handle 4xx errors
+[22m[39mOpenAI API error: API request failed: 400 undefined - Bad request
+
+[90mstderr[2m | src/providers/openai.test.ts[2m > [22m[2mOpenAIProvider[2m > [22m[2merror handling[2m > [22m[2mshould handle 5xx errors
+[22m[39mOpenAI API error: API request failed: 500 undefined - Internal server error
+
+[90mstderr[2m | src/providers/openai.test.ts[2m > [22m[2mOpenAIProvider[2m > [22m[2merror handling[2m > [22m[2mshould handle timeout-like errors
+[22m[39mOpenAI API error: Request timeout
+
+[90mstderr[2m | src/providers/openai.test.ts[2m > [22m[2mOpenAIProvider[2m > [22m[2mresponse edge cases[2m > [22m[2mshould handle null content in response
+[22m[39mOpenAI API error: Empty content in response
+
+ [31m❯[39m src/providers/openai.test.ts [2m([22m[2m19 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 24[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mconstructor[2m > [22mshould initialize with default values[32m 2[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mconstructor[2m > [22mshould use custom config values[32m 0[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mgenerate - non-streaming[2m > [22mshould return response on successful API call[32m 2[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mgenerate - non-streaming[2m > [22mshould handle tool calls in response[32m 1[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mgenerate - non-streaming[2m > [22mshould handle API error response[32m 1[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mgenerate - non-streaming[2m > [22mshould handle network error[32m 1[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mgenerate - non-streaming[2m > [22mshould pass custom model and options[32m 0[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mgenerate - non-streaming[2m > [22mshould include tools in request when provided[32m 0[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mgenerate - streaming[2m > [22mshould handle streaming response[32m 2[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mgenerate - streaming[2m > [22mshould accumulate tool calls across chunks[32m 1[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mgenerate - streaming[2m > [22mshould handle empty response body[32m 1[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mmessage cleaning[2m > [22mshould filter out unsupported message fields[32m 0[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22merror handling[2m > [22mshould handle 4xx errors[32m 0[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22merror handling[2m > [22mshould handle 5xx errors[32m 0[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22merror handling[2m > [22mshould handle timeout-like errors[32m 0[2mms[22m[39m
+[31m   [31m×[31m OpenAIProvider[2m > [22mresponse edge cases[2m > [22mshould handle null content in response[39m[32m 8[2mms[22m[39m
+[31m     → expected 'LLM API error: Empty content in respo…' to be '' // Object.is equality[39m
+   [32m✓[39m OpenAIProvider[2m > [22mresponse edge cases[2m > [22mshould handle empty tool_calls array[32m 0[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mresponse edge cases[2m > [22mshould use default usage when missing[32m 0[2mms[22m[39m
+   [32m✓[39m OpenAIProvider[2m > [22mresponse edge cases[2m > [22mshould handle missing finish_reason[32m 0[2mms[22m[39m
+[90mstdout[2m | src/session-v2/compaction.edge-cases.test.ts[2m > [22m[2mCompaction - 边缘场景测试[2m > [22m[2m场景1: 多次连续工具调用[2m > [22m[2m应该处理两个不同的 assistant 消息的 tool 回复
+[22m[39mFound 2 assistants with tool_calls
+Found 4 tool replies
+
+- [Compaction] 上下文压缩...
+[90mstdout[2m | src/session-v2/compaction.edge-cases.test.ts[2m > [22m[2mCompaction - 边缘场景测试[2m > [22m[2m场景2: tool 回复顺序问题[2m > [22m[2m应该按 tool_calls 的顺序添加 tool 回复
+[22m[39m[2026-01-26T12:52:41.342Z] [INFO] [Compaction] [Compaction] 触发压缩。当前 Token: 9923, 阈值: 5520
+[2026-01-26T12:52:41.343Z] [INFO] [Compaction] [Compaction] 处理 assistant（索引 120）：3 个 tool_calls，收集到 3 个 tool 回复
+[2026-01-26T12:52:41.344Z] [INFO] [Compaction] [Compaction] 已将 1 个 assistant 和 3 个 tool 回复移到保护区（保护区大小：40）
+
+[32m✔[39m 上下文压缩成功
+- [Compaction] 上下文压缩...
+[90mstdout[2m | src/session-v2/compaction.edge-cases.test.ts[2m > [22m[2mCompaction - 边缘场景测试[2m > [22m[2m场景2: tool 回复顺序问题[2m > [22m[2m应该按 tool_calls 的顺序添加 tool 回复
+[22m[39m
+=== 压缩后的消息列表 ===
+[0] role=assistant, Summary of conversat
+[1] role=assistant, [assistant with 3 tool_calls]
+[2] role=tool, call_A
+[3] role=tool, call_B
+[4] role=tool, call_C
+[5] role=user, Message 86 with lots
+[6] role=user, Message 87 with lots
+[7] role=user, Message 88 with lots
+[8] role=user, Message 89 with lots
+[9] role=user, Message 90 with lots
+[10] role=user, Message 91 with lots
+[11] role=user, Message 92 with lots
+[12] role=user, Message 93 with lots
+[13] role=user, Message 94 with lots
+[14] role=user, Message 95 with lots
+[15] role=user, Message 96 with lots
+[16] role=user, Message 97 with lots
+[17] role=user, Message 98 with lots
+[18] role=user, Message 99 with lots
+[19] role=user, Message 100 with lot
+[20] role=user, Message 101 with lot
+[21] role=user, Message 102 with lot
+[22] role=user, Message 103 with lot
+[23] role=user, Message 104 with lot
+[24] role=user, Message 105 with lot
+[25] role=user, Message 106 with lot
+[26] role=user, Message 107 with lot
+[27] role=user, Message 108 with lot
+[28] role=user, Message 109 with lot
+[29] role=user, Message 110 with lot
+[30] role=user, Message 111 with lot
+[31] role=user, Message 112 with lot
+[32] role=user, Message 113 with lot
+[33] role=user, Message 114 with lot
+[34] role=user, Message 115 with lot
+[35] role=user, Message 116 with lot
+[36] role=user, Message 117 with lot
+[37] role=user, Message 118 with lot
+[38] role=user, Message 119 with lot
+[39] role=assistant, done
+[40] role=user, next
+[41] role=user, Confirm task complet
+Position 0: expected call_A, got call_A - ✓
+Position 1: expected call_B, got call_B - ✓
+Position 2: expected call_C, got call_C - ✓
+
+[90mstdout[2m | src/session-v2/compaction.test.ts[2m > [22m[2mCompaction - 并发工具调用修复验证[2m > [22m[2m场景1: 4个并发工具调用被保护区边界切断
+[22m[39m[2026-01-26T12:52:41.344Z] [INFO] [Compaction] [Compaction] 触发压缩。当前 Token: 6940, 阈值: 5520
+[2026-01-26T12:52:41.346Z] [INFO] [Compaction] [Compaction] 处理 assistant（索引 125）：4 个 tool_calls，收集到 4 个 tool 回复
+[2026-01-26T12:52:41.346Z] [INFO] [Compaction] [Compaction] 已将 1 个 assistant 和 4 个 tool 回复移到保护区（保护区大小：40）
+
+[32m✔[39m 上下文压缩成功
+[90mstdout[2m | src/session-v2/compaction.edge-cases.test.ts[2m > [22m[2mCompaction - 边缘场景测试[2m > [22m[2m场景3: 保护区大小膨胀[2m > [22m[2m应该记录保护区实际大小超过 KEEP_RECENT_COUNT 的情况
+[22m[39m原始历史长度: 109
+压缩后保留区长度: 109
+KEEP_RECENT_COUNT = 6，实际保护区可能 = 6 + 103
+✓ 6 个并发工具调用被正确保留
+
+[90mstdout[2m | src/session-v2/compaction.test.ts[2m > [22m[2mCompaction - 并发工具调用修复验证[2m > [22m[2m场景1: 4个并发工具调用被保护区边界切断
+[22m[39m✓ 场景1 通过：4个并发工具调用被正确保留
+
+- [Compaction] 上下文压缩...
+[90mstdout[2m | src/session-v2/compaction.edge-cases.test.ts[2m > [22m[2mCompaction - 边缘场景测试[2m > [22m[2m场景4: tool_call_id 为空或无效[2m > [22m[2m应该优雅处理无效的 tool_call_id
+[22m[39m[2026-01-26T12:52:41.348Z] [INFO] [Compaction] [Compaction] 触发压缩。当前 Token: 6739, 阈值: 5520
+[2026-01-26T12:52:41.348Z] [INFO] [Compaction] [Compaction] 处理 assistant（索引 110）：1 个 tool_calls，收集到 1 个 tool 回复
+[2026-01-26T12:52:41.348Z] [INFO] [Compaction] [Compaction] 已将 1 个 assistant 和 1 个 tool 回复移到保护区（保护区大小：40）
+
+[32m✔[39m 上下文压缩成功
+[90mstdout[2m | src/session-v2/compaction.edge-cases.test.ts[2m > [22m[2mCompaction - 边缘场景测试[2m > [22m[2m场景4: tool_call_id 为空或无效[2m > [22m[2m应该优雅处理无效的 tool_call_id
+[22m[39m✓ 优雅处理了无效的 tool_call_id
+
+[90mstdout[2m | src/session-v2/compaction.test.ts[2m > [22m[2mCompaction - 并发工具调用修复验证[2m > [22m[2m场景2: 3个并发工具调用，只有2个在保护区内
+[22m[39m✓ 场景2 通过：3个并发工具调用被正确保留
+
+- [Compaction] 上下文压缩...
+[32m✔[39m 上下文压缩成功
+[90mstdout[2m | src/session-v2/compaction.edge-cases.test.ts[2m > [22m[2mCompaction - 边缘场景测试[2m > [22m[2m场景5: 保护区首条不是 tool 消息[2m > [22m[2m应该正确处理保护区首条是 user/assistant 消息的情况
+[22m[39m[2026-01-26T12:52:41.349Z] [INFO] [Compaction] [Compaction] 触发压缩。当前 Token: 6655, 阈值: 5520
+
+[90mstdout[2m | src/session-v2/compaction.test.ts[2m > [22m[2mCompaction - 并发工具调用修复验证[2m > [22m[2m场景3: 单个工具调用不应该影响压缩
+[22m[39m✓ 场景3 通过：单个工具调用被正确保留
+
+ [32m✓[39m src/session-v2/compaction.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [31m❯[39m src/session-v2/compaction.multi-tools.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 15[2mms[22m[39m
+[31m   [31m×[31m Multi-Tool Bug Fix Verification[2m > [22mshould preserve ALL tool responses when assistant has 4 tool_calls split across zones[39m[32m 11[2mms[22m[39m
+[31m     → expected false to be true // Object.is equality[39m
+[31m   [31m×[31m Multi-Tool Bug Fix Verification[2m > [22mshould handle multiple assistants each with multiple tool_calls[39m[32m 1[2mms[22m[39m
+[31m     → expected 2 to be 1 // Object.is equality[39m
+[31m   [31m×[31m Multi-Tool Bug Fix Verification[2m > [22mshould handle user exact scenario: 3 concurrent tool calls split by zone[39m[32m 1[2mms[22m[39m
+[31m     → expected false to be true // Object.is equality[39m
+ [31m❯[39m src/session-v2/compaction.edge-cases.test.ts [2m([22m[2m6 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 25[2mms[22m[39m
+   [32m✓[39m Compaction - 边缘场景测试[2m > [22m场景1: 多次连续工具调用[2m > [22m应该处理两个不同的 assistant 消息的 tool 回复[32m 4[2mms[22m[39m
+   [32m✓[39m Compaction - 边缘场景测试[2m > [22m场景2: tool 回复顺序问题[2m > [22m应该按 tool_calls 的顺序添加 tool 回复[32m 5[2mms[22m[39m
+   [32m✓[39m Compaction - 边缘场景测试[2m > [22m场景3: 保护区大小膨胀[2m > [22m应该记录保护区实际大小超过 KEEP_RECENT_COUNT 的情况[32m 1[2mms[22m[39m
+   [32m✓[39m Compaction - 边缘场景测试[2m > [22m场景4: tool_call_id 为空或无效[2m > [22m应该优雅处理无效的 tool_call_id[32m 1[2mms[22m[39m
+[31m   [31m×[31m Compaction - 边缘场景测试[2m > [22m场景5: 保护区首条不是 tool 消息[2m > [22m应该正确处理保护区首条是 user/assistant 消息的情况[39m[32m 10[2mms[22m[39m
+[31m     → expected 'user' to be 'assistant' // Object.is equality[39m
+[31m   [31m×[31m Compaction - 边缘场景测试[2m > [22m场景6: Assistant 在 pending 区，部分 tool 在 active 区[2m > [22m应该正确处理 assistant 在 pending 区但部分 tool 回复在 active 区的情况[39m[32m 2[2mms[22m[39m
+[31m     → expected false to be true // Object.is equality[39m
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m成功替换场景[2m > [22m[2m应该成功替换指定行的文本
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:2
+- line2
++ modified-line2
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m成功替换场景[2m > [22m[2m应该只替换部分文本（保留行的其他内容）
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- const name = "test";
++ const name = "modified";
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m成功批量替换场景[2m > [22m[2m应该成功替换单个替换操作
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:2
+- line2
++ modified-line2
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m成功批量替换场景[2m > [22m[2m应该成功替换多个替换操作（不同行）
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- line1
++ first
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:3
+- line3
++ middle
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:5
+- line5
++ last
+
+Modified 3/3 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m成功替换场景[2m > [22m[2m应该支持替换为空字符串（删除文本）
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:2
+- line2
++ 
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m成功批量替换场景[2m > [22m[2m应该只替换每行中第一个匹配的 oldText
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- test test test
++ TEST test test
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m成功替换场景[2m > [22m[2m应该支持替换为空字符串的一部分（保留部分内容）
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- const greeting = "Hello, World!";
++ const greeting = "Hello";
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m成功批量替换场景[2m > [22m[2m应该支持替换为空字符串（删除文本）
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:2
+- line2
++ 
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m成功替换场景[2m > [22m[2m应该支持替换为多行文本
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:2
+- line2
++ line2-a
+line2-b
+line2-c
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m成功批量替换场景[2m > [22m[2m应该支持部分文本替换
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- const name = "test";
++ const name = "modified";
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m边界条件[2m > [22m[2m应该能替换第1行
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- line1
++ first-line
+
+ [31m❯[39m src/util/event-bus.test.ts [2m([22m[2m30 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 162[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m基本功能[2m > [22m应该订阅和触发事件[32m 5[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m基本功能[2m > [22m应该支持多个处理器[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m基本功能[2m > [22m应该支持异步处理器[32m 21[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m基本功能[2m > [22m应该支持一次性订阅[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m基本功能[2m > [22m应该支持取消订阅[32m 0[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m基本功能[2m > [22m应该支持通过 handlerId 取消订阅[32m 0[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m基本功能[2m > [22m应该支持等待事件[32m 62[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m基本功能[2m > [22m等待事件应该超时[32m 17[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m中间件[2m > [22m应该执行全局中间件[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m中间件[2m > [22m应该执行事件特定中间件[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m中间件[2m > [22m中间件可以中止事件[32m 0[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m中间件[2m > [22m内置日志中间件应该工作[32m 2[2mms[22m[39m
+[31m   [31m×[31m EventBus[2m > [22m中间件[2m > [22m内置错误处理中间件应该工作[39m[32m 11[2mms[22m[39m
+[31m     → promise resolved "undefined" instead of rejecting[39m
+   [32m✓[39m EventBus[2m > [22m中间件[2m > [22m内置验证中间件应该工作[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m作用域事件总线[2m > [22m应该创建作用域总线[32m 0[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m作用域事件总线[2m > [22m作用域总线应该添加作用域前缀[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m作用域事件总线[2m > [22m应该支持取消作用域所有事件[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m性能监控[2m > [22m应该收集指标[32m 26[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m性能监控[2m > [22m应该重置指标[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m错误处理[2m > [22m应该捕获同步处理器错误[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m错误处理[2m > [22m应该捕获异步处理器错误[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m错误处理[2m > [22m应该处理监听器数量限制[32m 0[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m错误处理[2m > [22m应该处理异步禁用时的错误[32m 0[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22mTypedEventBus[2m > [22m应该提供类型安全[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22mTypedEventBus[2m > [22m应该支持类型安全的中间件[32m 0[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m单例实例[2m > [22m应该提供默认 eventBus 单例[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m单例实例[2m > [22m应该提供默认 typedEventBus 单例[32m 0[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m实用函数[2m > [22m应该支持 listenerCount[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m实用函数[2m > [22m应该支持 eventNames[32m 1[2mms[22m[39m
+   [32m✓[39m EventBus[2m > [22m实用函数[2m > [22m应该支持 offAll[32m 0[2mms[22m[39m
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m边界条件[2m > [22m[2m应该能替换最后一行
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:5
+- line5
++ last-line
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m同一行多次替换[2m > [22m[2m应该对同一行的不同部分进行多次替换（注意：基于原始行，后执行的替换会覆盖前面的）
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- const x = 1 + 2;
++ const y = 1 + 2;
+[Warning] Multiple replacements on line 1. Each uses the original line content.
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- const x = 1 + 2;
++ const x = 10 + 2;
+[Warning] Multiple replacements on line 1. Each uses the original line content.
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- const x = 1 + 2;
++ const x = 1 + 20;
+
+Modified 3/3 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m边界条件[2m > [22m[2m应该能替换第1行
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- line1
++ first-line
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m边界条件[2m > [22m[2m应该能替换最后一行
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:5
+- line5
++ last-line
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m边界条件[2m > [22m[2m应该能替换单行文件
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- single-line
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m边界条件[2m > [22m[2m应该能替换只有一行的文件
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- single-line
++ modified-single
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m边界条件[2m > [22m[2m应该处理不以换行符结尾的文件
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:2
+- line2
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+ [31m❯[39m src/tool/bash.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 65[2mms[22m[39m
+[31m   [31m×[31m BashTool[2m > [22mai-agent-v2 eeee[39m[32m 64[2mms[22m[39m
+[31m     → expected [] to include 'ai-agent-v2'[39m
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m边界条件[2m > [22m[2m空文件时可以匹配空行
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- 
++ new-content
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m核心场景：ReadFileTool + BatchReplaceTool 联合测试[2m > [22m[2m场景1：读取文件后根据行号修改单行内容
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:2
+- id: number;
++ id: string;
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\example.ts
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m边界条件[2m > [22m[2m应该能处理包含重复文本的行
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- test test test
++ TEST test test
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m错误处理 - 行号越界[2m > [22m[2m应该返回行号小于1的错误
+[22m[39m
+Modified 0/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m核心场景：ReadFileTool + BatchReplaceTool 联合测试[2m > [22m[2m场景2：读取文件后修改多个不连续的行
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:3
+- name: string;
++ firstName: string;
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:4
+- email: string;
++ emailAddress: string;
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:7
+- function getUserById(id: number): User | null {
++ function findUserById(id: number): User | null {
+
+Modified 3/3 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\example.ts
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m错误处理 - 行号越界[2m > [22m[2m应该返回行号为负数的错误
+[22m[39m
+Modified 0/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m核心场景：ReadFileTool + BatchReplaceTool 联合测试[2m > [22m[2m场景3：读取特定行范围后只修改该范围内的行
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:7
+- function getUserById(id: number): User | null {
++ function findUser(id: number): User | null {
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:8
+- const users: User[] = [
++ const userList: User[] = [
+
+Modified 2/2 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\example.ts
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m错误处理 - 行号越界[2m > [22m[2m应该返回行号大于有效行数的错误
+[22m[39m
+Modified 0/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m核心场景：ReadFileTool + BatchReplaceTool 联合测试[2m > [22m[2m场景4：读取文件后修改包含特殊字符的行
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:9
+- { id: 1, name: "Alice", email: "alice@example.com" },
++ { id: 1, name: "Alice Smith", email: "alice.smith@example.com" },
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:10
+- { id: 2, name: "Bob", email: "bob@example.com" }
++ { id: 2, name: "Bob Johnson", email: "bob.johnson@example.com" }
+
+Modified 2/2 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\example.ts
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m错误处理 - 行号越界[2m > [22m[2m应该正确处理文件以换行符结尾时的行号
+[22m[39m
+Modified 0/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m核心场景：ReadFileTool + BatchReplaceTool 联合测试[2m > [22m[2m场景5：读取文件后进行部分文本替换（不替换整行）
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:2
+- id: number;
++ id: string;
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:7
+- function getUserById(id: number): User | null {
++ function getUserById(id: string): User | null {
+
+Modified 2/2 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\example.ts
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m错误处理 - 行号越界[2m > [22m[2m应该正确处理文件不以换行符结尾时的行号
+[22m[39m
+Modified 0/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m核心场景：ReadFileTool + BatchReplaceTool 联合测试[2m > [22m[2m场景6：读取空行后修改
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:2
+- 
++ // empty line 1
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:4
+- 
++ // empty line 2
+
+Modified 2/2 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\example.ts
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m错误处理 - oldText 不匹配[2m > [22m[2m应该返回 oldText 不存在的错误
+[22m[39m
+Modified 0/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m错误处理 - oldText 不匹配[2m > [22m[2m应该区分大小写
+[22m[39m
+Modified 0/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m核心场景：ReadFileTool + BatchReplaceTool 联合测试[2m > [22m[2m场景7：读取 JSON 文件后修改指定行
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\config.json:3
+- "version": "1.0.0",
++ "version": "2.0.0",
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\config.json:5
+- "build": "tsc",
++ "build": "webpack",
+
+Modified 2/2 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\config.json
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m错误处理 - oldText 不匹配[2m > [22m[2m应该返回部分匹配失败的错误
+[22m[39m
+Modified 0/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m核心场景：ReadFileTool + BatchReplaceTool 联合测试[2m > [22m[2m场景8：读取文件后同一行多次替换（验证基于原始内容）
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:3
+- name: string;
++ firstName: string;
+[Warning] Multiple replacements on line 3. Each uses the original line content.
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\example.ts:3
+- name: string;
++ fullName: string;
+
+Modified 2/2 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\example.ts
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m错误处理 - oldText 不匹配[2m > [22m[2m应该处理混合成功和失败的情况
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- line1
++ success1
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:3
+- line3
++ success2
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:5
+- line5
++ success3
+
+Modified 3/5 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m错误处理 - oldText 不匹配[2m > [22m[2m应该处理包含前导空格的行
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- indented line
++ modified
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m换行符处理联合测试[2m > [22m[2m应该正确处理 CRLF 换行符的文件
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\crlf-file.txt:2
+- line2
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\crlf-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m换行符保留[2m > [22m[2m应该保留 \n 换行符
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:2
+- line2
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m换行符保留[2m > [22m[2m应该保留 \r\n 换行符
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file-crlf.txt:2
+- line2
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file-crlf.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m换行符处理联合测试[2m > [22m[2m应该正确处理混合换行符的文件
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\crlf-file.txt:2
+- line2
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\crlf-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m路径处理[2m > [22m[2m应该支持相对路径
+[22m[39m
+[Edit] Modified .test_surgical\test-file.txt:2
+- line2
++ modified
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m换行符保留[2m > [22m[2m应该正确检测混合换行符文件
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file-crlf.txt:1
+- line1
++ first
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file-crlf.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m换行符保留[2m > [22m[2m应该保留不以换行符结尾的文件格式
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:2
+- line2
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m边界情况：大文件处理[2m > [22m[2m应该能处理大型文件的读取和修改
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:100
+- const variable99 = 99;
++ const modified99 = 99;
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:150
+- const variable149 = 149;
++ const modified149 = 149;
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:200
+- const variable199 = 199;
++ const modified200 = 199;
+
+Modified 3/3 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\test.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m路径处理[2m > [22m[2m应该支持绝对路径
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:2
+- line2
++ modified
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m换行符保留[2m > [22m[2m应该保留以 \r\n 结尾的文件格式
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file-crlf.txt:1
+- line1
++ first
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file-crlf.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m边界情况：大文件处理[2m > [22m[2m应该能处理大量的替换操作
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:1
+- line0
++ modified0
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:2
+- line1
++ modified1
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:3
+- line2
++ modified2
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:4
+- line3
++ modified3
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:5
+- line4
++ modified4
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:6
+- line5
++ modified5
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:7
+- line6
++ modified6
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:8
+- line7
++ modified7
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:9
+- line8
++ modified8
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:10
+- line9
++ modified9
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:11
+- line10
++ modified10
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:12
+- line11
++ modified11
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:13
+- line12
++ modified12
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:14
+- line13
++ modified13
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:15
+- line14
++ modified14
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:16
+- line15
++ modified15
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:17
+- line16
++ modified16
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:18
+- line17
++ modified17
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:19
+- line18
++ modified18
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:20
+- line19
++ modified19
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:21
+- line20
++ modified20
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:22
+- line21
++ modified21
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:23
+- line22
++ modified22
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:24
+- line23
++ modified23
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:25
+- line24
++ modified24
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:26
+- line25
++ modified25
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:27
+- line26
++ modified26
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:28
+- line27
++ modified27
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:29
+- line28
++ modified28
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:30
+- line29
++ modified29
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:31
+- line30
++ modified30
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:32
+- line31
++ modified31
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:33
+- line32
++ modified32
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:34
+- line33
++ modified33
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:35
+- line34
++ modified34
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:36
+- line35
++ modified35
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:37
+- line36
++ modified36
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:38
+- line37
++ modified37
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:39
+- line38
++ modified38
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:40
+- line39
++ modified39
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:41
+- line40
++ modified40
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:42
+- line41
++ modified41
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:43
+- line42
++ modified42
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:44
+- line43
++ modified43
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:45
+- line44
++ modified44
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:46
+- line45
++ modified45
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:47
+- line46
++ modified46
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:48
+- line47
++ modified47
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:49
+- line48
++ modified48
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:50
+- line49
++ modified49
+
+Modified 50/50 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\test.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m路径处理[2m > [22m[2m应该支持 ./ 前缀的路径
+[22m[39m
+[Edit] Modified .\.test_surgical\test-file.txt:2
+- line2
++ modified
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m特殊字符处理[2m > [22m[2m应该转义 newText 中的 $ 符号
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- price: $100
++ price: $200
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m备份功能[2m > [22m[2m应该在修改前创建备份
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:2
+- line2
++ modified
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m错误处理联合测试[2m > [22m[2m应该处理读取成功但替换失败的情况
+[22m[39m
+Modified 0/1 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\test.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m特殊字符处理[2m > [22m[2m应该处理包含多个 $ 符号的文本
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- var $a = $b + $c;
++ var $x = $b + $c;
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m备份功能[2m > [22m[2m应该在返回结果中包含备份信息
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:2
+- line2
++ modified
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m错误处理联合测试[2m > [22m[2m应该处理部分成功部分失败的情况
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:1
+- line1
++ success1
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:3
+- line3
++ success2
+
+Modified 2/3 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\test.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m特殊字符处理[2m > [22m[2m应该处理 $$ 转义序列
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- price: $$100
++ price: $$200
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m特殊字符处理[2m > [22m[2m应该能处理包含引号的文本
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- const str = "hello";
++ const str = "world";
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m特殊字符处理[2m > [22m[2m应该能处理包含正则特殊字符的文本
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- test[0].value
++ test[1].value
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m错误处理联合测试[2m > [22m[2m应该处理行号越界的情况
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:1
+- line1
++ success
+
+Modified 1/2 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\test.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m特殊字符处理[2m > [22m[2m应该能处理包含引号的文本
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- const str = "hello";
++ const str = "world";
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m特殊字符处理[2m > [22m[2m应该能处理 unicode 字符
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- 中文测试
++ 修改后的内容
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m特殊字符处理[2m > [22m[2m应该能处理表情符
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- Hello 😀
++ Hello 🙂
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m特殊字符处理[2m > [22m[2m应该能处理包含正则特殊字符的文本
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- test[0].value
++ test[1].value
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m并发安全[2m > [22m[2m应该能处理多个并发修改请求（不同行）
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- line1
++ modified-1
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m备份功能联合测试[2m > [22m[2mBatchReplaceTool 应该在修改前创建备份
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:1
+- original content
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\test.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m并发安全[2m > [22m[2m应该能处理多个并发修改请求（不同行）
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:3
+- line3
++ modified-3
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m特殊字符处理[2m > [22m[2m应该能处理 unicode 字符
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- 中文测试
++ 修改后的内容
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m并发安全[2m > [22m[2m应该能处理修改同一行的并发请求（后一个会失败）
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- original
++ first-mod
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m备份功能联合测试[2m > [22m[2m应该返回备份信息以便恢复
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:1
+- original content
++ modified content
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\test.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m文件编码[2m > [22m[2m应该能正确处理 UTF-8 编码的文件
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- café
++ restaurant
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m特殊字符处理[2m > [22m[2m应该能处理表情符
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- Hello 😀
++ Hello 🙂
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m文件编码[2m > [22m[2m应该能处理带 BOM 的 UTF-8 文件 - BOM 会作为内容的一部分
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- line1
++ modified
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m特殊字符和编码联合测试[2m > [22m[2m应该正确处理包含 $ 符号的文件
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:1
+- const $ = require("jquery");
++ const $ = require("cheerio");
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:2
+- const $$ = document.querySelectorAll;
++ const $$$ = document.querySelectorAll;
+
+Modified 2/2 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\test.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m路径处理[2m > [22m[2m应该支持相对路径
+[22m[39m[Batch Edit] .test_batch_replace\test-file.txt:2
+- line2
++ modified
+
+Modified 1/1 replacements in .test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m路径处理[2m > [22m[2m应该支持绝对路径
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:2
+- line2
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m性能测试[2m > [22m[2m应该能处理大文件的单行替换
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:5000
+- line-4999
++ modified-line
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m特殊字符和编码联合测试[2m > [22m[2m应该正确处理 Unicode 字符
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:1
+- const name = "中文";
++ const name = "日本語";
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:2
+- const emoji = "😀";
++ const emoji = "🎉";
+
+Modified 2/2 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\test.txt
+
+[90mstdout[2m | src/tool/surgical.test.ts[2m > [22m[2mSurgicalEditTool[2m > [22m[2m性能测试[2m > [22m[2m应该能处理长行的替换
+[22m[39m
+[Edit] Modified D:\work\ai-agent-v2\.test_surgical\test-file.txt:1
+- aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
++ bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m备份功能[2m > [22m[2m应该在修改前创建备份
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:2
+- line2
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m特殊字符和编码联合测试[2m > [22m[2m应该正确处理包含引号的字符串
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:1
+- const str1 = "hello";
++ const str1 = "hi";
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:2
+- const str2 = 'world';
++ const str2 = 'earth';
+[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:3
+- const str3 = `template`;
++ const str3 = `literal`;
+
+Modified 3/3 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\test.txt
+
+ [32m✓[39m src/tool/surgical.test.ts [2m([22m[2m40 tests[22m[2m)[22m[32m 173[2mms[22m[39m
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m备份功能[2m > [22m[2m应该在返回结果中包含备份信息
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:2
+- line2
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m路径处理联合测试[2m > [22m[2m应该支持相对路径的读写和修改
+[22m[39m[Batch Edit] .test_file_batch_integration\test.txt:1
+- line1
++ modified
+
+Modified 1/1 replacements in .test_file_batch_integration\test.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m结果验证[2m > [22m[2m应该返回详细的替换结果
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- line1
++ success1
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:3
+- line3
++ success2
+
+Modified 2/3 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/file-and-batch-replace-integration.test.ts[2m > [22m[2mFile Tool 和 BatchReplace Tool 深度综合测试[2m > [22m[2m路径处理联合测试[2m > [22m[2m应该支持绝对路径的读写和修改
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_file_batch_integration\test.txt:1
+- line1
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_file_batch_integration\test.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m结果验证[2m > [22m[2m当所有替换都成功时不应有 hasErrors 标记
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- line1
++ success1
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:2
+- line2
++ success2
+
+Modified 2/2 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+ [32m✓[39m src/tool/file-and-batch-replace-integration.test.ts [2m([22m[2m41 tests[22m[2m)[22m[32m 160[2mms[22m[39m
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m结果验证[2m > [22m[2m当有替换失败时应有 hasErrors 标记
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- line1
++ success1
+
+Modified 1/2 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m性能测试[2m > [22m[2m应该能处理大文件的批量替换
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:100
+- line-99
++ modified-99
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:500
+- line-499
++ modified-499
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:900
+- line-899
++ modified-899
+
+Modified 3/3 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m性能测试[2m > [22m[2m应该能处理大量替换操作
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- line-0
++ modified-0
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:2
+- line-1
++ modified-1
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:3
+- line-2
++ modified-2
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:4
+- line-3
++ modified-3
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:5
+- line-4
++ modified-4
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:6
+- line-5
++ modified-5
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:7
+- line-6
++ modified-6
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:8
+- line-7
++ modified-7
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:9
+- line-8
++ modified-8
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:10
+- line-9
++ modified-9
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:11
+- line-10
++ modified-10
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:12
+- line-11
++ modified-11
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:13
+- line-12
++ modified-12
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:14
+- line-13
++ modified-13
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:15
+- line-14
++ modified-14
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:16
+- line-15
++ modified-15
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:17
+- line-16
++ modified-16
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:18
+- line-17
++ modified-17
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:19
+- line-18
++ modified-18
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:20
+- line-19
++ modified-19
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:21
+- line-20
++ modified-20
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:22
+- line-21
++ modified-21
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:23
+- line-22
++ modified-22
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:24
+- line-23
++ modified-23
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:25
+- line-24
++ modified-24
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:26
+- line-25
++ modified-25
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:27
+- line-26
++ modified-26
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:28
+- line-27
++ modified-27
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:29
+- line-28
++ modified-28
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:30
+- line-29
++ modified-29
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:31
+- line-30
++ modified-30
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:32
+- line-31
++ modified-31
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:33
+- line-32
++ modified-32
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:34
+- line-33
++ modified-33
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:35
+- line-34
++ modified-34
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:36
+- line-35
++ modified-35
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:37
+- line-36
++ modified-36
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:38
+- line-37
++ modified-37
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:39
+- line-38
++ modified-38
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:40
+- line-39
++ modified-39
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:41
+- line-40
++ modified-40
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:42
+- line-41
++ modified-41
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:43
+- line-42
++ modified-42
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:44
+- line-43
++ modified-43
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:45
+- line-44
++ modified-44
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:46
+- line-45
++ modified-45
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:47
+- line-46
++ modified-46
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:48
+- line-47
++ modified-47
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:49
+- line-48
++ modified-48
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:50
+- line-49
++ modified-49
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:51
+- line-50
++ modified-50
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:52
+- line-51
++ modified-51
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:53
+- line-52
++ modified-52
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:54
+- line-53
++ modified-53
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:55
+- line-54
++ modified-54
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:56
+- line-55
++ modified-55
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:57
+- line-56
++ modified-56
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:58
+- line-57
++ modified-57
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:59
+- line-58
++ modified-58
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:60
+- line-59
++ modified-59
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:61
+- line-60
++ modified-60
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:62
+- line-61
++ modified-61
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:63
+- line-62
++ modified-62
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:64
+- line-63
++ modified-63
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:65
+- line-64
++ modified-64
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:66
+- line-65
++ modified-65
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:67
+- line-66
++ modified-66
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:68
+- line-67
++ modified-67
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:69
+- line-68
++ modified-68
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:70
+- line-69
++ modified-69
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:71
+- line-70
++ modified-70
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:72
+- line-71
++ modified-71
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:73
+- line-72
++ modified-72
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:74
+- line-73
++ modified-73
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:75
+- line-74
++ modified-74
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:76
+- line-75
++ modified-75
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:77
+- line-76
++ modified-76
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:78
+- line-77
++ modified-77
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:79
+- line-78
++ modified-78
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:80
+- line-79
++ modified-79
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:81
+- line-80
++ modified-80
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:82
+- line-81
++ modified-81
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:83
+- line-82
++ modified-82
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:84
+- line-83
++ modified-83
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:85
+- line-84
++ modified-84
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:86
+- line-85
++ modified-85
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:87
+- line-86
++ modified-86
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:88
+- line-87
++ modified-87
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:89
+- line-88
++ modified-88
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:90
+- line-89
++ modified-89
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:91
+- line-90
++ modified-90
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:92
+- line-91
++ modified-91
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:93
+- line-92
++ modified-92
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:94
+- line-93
++ modified-93
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:95
+- line-94
++ modified-94
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:96
+- line-95
++ modified-95
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:97
+- line-96
++ modified-96
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:98
+- line-97
++ modified-97
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:99
+- line-98
++ modified-98
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:100
+- line-99
++ modified-99
+
+Modified 100/100 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m文件编码[2m > [22m[2m应该能正确处理 UTF-8 编码的文件
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- café
++ restaurant
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m边界情况 - 空行和空白字符[2m > [22m[2m应该能处理包含空行的文件
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- line1
++ modified
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:2
+- 
++ empty-line
+[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:3
+- line3
++ modified3
+
+Modified 3/3 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m边界情况 - 空行和空白字符[2m > [22m[2m应该能处理包含前导空格的行
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- indented line
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+[90mstdout[2m | src/tool/batch-replace.test.ts[2m > [22m[2mBatchReplaceTool[2m > [22m[2m边界情况 - 空行和空白字符[2m > [22m[2m应该能处理包含尾随空格的行
+[22m[39m[Batch Edit] D:\work\ai-agent-v2\.test_batch_replace\test-file.txt:1
+- line with spaces
++ modified
+
+Modified 1/1 replacements in D:\work\ai-agent-v2\.test_batch_replace\test-file.txt
+
+ [32m✓[39m src/tool/batch-replace.test.ts [2m([22m[2m51 tests[22m[2m)[22m[32m 196[2mms[22m[39m
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Basic Flow[2m > [22m[2mshould return response when no tool calls needed
+[22m[39m[2026-01-26T12:52:41.812Z] [INFO] [Agent] totalUsed: 17/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Basic Flow[2m > [22m[2mshould add user message to session
+[22m[39m[2026-01-26T12:52:41.815Z] [INFO] [Agent] totalUsed: 18/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Basic Flow[2m > [22m[2mshould handle non-streaming response
+[22m[39m[2026-01-26T12:52:41.816Z] [INFO] [Agent] totalUsed: 18/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Call Error Handling[2m > [22m[2mshould handle tool execution error gracefully (not throw)
+[22m[39m[2026-01-26T12:52:41.817Z] [INFO] [Agent] totalUsed: 20/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m Tool calls: Error: Tool execution error: Command failed
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Call Error Handling[2m > [22m[2mshould handle tool execution error gracefully (not throw)
+[22m[39m[2026-01-26T12:52:41.818Z] [INFO] [Agent] totalUsed: 126/7360
+
+- [Agent] Thinking-2...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Call Error Handling[2m > [22m[2mshould include tool error in session history
+[22m[39m[2026-01-26T12:52:41.819Z] [INFO] [Agent] totalUsed: 19/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m Tool calls: Error: Tool execution error: Test error
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Call Error Handling[2m > [22m[2mshould include tool error in session history
+[22m[39m[2026-01-26T12:52:41.820Z] [INFO] [Agent] totalUsed: 124/7360
+
+- [Agent] Thinking-2...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Call Error Handling[2m > [22m[2mshould continue after tool error (LLM can recover)
+[22m[39m[2026-01-26T12:52:41.821Z] [INFO] [Agent] totalUsed: 18/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m Tool calls: Error: Tool execution error: First call fails
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Call Error Handling[2m > [22m[2mshould continue after tool error (LLM can recover)
+[22m[39m[2026-01-26T12:52:41.822Z] [INFO] [Agent] totalUsed: 117/7360
+
+- [Agent] Thinking-2...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Call Error Handling[2m > [22m[2mshould handle empty tool name gracefully
+[22m[39m[2026-01-26T12:52:41.823Z] [INFO] [Agent] totalUsed: 20/7360
+
+- [Agent] Thinking-1...
+[33m⚠[39m Tool calls completed with errors: Error: Tool name is empty
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Call Error Handling[2m > [22m[2mshould handle empty tool name gracefully
+[22m[39m[2026-01-26T12:52:41.823Z] [WARN] [Agent] Tool execution had errors, continuing for LLM to handle
+
+- [Agent] Thinking-2...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Call Error Handling[2m > [22m[2mshould handle empty tool name gracefully
+[22m[39m[2026-01-26T12:52:41.823Z] [INFO] [Agent] totalUsed: 114/7360
+
+[32m✔[39m 
+Task success!
+ [31m❯[39m src/tool/index.test.ts [2m([22m[2m13 tests[22m[2m | [22m[31m12 failed[39m[2m)[22m[32m 12[2mms[22m[39m
+   [32m✓[39m ToolRegistry[2m > [22mshould have bash tool registered by default[32m 2[2mms[22m[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould register a new tool[39m[32m 4[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould throw when registering duplicate tool[39m[32m 1[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould unregister a tool[39m[32m 0[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould return undefined for unregistered tool[39m[32m 0[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould get all tools[39m[32m 0[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould get tool schemas[39m[32m 0[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould return schemas in OpenAI function calling format[39m[32m 0[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould execute tool via registry[39m[32m 1[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould return error for non-existent tool[39m[32m 0[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould return error for invalid args[39m[32m 0[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould report correct size[39m[32m 0[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[31m   [31m×[31m ToolRegistry[2m > [22mshould clear all tools[39m[32m 0[2mms[22m[39m
+[31m     → Tool "bash" is already registered[39m
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent FinishReason Handling[2m > [22m[2mshould accept valid finishReasons (stop, eos, undefined)
+[22m[39m[2026-01-26T12:52:41.824Z] [INFO] [Agent] totalUsed: 21/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m 
+Task success!
+- [Agent] Thinking-1...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent FinishReason Handling[2m > [22m[2mshould accept valid finishReasons (stop, eos, undefined)
+[22m[39m[2026-01-26T12:52:41.825Z] [INFO] [Agent] totalUsed: 20/7360
+
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent FinishReason Handling[2m > [22m[2mshould accept valid finishReasons (stop, eos, undefined)
+[22m[39m[2026-01-26T12:52:41.825Z] [INFO] [Agent] totalUsed: 22/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent FinishReason Handling[2m > [22m[2mshould retry on unexpected finishReason
+[22m[39m[2026-01-26T12:52:41.826Z] [INFO] [Agent] totalUsed: 22/7360
+
+- [Agent] Thinking-1...
+[31m✖[39m Unexpected finishReason: length
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent FinishReason Handling[2m > [22m[2mshould retry on unexpected finishReason
+[22m[39m[2026-01-26T12:52:41.826Z] [INFO] [Agent] totalUsed: 65/7360
+
+- [Agent] Thinking-2...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent FinishReason Handling[2m > [22m[2mshould terminate after max consecutive finishReason errors
+[22m[39m[2026-01-26T12:52:41.827Z] [INFO] [Agent] totalUsed: 19/7360
+
+- [Agent] Thinking-1...
+[31m✖[39m Unexpected finishReason: content_filter
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent FinishReason Handling[2m > [22m[2mshould terminate after max consecutive finishReason errors
+[22m[39m[2026-01-26T12:52:41.827Z] [INFO] [Agent] totalUsed: 63/7360
+
+- [Agent] Thinking-2...
+[31m✖[39m Unexpected finishReason: content_filter
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent FinishReason Handling[2m > [22m[2mshould terminate after max consecutive finishReason errors
+[22m[39m[2026-01-26T12:52:41.827Z] [INFO] [Agent] totalUsed: 107/7360
+
+- [Agent] Thinking-3...
+[31m✖[39m Unexpected finishReason: content_filter
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould retry on network error with exponential backoff
+[22m[39m[2026-01-26T12:52:41.828Z] [INFO] [Agent] totalUsed: 19/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould terminate after max network retries
+[22m[39m[2026-01-26T12:52:41.828Z] [INFO] [Agent] totalUsed: 21/7360
+
+- [Agent] Thinking-1...
+[33m⚠[39m Network error (attempt 1): Failed to fetch
+- Retrying in 2s...
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould terminate after max network retries
+[22m[39mSession save error: Error: ENOENT: no such file or directory, open 'D:\work\ai-agent-v2\.memory\1769431961824\messages.json'
+[90m    at open (node:internal/fs/promises:639:25)[39m
+[90m    at Object.writeFile (node:internal/fs/promises:1213:14)[39m
+    at [90mD:\work\ai-agent-v2\[39msrc\session-v2\index.ts:69:9 {
+  errno: [33m-4058[39m,
+  code: [32m'ENOENT'[39m,
+  syscall: [32m'open'[39m,
+  path: [32m'D:\\work\\ai-agent-v2\\.memory\\1769431961824\\messages.json'[39m
+}
+
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould terminate after max network retries
+[22m[39mSession save error: Error: ENOENT: no such file or directory, open 'D:\work\ai-agent-v2\.memory\1769431961826\messages.json'
+[90m    at open (node:internal/fs/promises:639:25)[39m
+[90m    at Object.writeFile (node:internal/fs/promises:1213:14)[39m
+    at [90mD:\work\ai-agent-v2\[39msrc\session-v2\index.ts:69:9 {
+  errno: [33m-4058[39m,
+  code: [32m'ENOENT'[39m,
+  syscall: [32m'open'[39m,
+  path: [32m'D:\\work\\ai-agent-v2\\.memory\\1769431961826\\messages.json'[39m
+}
+
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould terminate after max network retries
+[22m[39mSession save error: Error: ENOENT: no such file or directory, open 'D:\work\ai-agent-v2\.memory\1769431961827\messages.json'
+[90m    at open (node:internal/fs/promises:639:25)[39m
+[90m    at Object.writeFile (node:internal/fs/promises:1213:14)[39m
+    at [90mD:\work\ai-agent-v2\[39msrc\session-v2\index.ts:69:9 {
+  errno: [33m-4058[39m,
+  code: [32m'ENOENT'[39m,
+  syscall: [32m'open'[39m,
+  path: [32m'D:\\work\\ai-agent-v2\\.memory\\1769431961827\\messages.json'[39m
+}
+
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould terminate after max network retries
+[22m[39mSession save error: Error: ENOENT: no such file or directory, open 'D:\work\ai-agent-v2\.memory\1769431961828\messages.json'
+[90m    at open (node:internal/fs/promises:639:25)[39m
+[90m    at Object.writeFile (node:internal/fs/promises:1213:14)[39m
+    at [90mD:\work\ai-agent-v2\[39msrc\session-v2\index.ts:69:9 {
+  errno: [33m-4058[39m,
+  code: [32m'ENOENT'[39m,
+  syscall: [32m'open'[39m,
+  path: [32m'D:\\work\\ai-agent-v2\\.memory\\1769431961828\\messages.json'[39m
+}
+
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould terminate after max network retries
+[22m[39mSession save error: Error: ENOENT: no such file or directory, open 'D:\work\ai-agent-v2\.memory\1769431961828\messages.json'
+[90m    at open (node:internal/fs/promises:639:25)[39m
+[90m    at Object.writeFile (node:internal/fs/promises:1213:14)[39m
+    at [90mD:\work\ai-agent-v2\[39msrc\session-v2\index.ts:69:9 {
+  errno: [33m-4058[39m,
+  code: [32m'ENOENT'[39m,
+  syscall: [32m'open'[39m,
+  path: [32m'D:\\work\\ai-agent-v2\\.memory\\1769431961828\\messages.json'[39m
+}
+
+ [32m✓[39m src/tool/grep.test.ts [2m([22m[2m36 tests[22m[2m)[22m[33m 1497[2mms[22m[39m
+   [33m[2m✓[22m[39m GrepTool[2m > [22mmetadata[2m > [22mincludes timedOut flag in metadata [33m 424[2mms[22m[39m
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould terminate after max network retries
+[22m[39m[2026-01-26T12:52:43.837Z] [INFO] [Agent] totalUsed: 63/7360
+
+- [Agent] Thinking-2...
+[33m⚠[39m Network error (attempt 2): Failed to fetch
+- Retrying in 4s...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould terminate after max network retries
+[22m[39m[2026-01-26T12:52:47.846Z] [INFO] [Agent] totalUsed: 63/7360
+
+- [Agent] Thinking-3...
+[33m⚠[39m Network error (attempt 3): Failed to fetch
+- Retrying in 8s...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould terminate after max network retries
+[22m[39m[2026-01-26T12:52:55.853Z] [INFO] [Agent] totalUsed: 63/7360
+
+- [Agent] Thinking-4...
+[33m⚠[39m Network error (attempt 4): Failed to fetch
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould terminate after max network retries
+[22m[39m[2026-01-26T12:52:55.854Z] [ERROR] [Agent] Network error after 3 retries
+
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould handle network errors differently from regular errors
+[22m[39m[2026-01-26T12:52:55.855Z] [INFO] [Agent] totalUsed: 21/7360
+
+- [Agent] Thinking-1...
+[33m⚠[39m Network error (attempt 1): ECONNRESET
+- Retrying in 2s...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould handle network errors differently from regular errors
+[22m[39m[2026-01-26T12:52:57.861Z] [INFO] [Agent] totalUsed: 21/7360
+
+- [Agent] Thinking-2...
+[33m⚠[39m Network error (attempt 2): ECONNRESET
+- Retrying in 4s...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould handle network errors differently from regular errors
+[22m[39m[2026-01-26T12:53:01.870Z] [INFO] [Agent] totalUsed: 21/7360
+
+- [Agent] Thinking-3...
+[33m⚠[39m Network error (attempt 3): ECONNRESET
+- Retrying in 8s...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould handle network errors differently from regular errors
+[22m[39m[2026-01-26T12:53:09.873Z] [INFO] [Agent] totalUsed: 21/7360
+
+- [Agent] Thinking-4...
+[33m⚠[39m Network error (attempt 4): ECONNRESET
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Network Error Handling[2m > [22m[2mshould handle network errors differently from regular errors
+[22m[39m[2026-01-26T12:53:09.874Z] [ERROR] [Agent] Network error after 3 retries
+
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Error vs LLM Error Separation[2m > [22m[2mshould NOT classify tool error as LLM error (should not throw)
+[22m[39m[2026-01-26T12:53:09.875Z] [INFO] [Agent] totalUsed: 20/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m Tool calls: Error: Tool execution error: Tool crashed
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Error vs LLM Error Separation[2m > [22m[2mshould NOT classify tool error as LLM error (should not throw)
+[22m[39m[2026-01-26T12:53:09.875Z] [INFO] [Agent] totalUsed: 117/7360
+
+- [Agent] Thinking-2...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Error vs LLM Error Separation[2m > [22m[2mshould return structured error message in history
+[22m[39m[2026-01-26T12:53:09.878Z] [INFO] [Agent] totalUsed: 19/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m Tool calls: Error: Tool execution error: Critical failure
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Tool Error vs LLM Error Separation[2m > [22m[2mshould return structured error message in history
+[22m[39m[2026-01-26T12:53:09.878Z] [INFO] [Agent] totalUsed: 117/7360
+
+- [Agent] Thinking-2...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Max Loop Limit[2m > [22m[2mshould terminate when maxLoop is reached
+[22m[39m[2026-01-26T12:53:09.879Z] [INFO] [Agent] totalUsed: 18/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m Tool calls: ok
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Max Loop Limit[2m > [22m[2mshould terminate when maxLoop is reached
+[22m[39m[2026-01-26T12:53:09.880Z] [INFO] [Agent] totalUsed: 103/7360
+
+- [Agent] Thinking-2...
+[32m✔[39m Tool calls: ok
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Max Loop Limit[2m > [22m[2mshould terminate when maxLoop is reached
+[22m[39m[2026-01-26T12:53:09.880Z] [INFO] [Agent] totalUsed: 188/7360
+
+- [Agent] Thinking-3...
+[32m✔[39m Tool calls: ok
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Max Loop Limit[2m > [22m[2mshould terminate when maxLoop is reached
+[22m[39m[2026-01-26T12:53:09.880Z] [INFO] [Agent] totalUsed: 273/7360
+
+- [Agent] Thinking-4...
+[32m✔[39m Tool calls: ok
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Max Loop Limit[2m > [22m[2mshould terminate when maxLoop is reached
+[22m[39m[2026-01-26T12:53:09.880Z] [INFO] [Agent] totalUsed: 358/7360
+
+- [Agent] Thinking-5...
+[32m✔[39m Tool calls: ok
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Max Loop Limit[2m > [22m[2mshould allow unlimited loops when maxLoop is null
+[22m[39m[2026-01-26T12:53:09.880Z] [INFO] [Agent] totalUsed: 20/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m Tool calls: continuing
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Max Loop Limit[2m > [22m[2mshould allow unlimited loops when maxLoop is null
+[22m[39m[2026-01-26T12:53:09.881Z] [INFO] [Agent] totalUsed: 108/7360
+
+- [Agent] Thinking-2...
+[32m✔[39m Tool calls: continuing
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Max Loop Limit[2m > [22m[2mshould allow unlimited loops when maxLoop is null
+[22m[39m[2026-01-26T12:53:09.881Z] [INFO] [Agent] totalUsed: 196/7360
+
+- [Agent] Thinking-3...
+[32m✔[39m Tool calls: final
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Max Loop Limit[2m > [22m[2mshould allow unlimited loops when maxLoop is null
+[22m[39m[2026-01-26T12:53:09.881Z] [INFO] [Agent] totalUsed: 283/7360
+
+- [Agent] Thinking-4...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Session Management[2m > [22m[2mshould persist messages in session
+[22m[39m[2026-01-26T12:53:09.882Z] [INFO] [Agent] totalUsed: 18/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Session Management[2m > [22m[2mshould persist messages in session
+[22m[39m[2026-01-26T12:53:09.882Z] [INFO] [Agent] totalUsed: 77/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Session Management[2m > [22m[2mshould clear session
+[22m[39m[2026-01-26T12:53:09.883Z] [INFO] [Agent] totalUsed: 17/7360
+
+- [Agent] Thinking-1...
+[32m✔[39m 
+Task success!
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Error Message Formatting[2m > [22m[2mshould format network error message for history
+[22m[39m[2026-01-26T12:53:09.895Z] [INFO] [Agent] totalUsed: 21/7360
+
+- [Agent] Thinking-1...
+[33m⚠[39m Network error (attempt 1): Failed to fetch
+- Retrying in 2s...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Error Message Formatting[2m > [22m[2mshould format network error message for history
+[22m[39m[2026-01-26T12:53:11.904Z] [INFO] [Agent] totalUsed: 21/7360
+
+- [Agent] Thinking-2...
+[33m⚠[39m Network error (attempt 2): Failed to fetch
+- Retrying in 4s...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Error Message Formatting[2m > [22m[2mshould format network error message for history
+[22m[39m[2026-01-26T12:53:15.920Z] [INFO] [Agent] totalUsed: 21/7360
+
+- [Agent] Thinking-3...
+[33m⚠[39m Network error (attempt 3): Failed to fetch
+- Retrying in 8s...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Error Message Formatting[2m > [22m[2mshould format network error message for history
+[22m[39m[2026-01-26T12:53:23.925Z] [INFO] [Agent] totalUsed: 21/7360
+
+- [Agent] Thinking-4...
+[33m⚠[39m Network error (attempt 4): Failed to fetch
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Error Message Formatting[2m > [22m[2mshould format network error message for history
+[22m[39m[2026-01-26T12:53:23.926Z] [ERROR] [Agent] Network error after 3 retries
+
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Error Message Formatting[2m > [22m[2mshould format generic error message for history
+[22m[39m[2026-01-26T12:53:23.928Z] [INFO] [Agent] totalUsed: 21/7360
+
+- [Agent] Thinking-1...
+[31m✖[39m Error: Something went wrong
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Error Message Formatting[2m > [22m[2mshould format generic error message for history
+[22m[39m[2026-01-26T12:53:23.929Z] [ERROR] [Agent] LLM call failed: Something went wrong
+
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Error Message Formatting[2m > [22m[2mshould format generic error message for history
+[22m[39m[2026-01-26T12:53:23.929Z] [INFO] [Agent] totalUsed: 44/7360
+
+- [Agent] Thinking-2...
+[31m✖[39m Error: Something went wrong
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2mAgent Error Message Formatting[2m > [22m[2mshould format generic error message for history
+[22m[39m[2026-01-26T12:53:23.930Z] [INFO] [Agent] totalUsed: 67/7360
+
+- [Agent] Thinking-3...
+[31m✖[39m Error: Something went wrong
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Error Message Formatting[2m > [22m[2mshould format generic error message for history
+[22m[39m[2026-01-26T12:53:23.930Z] [ERROR] [Agent] LLM call failed: Something went wrong
+
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2mAgent Error Message Formatting[2m > [22m[2mshould format generic error message for history
+[22m[39m[2026-01-26T12:53:23.931Z] [ERROR] [Agent] LLM call failed: Something went wrong
+
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2misNetworkError Utility[2m > [22m[2mshould detect network-related errors and trigger retry
+[22m[39m[2026-01-26T12:53:23.931Z] [INFO] [Agent] totalUsed: 22/7360
+
+- [Agent] Thinking-1...
+[33m⚠[39m Network error (attempt 1): Failed to fetch
+- Retrying in 2s...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2misNetworkError Utility[2m > [22m[2mshould detect network-related errors and trigger retry
+[22m[39m[2026-01-26T12:53:25.938Z] [INFO] [Agent] totalUsed: 22/7360
+
+- [Agent] Thinking-2...
+[31m✖[39m Error: Network error
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2misNetworkError Utility[2m > [22m[2mshould detect network-related errors and trigger retry
+[22m[39m[2026-01-26T12:53:25.939Z] [ERROR] [Agent] LLM call failed: Network error
+
+- [Agent] Thinking-3...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2misNetworkError Utility[2m > [22m[2mshould detect network-related errors and trigger retry
+[22m[39m[2026-01-26T12:53:25.939Z] [INFO] [Agent] totalUsed: 43/7360
+
+[33m⚠[39m Network error (attempt 2): ECONNRESET
+- Retrying in 4s...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2misNetworkError Utility[2m > [22m[2mshould detect network-related errors and trigger retry
+[22m[39m[2026-01-26T12:53:29.951Z] [INFO] [Agent] totalUsed: 43/7360
+
+- [Agent] Thinking-4...
+[33m⚠[39m Network error (attempt 3): ETIMEDOUT
+- Retrying in 8s...
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2misNetworkError Utility[2m > [22m[2mshould detect network-related errors and trigger retry
+[22m[39m[2026-01-26T12:53:37.959Z] [INFO] [Agent] totalUsed: 43/7360
+
+- [Agent] Thinking-5...
+[33m⚠[39m Network error (attempt 4): socket hang up
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2misNetworkError Utility[2m > [22m[2mshould detect network-related errors and trigger retry
+[22m[39m[2026-01-26T12:53:37.959Z] [ERROR] [Agent] Network error after 3 retries
+
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2misNetworkError Utility[2m > [22m[2mshould not retry on non-network errors (should terminate quickly)
+[22m[39m[2026-01-26T12:53:37.960Z] [INFO] [Agent] totalUsed: 20/7360
+
+- [Agent] Thinking-1...
+[31m✖[39m Error: Invalid API key
+[90mstdout[2m | src/agent/index.test.ts[2m > [22m[2misNetworkError Utility[2m > [22m[2mshould not retry on non-network errors (should terminate quickly)
+[22m[39m[2026-01-26T12:53:37.960Z] [INFO] [Agent] totalUsed: 42/7360
+
+- [Agent] Thinking-2...
+[31m✖[39m Error: Model not found
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2misNetworkError Utility[2m > [22m[2mshould not retry on non-network errors (should terminate quickly)
+[22m[39m[2026-01-26T12:53:37.960Z] [ERROR] [Agent] LLM call failed: Invalid API key
+
+[90mstderr[2m | src/agent/index.test.ts[2m > [22m[2misNetworkError Utility[2m > [22m[2mshould not retry on non-network errors (should terminate quickly)
+[22m[39m[2026-01-26T12:53:37.960Z] [ERROR] [Agent] LLM call failed: Model not found
+
+ [32m✓[39m src/agent/index.test.ts [2m([22m[2m24 tests[22m[2m)[22m[33m 56151[2mms[22m[39m
+   [33m[2m✓[22m[39m Agent Network Error Handling[2m > [22mshould terminate after max network retries [33m 14026[2mms[22m[39m
+   [33m[2m✓[22m[39m Agent Network Error Handling[2m > [22mshould handle network errors differently from regular errors [33m 14020[2mms[22m[39m
+   [33m[2m✓[22m[39m Agent Error Message Formatting[2m > [22mshould format network error message for history [33m 14033[2mms[22m[39m
+   [33m[2m✓[22m[39m isNetworkError Utility[2m > [22mshould detect network-related errors and trigger retry [33m 14028[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 20 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/providers/openai.test.ts[2m > [22mOpenAIProvider[2m > [22mresponse edge cases[2m > [22mshould handle null content in response
+[31m[1mAssertionError[22m: expected 'LLM API error: Empty content in respo…' to be '' // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[31m+ LLM API error: Empty content in response[39m
+
+[36m [2m❯[22m src/providers/openai.test.ts:[2m401:31[22m[39m
+    [90m399| [39m
+    [90m400| [39m      const result = await provider.generate([{ role: 'user', content:…
+    [90m401| [39m      [34mexpect[39m(result[33m?.[39mcontent)[33m.[39m[34mtoBe[39m([32m''[39m)[33m;[39m
+    [90m   | [39m                              [31m^[39m
+    [90m402| [39m    })[33m;[39m
+    [90m403| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/20]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/session-v2/compaction.edge-cases.test.ts[2m > [22mCompaction - 边缘场景测试[2m > [22m场景5: 保护区首条不是 tool 消息[2m > [22m应该正确处理保护区首条是 user/assistant 消息的情况
+[31m[1mAssertionError[22m: expected 'user' to be 'assistant' // Object.is equality[39m
+
+Expected: [32m"assistant"[39m
+Received: [31m"user"[39m
+
+[36m [2m❯[22m src/session-v2/compaction.edge-cases.test.ts:[2m328:33[22m[39m
+    [90m326| [39m      [90m// 验证最后几条消息被保留[39m
+    [90m327| [39m      [35mconst[39m lastThree [33m=[39m result[33m.[39mlist[33m.[39m[34mslice[39m([33m-[39m[34m3[39m)[33m;[39m
+    [90m328| [39m      [34mexpect[39m(lastThree[[34m0[39m][33m.[39mrole)[33m.[39m[34mtoBe[39m([32m'assistant'[39m)[33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m329| [39m      [34mexpect[39m(lastThree[[34m1[39m][33m.[39mrole)[33m.[39m[34mtoBe[39m([32m'user'[39m)[33m;[39m
+    [90m330| [39m      [34mexpect[39m(lastThree[[34m2[39m][33m.[39mrole)[33m.[39m[34mtoBe[39m([32m'assistant'[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/20]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/session-v2/compaction.edge-cases.test.ts[2m > [22mCompaction - 边缘场景测试[2m > [22m场景6: Assistant 在 pending 区，部分 tool 在 active 区[2m > [22m应该正确处理 assistant 在 pending 区但部分 tool 回复在 active 区的情况
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/session-v2/compaction.edge-cases.test.ts:[2m387:34[22m[39m
+    [90m385| [39m
+    [90m386| [39m      [90m// 验证压缩成功[39m
+    [90m387| [39m      [34mexpect[39m(result[33m.[39misCompacted)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m   | [39m                                 [31m^[39m
+    [90m388| [39m
+    [90m389| [39m      [90m// 验证 assistant 被移到 active 区[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/20]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/session-v2/compaction.multi-tools.test.ts[2m > [22mMulti-Tool Bug Fix Verification[2m > [22mshould preserve ALL tool responses when assistant has 4 tool_calls split across zones
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/session-v2/compaction.multi-tools.test.ts:[2m69:32[22m[39m
+    [90m 67| [39m
+    [90m 68| [39m    [90m// Verify compression triggered[39m
+    [90m 69| [39m    [34mexpect[39m(result[33m.[39misCompacted)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m   | [39m                               [31m^[39m
+    [90m 70| [39m
+    [90m 71| [39m    [90m// Verify ALL 4 tools preserved[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/20]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/session-v2/compaction.multi-tools.test.ts[2m > [22mMulti-Tool Bug Fix Verification[2m > [22mshould handle multiple assistants each with multiple tool_calls
+[31m[1mAssertionError[22m: expected 2 to be 1 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 2[39m
+
+[36m [2m❯[22m src/session-v2/compaction.multi-tools.test.ts:[2m143:31[22m[39m
+    [90m141| [39m    [90m// Assistant 1's tools are all in pending, so it gets summarized[39m
+    [90m142| [39m    const assistants = result.list.filter(m => m.tool_calls && m.tool_…
+    [90m143| [39m    [34mexpect[39m(assistants[33m.[39mlength)[33m.[39m[34mtoBe[39m([34m1[39m)[33m;[39m
+    [90m   | [39m                              [31m^[39m
+    [90m144| [39m    [34mexpect[39m(assistants[[34m0[39m][33m.[39mtool_calls[33m?.[39mlength)[33m.[39m[34mtoBe[39m([34m2[39m)[33m;[39m
+    [90m145| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/20]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/session-v2/compaction.multi-tools.test.ts[2m > [22mMulti-Tool Bug Fix Verification[2m > [22mshould handle user exact scenario: 3 concurrent tool calls split by zone
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/session-v2/compaction.multi-tools.test.ts:[2m198:32[22m[39m
+    [90m196| [39m
+    [90m197| [39m    [90m// Verify compression triggered[39m
+    [90m198| [39m    [34mexpect[39m(result[33m.[39misCompacted)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m   | [39m                               [31m^[39m
+    [90m199| [39m
+    [90m200| [39m    [90m// Verify assistant exists with all 3 tool_calls[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/20]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/util/event-bus.test.ts[2m > [22mEventBus[2m > [22m中间件[2m > [22m内置错误处理中间件应该工作
+[31m[1mAssertionError[22m: promise resolved "undefined" instead of rejecting[39m
+
+[32m- Expected:[39m 
+Error {
+  "message": "rejected promise",
+}
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2m❯[22m src/util/event-bus.test.ts:[2m190:46[22m[39m
+    [90m188| [39m      })[33m;[39m
+    [90m189| [39m      
+    [90m190| [39m      [35mawait[39m [34mexpect[39m(bus[33m.[39m[34memit[39m([32m'test.event'[39m[33m,[39m {}))
+    [90m   | [39m                                             [31m^[39m
+    [90m191| [39m        [33m.[39mrejects
+    [90m192| [39m        [33m.[39m[34mtoThrow[39m([32m'Test error'[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/20]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tool/bash.test.ts[2m > [22mBashTool[2m > [22mai-agent-v2 eeee
+[31m[1mAssertionError[22m: expected [] to include 'ai-agent-v2'[39m
+[36m [2m❯[22m src/tool/bash.test.ts:[2m11:26[22m[39m
+    [90m  9| [39m        [90m// 先 cd 到目标目录（cd 会返回新路径）[39m
+    [90m 10| [39m        const cdResult = await tool.execute({ command: 'cd D:\\\\work\…
+    [90m 11| [39m        [34mexpect[39m(cdResult)[33m.[39m[34mtoContain[39m([32m'ai-agent-v2'[39m)[33m;[39m
+    [90m   | [39m                         [31m^[39m
+    [90m 12| [39m
+    [90m 13| [39m        [90m// Windows 使用 dir，Unix 使用 ls[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/20]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould register a new tool
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould throw when registering duplicate tool
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould unregister a tool
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould return undefined for unregistered tool
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould get all tools
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould get tool schemas
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould return schemas in OpenAI function calling format
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould execute tool via registry
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould return error for non-existent tool
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould return error for invalid args
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould report correct size
+[41m[1m FAIL [22m[49m src/tool/index.test.ts[2m > [22mToolRegistry[2m > [22mshould clear all tools
+[31m[1mError[22m: Tool "bash" is already registered[39m
+[36m [2m❯[22m Function.register src/tool/registry.ts:[2m31:23[22m[39m
+    [90m 29| [39m        [35mfor[39m ([35mconst[39m t [35mof[39m tools) {
+    [90m 30| [39m            [35mif[39m ([35mthis[39m[33m.[39mtools[33m.[39m[34mhas[39m(t[33m.[39mname)) {
+    [90m 31| [39m                throw new Error(`Tool "${t.name}" is already registere…
+    [90m   | [39m                      [31m^[39m
+    [90m 32| [39m            }
+    [90m 33| [39m            [35mthis[39m[33m.[39mtools[33m.[39m[35mset[39m(t[33m.[39mname[33m,[39m t)[33m;[39m
+[90m [2m❯[22m registerDefaultTools src/tool/index.ts:[2m54:18[22m[39m
+[90m [2m❯[22m src/tool/index.test.ts:[2m30:9[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/20]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m6 failed[39m[22m[2m | [22m[1m[32m6 passed[39m[22m[90m (12)[39m
+[2m      Tests [22m [1m[31m20 failed[39m[22m[2m | [22m[1m[32m247 passed[39m[22m[90m (267)[39m
+[2m   Start at [22m 20:52:40
+[2m   Duration [22m 57.30s[2m (transform 1.10s, setup 0ms, collect 4.25s, tests 58.49s, environment 3ms, prepare 1.93s)[22m
+
+ ELIFECYCLE  Test failed. See above for more details.

@@ -1,8 +1,8 @@
 /**
- * Tool Registry
+ * Tool Registry - 工具注册中心
  *
- * 工具注册中心，负责管理所有可用的工具
- *
+ * 管理所有可用的工具，提供统一的工具执行接口
+ * 
  * @example
  * ```ts
  * import { ToolRegistry } from './index';
@@ -18,7 +18,7 @@
  * ```
  */
 
-import { ToolRegistry } from './registry';
+import { ToolRegistry } from './registry/ToolRegistry';
 import BashTool from './bash';
 import GlobTool from './glob';
 import { ReadFileTool } from './file';
@@ -31,51 +31,47 @@ import { initializeMcp } from '../mcp/index';
 import { WebSearchTool } from './web-search';
 import { WebFetchTool } from './web-fetch';
 import { SkillTool, initializeSkills } from '../skills';
-// import ExploreTool from './explore';
-// import TaskTool from './task';
 
 // =============================================================================
-// 工具注册表
+// 重新导出
 // =============================================================================
 
-export { ToolRegistry } from './registry';
+export { ToolRegistry } from './registry/ToolRegistry';
+export { BaseTool, ToolResult } from './base';
 
 // =============================================================================
 // 默认工具注册
 // =============================================================================
 
 /**
- * 初始化并注册所有默认工具
- *
+ * 注册所有默认工具（同步版本）
+ * 
  * 在应用启动时调用此函数
  */
 export function registerDefaultTools(): void {
-
-    ToolRegistry.register([
-        new BashTool(),
-        new GlobTool(),
-        new GrepTool(),
-        new ReadFileTool(),
-        new WriteFileTool(),
-        new SurgicalEditTool(),
-        new BatchReplaceTool(),
-        new WebSearchTool(),
-        new WebFetchTool(),
-        new SkillTool(),
-        // new ExploreTool(),
-        // new TaskTool(),
-        ...TodoTools(),
-    ]);
+  ToolRegistry.register([
+    new BashTool(),
+    new GlobTool(),
+    new GrepTool(),
+    new ReadFileTool(),
+    new WriteFileTool(),
+    new SurgicalEditTool(),
+    new BatchReplaceTool(),
+    new WebSearchTool(),
+    new WebFetchTool(),
+    new SkillTool(),
+    ...TodoTools(),
+  ]);
 }
 
 /**
- * 初始化并注册所有工具（包括 MCP 服务器工具）
- *
+ * 注册所有工具（异步版本，包括 MCP 服务器工具）
+ * 
  * 在应用启动时调用此函数，异步加载 MCP 服务器
- *
+ * 
  * @param configPath - MCP 配置文件路径（可选）
  * @returns MCP 管理器实例
- *
+ * 
  * @example
  * ```ts
  * import { registerDefaultToolsAsync } from './tool';
@@ -88,41 +84,40 @@ export function registerDefaultTools(): void {
  * ```
  */
 export async function registerDefaultToolsAsync(configPath?: string) {
-    // 初始化技能加载器（在注册 SkillTool 之前）
-    try {
-        await initializeSkills();
-    } catch (error) {
-        console.warn('[Skills] Failed to initialize skills:', error);
+  // 初始化技能加载器（在注册 SkillTool 之前）
+  try {
+    await initializeSkills();
+  } catch (error) {
+    console.warn('[Skills] Failed to initialize skills:', error);
+  }
+
+  // 注册内置工具
+  registerDefaultTools();
+
+  // 初始化 MCP 服务器（如果配置文件存在）
+  try {
+    const manager = await initializeMcp(configPath);
+    const servers = manager.getConnectedServers();
+    const totalTools = manager.getTotalToolsCount();
+
+    if (servers.length > 0) {
+      console.log(`[MCP] Loaded ${totalTools} tools from ${servers.length} server(s)`);
     }
 
-    // 注册内置工具
-    registerDefaultTools();
-
-    // 初始化 MCP 服务器（如果配置文件存在）
-    try {
-        const manager = await initializeMcp(configPath);
-        const servers = manager.getConnectedServers();
-        const totalTools = manager.getTotalToolsCount();
-
-        if (servers.length > 0) {
-            console.log(`[MCP] Loaded ${totalTools} tools from ${servers.length} server(s)`);
-        }
-
-        return manager;
-    } catch (error) {
-        // MCP 加载失败不应该阻止应用启动
-        if (error instanceof Error && !error.message.includes('not found')) {
-            console.warn('[MCP] Failed to load MCP servers:', error.message);
-        }
-        return null;
+    return manager;
+  } catch (error) {
+    // MCP 加载失败不应该阻止应用启动
+    if (error instanceof Error && !error.message.includes('not found')) {
+      console.warn('[MCP] Failed to load MCP servers:', error.message);
     }
+    return null;
+  }
 }
 
 // =============================================================================
-// 导出
+// 工具导出
 // =============================================================================
 
-export { BaseTool } from './base';
 export { default as BashTool } from './bash';
 export { getBashParser } from './bash-parser';
 export type { CommandInfo, SecurityIssue, ParseResult } from './bash-parser';

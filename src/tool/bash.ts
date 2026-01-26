@@ -36,7 +36,7 @@ export default class BashTool extends BaseTool<typeof schema> {
     private cwd = process.cwd();
 
     get description(): string {
-        return 'Run bash commands, with optional inline node/python scripts';
+        return ['Run bash commands, with optional inline node/python scripts','When viewing log files, using the tail command is the best practice.'].join('\n');
     }
 
     schema = schema;

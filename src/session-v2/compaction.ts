@@ -6,16 +6,16 @@ export class Compaction {
   private readonly maxTokens: number;
   private readonly maxOutputTokens: number;
   private readonly triggerRatio = 0.92; // 92% 触发压缩
-  private  keepMessagesNum: number = 40; 
+  private keepMessagesNum: number = 40;
   logger: ScopedLogger;
   llmProvider: LLMProvider;
 
-  constructor(config: { maxTokens: number; maxOutputTokens: number; llmProvider: LLMProvider;keepMessagesNum?:number }) {
+  constructor(config: { maxTokens: number; maxOutputTokens: number; llmProvider: LLMProvider; keepMessagesNum?: number }) {
     this.maxTokens = config.maxTokens;
     this.maxOutputTokens = config.maxOutputTokens;
     this.logger = new ScopedLogger("Compaction");
     this.llmProvider = config.llmProvider;
-    this.keepMessagesNum =config.keepMessagesNum||this.keepMessagesNum;
+    this.keepMessagesNum = config.keepMessagesNum || this.keepMessagesNum;
   }
 
   getToken(history: Message[]) {
@@ -25,14 +25,9 @@ export class Compaction {
     return {
       totalUsed,
       usableLimit: usableLimit * this.triggerRatio
-    }
+    };
   }
 
-  /**
-   * 核心入口：检查并执行压缩
-   * @param history 原始历史记录
-   * @param summarizer 外部注入的 LLM 摘要执行器
-   */
   /**
    * 性能优化：构建 tool_call_id 到 assistant 索引的映射表
    * 时间复杂度：O(n)，其中 n 是 history 的长度
@@ -73,8 +68,6 @@ export class Compaction {
     return map;
   }
 
-
-
   async compact(history: Message[]): Promise<{
     isCompacted: boolean,
     summaryMessage: Message | null,
@@ -82,9 +75,13 @@ export class Compaction {
   }> {
     const totalUsed = this.calculateTotalUsage(history);
     const usableLimit = this.maxTokens - this.maxOutputTokens;
+    const threshold = usableLimit * this.triggerRatio;
 
-    // 如果没达到 92% 的阈值，直接返回原数据
-    if (totalUsed < usableLimit * this.triggerRatio || history.length <= this.keepMessagesNum) {
+    // 只有当消息数量超过保留数量且 token 达到阈值时，才触发压缩
+    const shouldCompact = history.length > this.keepMessagesNum && totalUsed >= threshold;
+
+    // 如果没达到压缩条件，直接返回原数据
+    if (!shouldCompact) {
       return {
         isCompacted: false,
         summaryMessage: null,
@@ -92,10 +89,8 @@ export class Compaction {
       };
     }
 
-
-
     this.logger.info(
-      `[Compaction] 触发压缩。当前 Token: ${totalUsed}, 阈值: ${Math.floor(usableLimit * this.triggerRatio)}`
+      `[Compaction] 触发压缩。当前 Token: ${totalUsed}, 阈值: ${Math.floor(threshold)}`
     );
 
     let activeMessages = history.slice(-this.keepMessagesNum); // 保护区
@@ -283,31 +278,30 @@ export class Compaction {
       .join("\n");
 
     // 5. 执行异步摘要
+    const newSummaryContent = await this.summarizer(
+      textToSummarize,
+      previousSummary,
+    );
 
-      const newSummaryContent = await this.summarizer(
-        textToSummarize,
-        previousSummary,
-      );
+    const summaryMessage: Message = {
+      role: "assistant",
+      type: "summary",
+      content: `${newSummaryContent}`,
+    };
 
-      const summaryMessage: Message = {
-        role: "assistant",
-        type: "summary",
-        content: `${newSummaryContent}`,
-      };
+    // 6. 重组历史
+    const newHistory = [summaryMessage, ...activeMessages, {
+      role: "user" as const,
+      type: "text" as const,
+      content: "Confirm task completion. If the task is not finished, define the next actions and continue execution until all user requirements are satisfied.",
+    }];
 
-      // 6. 重组历史
-      const newHistory = [summaryMessage, ...activeMessages,{
-        role: "user" as const,
-        type: "text" as const,
-        content: "Confirm task completion. If the task is not finished, define the next actions and continue execution until all user requirements are satisfied.",
-      }];
+    return {
+      isCompacted: true,
+      summaryMessage,
+      list: newHistory
+    };
 
-      return {
-        isCompacted: true,
-        summaryMessage,
-        list: newHistory
-      };
-  
   }
 
   /**
@@ -332,11 +326,9 @@ export class Compaction {
 
   async summarizer(textToSummarize: string, previousSummary?: string) {
 
-    
 
-    
     const spinner = this.logger.spinner("上下文压缩...");
-  
+
     const llmResponse = await this.llmProvider.generate(
       [
         {
@@ -351,10 +343,10 @@ export class Compaction {
 7. **Pending Tasks**: Work items that remain unfinished.
 8. **Current Work**: The progress at the point the conversation was interrupted.
 
-${previousSummary?`<previous_summary>:
- ${previousSummary}
- </previous_summary>
-`:''}
+${previousSummary ? `<previous_summary>
+  ${previousSummary}
+</previous_summary>
+` : ''}
 
 <current_mesage_history>
 ${textToSummarize}

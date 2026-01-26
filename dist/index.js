@@ -13,6 +13,7 @@ const agent_1 = __importDefault(require("./agent"));
 const cli_1 = require("./cli");
 const tool_1 = require("./tool");
 const operator_1 = require("./prompts/operator");
+const context_1 = require("./context");
 const env = process.env.NODE_ENV || 'development';
 dotenv_1.default.config({ path: `.env.${env}`, override: true });
 /**
@@ -32,15 +33,19 @@ async function initializeApp(config) {
         language: "Chinese",
     });
     console.log(`Available tools:\n${tool_1.ToolRegistry.getSchemas().map(tool => `'${tool.function.name}'`).join("\n")}`);
-    const sessionId = new Date().getTime().toString();
+    // 创建 Agent（内部会创建 AgentContext）
     const agent = new agent_1.default({
         llmProvider,
         systemPrompt: customPrompt,
         defaultTools: tool_1.ToolRegistry.getSchemas(),
-        sessionId,
     });
+    // 设置全局 AgentContext 单例（供 ToolRegistry 等使用）
+    (0, context_1.setAgentContext)(agent.context);
     agent.start();
-    return { agent, sessionId };
+    console.log(`[App] Initialized with session: ${agent.context.sessionId}`);
+    console.log(`[App] Cache directory: ${agent.context.cacheRoot}`);
+    console.log(`[App] Session directory: ${agent.context.sessionDir}`);
+    return { agent, sessionId: agent.context.sessionId };
 }
 /**
  * 启动 CLI 交互模式
@@ -64,7 +69,7 @@ async function main() {
         throw new Error('DEEPSEEK_API_KEY is not set');
     }
     if (!deepseekBaseUrl) {
-        throw new Error('DEEPSEEK_BASE_URL is not set');
+        throw new Error('DEEEPSEEK_BASE_URL is not set');
     }
     // 初始化应用
     const { agent, sessionId } = await initializeApp({

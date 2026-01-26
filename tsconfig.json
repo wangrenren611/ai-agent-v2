@@ -1,5 +1,5 @@
 {
-  "exclude": ["dist", "__tests__", "node_modules", "src/cli/ui/**/*.tsx"],
+  "exclude": ["dist", "__tests__", "node_modules", "src/cli-ui/**/*", "src/cli-ink/**/*", "**/*.test.ts"],
   "compilerOptions": {
     "lib": ["ESNext"],
     "module": "CommonJS",

@@ -70,7 +70,7 @@ describe('SurgicalEditTool', () => {
       const tool = new SurgicalEditTool();
       expect(tool.description).toContain('Precise code replacement');
       expect(tool.description).toContain('line numbers');
-      expect(tool.description).toContain('plain strings');
+      expect(tool.description).toContain('exact text');
     });
 
     it('应该具有正确的 schema 定义', () => {
@@ -90,7 +90,8 @@ describe('SurgicalEditTool', () => {
         newText: 'modified-line2',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       // 验证文件内容
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
@@ -110,7 +111,8 @@ describe('SurgicalEditTool', () => {
         newText: '"modified"',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('const name = "modified";\nline2\nline3');
@@ -125,7 +127,8 @@ describe('SurgicalEditTool', () => {
         newText: '',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('line1\n\nline3\nline4\nline5');
@@ -142,7 +145,8 @@ describe('SurgicalEditTool', () => {
         newText: '',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('const greeting = "Hello";\nline2');
@@ -157,7 +161,8 @@ describe('SurgicalEditTool', () => {
         newText: 'line2-a\nline2-b\nline2-c',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('line1\nline2-a\nline2-b\nline2-c\nline3\nline4\nline5');
@@ -174,7 +179,8 @@ describe('SurgicalEditTool', () => {
         newText: 'first-line',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content.startsWith('first-line')).toBe(true);
@@ -189,7 +195,8 @@ describe('SurgicalEditTool', () => {
         newText: 'last-line',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content.endsWith('last-line')).toBe(true);
@@ -206,7 +213,8 @@ describe('SurgicalEditTool', () => {
         newText: 'modified-single',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('modified-single');
@@ -224,7 +232,8 @@ describe('SurgicalEditTool', () => {
         newText: 'new-content',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('new-content');
@@ -242,7 +251,8 @@ describe('SurgicalEditTool', () => {
         newText: 'TEST',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('TEST test test\nline2');
@@ -259,7 +269,8 @@ describe('SurgicalEditTool', () => {
         newText: 'newText',
       });
 
-      expect(result).toContain('Error: File not found');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('FILE_NOT_FOUND');
     });
 
     it('应该处理相对路径的文件不存在', async () => {
@@ -271,7 +282,8 @@ describe('SurgicalEditTool', () => {
         newText: 'newText',
       });
 
-      expect(result).toContain('Error: File not found');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('FILE_NOT_FOUND');
     });
   });
 
@@ -285,7 +297,8 @@ describe('SurgicalEditTool', () => {
         newText: 'newText',
       });
 
-      expect(result).toContain('Error: Line number out of range');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('LINE_OUT_OF_RANGE');
     });
 
     it('应该返回行号为负数的错误', async () => {
@@ -297,7 +310,8 @@ describe('SurgicalEditTool', () => {
         newText: 'newText',
       });
 
-      expect(result).toContain('Error: Line number out of range');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('LINE_OUT_OF_RANGE');
     });
 
     it('应该返回行号大于总行数的错误', async () => {
@@ -309,7 +323,8 @@ describe('SurgicalEditTool', () => {
         newText: 'newText',
       });
 
-      expect(result).toContain('Error: Line number out of range');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('LINE_OUT_OF_RANGE');
     });
 
     it('应该返回行号恰好等于总行数+1的错误', async () => {
@@ -321,7 +336,8 @@ describe('SurgicalEditTool', () => {
         newText: 'newText',
       });
 
-      expect(result).toContain('Error: Line number out of range');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('LINE_OUT_OF_RANGE');
     });
   });
 
@@ -335,8 +351,9 @@ describe('SurgicalEditTool', () => {
         newText: 'newText',
       });
 
-      expect(result).toContain('not found on line 2');
-      expect(result).toContain('content is: "line2"');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('TEXT_NOT_FOUND');
+      expect(result.metadata?.expectedText).toBe('non-existent-text');
     });
 
     it('应该返回大小写不匹配的错误（区分大小写）', async () => {
@@ -348,7 +365,8 @@ describe('SurgicalEditTool', () => {
         newText: 'newText',
       });
 
-      expect(result).toContain('not found on line 2');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('TEXT_NOT_FOUND');
     });
 
     it('应该返回完全不匹配的错误', async () => {
@@ -363,7 +381,8 @@ describe('SurgicalEditTool', () => {
         newText: 'modified',
       });
 
-      expect(result).toContain('not found on line 1');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('TEXT_NOT_FOUND');
     });
 
     it('应该处理包含前导空格的行', async () => {
@@ -378,7 +397,8 @@ describe('SurgicalEditTool', () => {
         newText: 'modified',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('modified\nline2');
@@ -393,7 +413,8 @@ describe('SurgicalEditTool', () => {
         newText: 'newText',
       });
 
-      expect(result).toContain('not found on line 2');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('TEXT_NOT_FOUND');
     });
   });
 
@@ -409,7 +430,8 @@ describe('SurgicalEditTool', () => {
         newText: 'modified',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
     });
 
     it('应该支持绝对路径', async () => {
@@ -423,7 +445,8 @@ describe('SurgicalEditTool', () => {
         newText: 'modified',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
     });
 
     it('应该支持 ./ 前缀的路径', async () => {
@@ -437,7 +460,8 @@ describe('SurgicalEditTool', () => {
         newText: 'modified',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
     });
   });
 
@@ -457,7 +481,7 @@ describe('SurgicalEditTool', () => {
 
       // 验证备份函数被调用
       expect(backupManager.backup).toHaveBeenCalledWith(TEST_FILE);
-      expect(result).toContain('backup: backup-test-123');
+      expect(result.data?.backupId).toBe('backup-test-123');
     });
 
     it('应该在返回结果中包含备份信息', async () => {
@@ -473,7 +497,8 @@ describe('SurgicalEditTool', () => {
         newText: 'modified',
       });
 
-      expect(result).toContain('(backup: backup-id-456)');
+      expect(result.data?.backupId).toBe('backup-id-456');
+      expect(result.data?.message).toContain('backup-id-456');
     });
   });
 
@@ -489,7 +514,8 @@ describe('SurgicalEditTool', () => {
         newText: '"world"',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toContain('"world"');
@@ -506,7 +532,8 @@ describe('SurgicalEditTool', () => {
         newText: '[1]',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('test[1].value\nline2');
@@ -523,7 +550,8 @@ describe('SurgicalEditTool', () => {
         newText: '修改后的内容',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('修改后的内容\nline2');
@@ -540,7 +568,8 @@ describe('SurgicalEditTool', () => {
         newText: '🙂',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('Hello 🙂\nline2');
@@ -568,8 +597,8 @@ describe('SurgicalEditTool', () => {
         }),
       ]);
 
-      expect(result1).toContain('Modification successful');
-      expect(result2).toContain('Modification successful');
+      expect(result1.success).toBe(true);
+      expect(result2.success).toBe(true);
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('modified-1\nline2\nmodified-3\nline4\nline5');
@@ -598,8 +627,9 @@ describe('SurgicalEditTool', () => {
         newText: 'second-mod',
       });
 
-      expect(result1).toContain('Modification successful');
-      expect(result2).toContain('not found on line 1');
+      expect(result1.success).toBe(true);
+      expect(result2.success).toBe(false);
+      expect(result2.error).toContain('TEXT_NOT_FOUND');
     });
   });
 
@@ -615,7 +645,8 @@ describe('SurgicalEditTool', () => {
         newText: 'restaurant',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content).toBe('restaurant\nnaïve\nstraße');
@@ -634,7 +665,8 @@ describe('SurgicalEditTool', () => {
         newText: 'modified',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
     });
   });
 
@@ -655,7 +687,8 @@ describe('SurgicalEditTool', () => {
         newText: 'modified-line',
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       const contentLines = content.split('\n');
@@ -674,7 +707,8 @@ describe('SurgicalEditTool', () => {
         newText: 'b'.repeat(100),
       });
 
-      expect(result).toContain('Modification successful');
+      expect(result.success).toBe(true);
+      expect(result.data?.message).toContain('Modification successful');
 
       const content = fs.readFileSync(TEST_FILE, 'utf-8');
       expect(content.startsWith('b'.repeat(100) + 'a'.repeat(9900))).toBe(true);

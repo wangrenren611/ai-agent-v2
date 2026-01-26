@@ -14,14 +14,17 @@ export class SessionManager {
   
   constructor({
     sessionId,
+    sessionDir,
     llmProvider
   }: {
-    sessionId: string,
+    sessionId: string;
+    sessionDir?: string;
     llmProvider: LLMProvider
   }) {
     this.id = sessionId;
     this.messageList = []
-    this.sessionPath = path.join('.memory', this.id);
+    // 使用传入的 sessionDir 或默认到 .agent-cache/sessions/{sessionId}
+    this.sessionPath = sessionDir || path.join('.agent-cache', 'sessions', this.id);
     this.maxOutputTokens = llmProvider.maxOutputTokens;
     this.maxTokens = llmProvider.maxTokens
     this.llmProvider = llmProvider;
@@ -60,7 +63,6 @@ export class SessionManager {
       this.save(message);
     }
   }
-
 
   private save(message: Message | Message[]) {
     // 使用 Promise 链确保保存顺序，防止竞态条件
