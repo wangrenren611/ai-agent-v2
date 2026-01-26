@@ -51,7 +51,8 @@
       "Bash(pnpm exec tsc:*)",
       "Bash(python3 -m json.tool:*)",
       "Bash(pnpm vitest:*)",
-      "Bash(npx vitest:*)"
+      "Bash(npx vitest:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix\\(tool\\): 修复 batch-replace 中 $ 符号转义 bug 并添加集成测试\n\n- 修复 escapeReplacementString 函数使用函数替换形式正确转义 $\n- 添加 file-and-batch-replace-integration.test.ts \\(41 个测试\\)\n- 更新 batch-replace.test.ts 中 $ 符号相关测试\n\n原有实现 text.replace\\(/$/g, ''$$'\\) 在 String.replace\\(\\) 中 $$\n表示字面量 $，导致转义失败。改用函数替换形式解决。\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   },
   "enableAllProjectMcpServers": true,
