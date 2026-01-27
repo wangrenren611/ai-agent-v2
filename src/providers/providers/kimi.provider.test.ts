@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { KimiProvider } from './kimi.provider';
-import { BaseProviderConfig, Message } from '../../base';
+import { KimiProvider } from './kimi.provider.js';
+import { BaseProviderConfig, Message } from '../../base.js';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;

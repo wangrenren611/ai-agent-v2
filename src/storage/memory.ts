@@ -1,7 +1,7 @@
-import { Message } from "../providers/base";
-import { ScopedLogger } from "../util/log";
-import { connectDB } from "./mongoose";
-import { MessageData } from "./models/message";
+import { Message } from '../providers/base.js';
+import { ScopedLogger } from '../util/log.js';
+import { connectDB } from './mongoose.js';
+import { MessageData } from './models/message.js';
 
 export default class Memory {
     private logger: ScopedLogger;
@@ -27,9 +27,10 @@ export default class Memory {
        if (this.db) {
            // 持久化到数据库
            try {
+               const contentStr = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
                await MessageData.create({
                    userId: 'default',
-                   content: msg.role==='tool'? "":msg.content,
+                   content: msg.role==='tool'? "":contentStr,
                    role: msg.role,
                    type: msg.type || 'text',
                });

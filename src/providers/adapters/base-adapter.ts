@@ -5,7 +5,7 @@
  * request/response transformations.
  */
 
-import { Message, LLMOptions, LLMResponse, MessageContent } from '../base';
+import { Message, LLMOptions, LLMResponse, MessageContent } from '../base.js';
 
 /**
  * Standard request body format for LLM APIs

@@ -5,7 +5,7 @@
  * Extracted and generalized from openai.ts implementation.
  */
 
-import { StreamChunk } from '../../providers/base';
+import { StreamChunk } from '../../providers/base.js';
 
 export interface StreamCallbacks {
   /** Called when content chunk is received */

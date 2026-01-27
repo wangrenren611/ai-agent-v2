@@ -8,7 +8,7 @@
 import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
-import type { McpServerConfig } from './types';
+import type { McpServerConfig } from './types.js';
 
 // =============================================================================
 // MCP 配置文件结构

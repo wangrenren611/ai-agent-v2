@@ -37,19 +37,19 @@
  * ```
  */
 
-export * from './types';
-export * from './EventBus';
-export * from './ScopedEventBus';
-export * from './TypedEventBus';
-export * from './middleware';
+export * from './types.js';
+export * from './EventBus.js';
+export * from './ScopedEventBus.js';
+export * from './TypedEventBus.js';
+export * from './middleware.js';
 
 // =============================================================================
 // 默认单例实例
 // =============================================================================
 
-import { EventBus } from './EventBus';
-import { TypedEventBus } from './TypedEventBus';
-import type { SessionEvents, AgentEvents } from './types';
+import { EventBus } from './EventBus.js';
+import { TypedEventBus } from './TypedEventBus.js';
+import type { SessionEvents, AgentEvents } from './types.js';
 
 /**
  * 默认事件总线单例

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import * as path from 'path';
-import { BaseTool, ToolResult } from '../tool/base';
-import { getSkillLoader } from './loader';
-import { parseSkillMarkdown } from './parser';
+import { BaseTool, ToolResult } from '../tool/base.js';
+import { getSkillLoader } from './loader.js';
+import { parseSkillMarkdown } from './parser.js';
 
 export interface SkillToolResult {
     title: string;

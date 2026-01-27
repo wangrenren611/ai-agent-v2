@@ -7,10 +7,10 @@
  * - 命令执行
  */
 
-import { BaseTool, ToolResult } from './base';
+import { BaseTool, ToolResult } from './base.js';
 import { z } from 'zod';
-import { getBashParser } from './bash-parser';
-import { getPlatform, execCommandAsync } from '../util/platform-cmd';
+import { getBashParser } from './bash-parser.js';
+import { getPlatform, execCommandAsync } from '../util/platform-cmd.js';
 
 // =============================================================================
 // 模式定义

@@ -1,5 +1,5 @@
-import { BaseTool, ToolResult } from "./base";
-import { AgentContext } from "../context";
+import { BaseTool, ToolResult } from './base.js';
+import { AgentContext } from '../context/index.js';
 
 // 重新导出供外部使用
 export { BaseTool, ToolResult };

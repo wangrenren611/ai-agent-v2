@@ -8,7 +8,7 @@
 // =============================================================================
 
 export type {
-  ProviderConfig,
+  BaseProviderConfig as ProviderConfig,
   ToolSchema,
   StreamChunk,
   StreamCallback,
@@ -16,7 +16,7 @@ export type {
   Message,
   ToolCall,
   LLMResponse,
-} from '../providers/base';
+} from '../providers/base.js';
 
 export type {
   EventHandler,
@@ -29,7 +29,7 @@ export type {
   Subscription,
   SessionEvents,
   AgentEvents,
-} from '../util/event-bus/types';
+} from '../util/event-bus/types.js';
 
 // =============================================================================
 // Tool 类型
@@ -38,13 +38,13 @@ export type {
 export type {
   ToolResult,
   ToolContext,
-} from '../tool/base';
+} from '../tool/base.js';
 
 export type {
   ToolContext as ToolRegistryContext,
   ToolRegistryConfig,
   ToolRegistryState,
-} from '../tool/registry/types';
+} from '../tool/registry/types.js';
 
 // =============================================================================
 // Context 类型
@@ -57,7 +57,7 @@ export type {
   DangerousOperation,
   DangerousOperationDef,
   ConfirmationRequest,
-} from '../context/agent-context';
+} from '../context/agent-context.js';
 
 // =============================================================================
 // Agent 类型
@@ -67,7 +67,7 @@ export type {
   AgentConfig,
   AgentRunOptions,
   AgentResponse,
-} from '../agent';
+} from '../agent/index.js';
 
 // =============================================================================
 // CLI 类型 (TODO: 未实现)
@@ -76,7 +76,7 @@ export type {
 // export type {
 //   CLIConfig,
 //   CommandContext,
-// } from '../cli';
+// } from '../cli.js';
 
 // =============================================================================
 // 实用类型

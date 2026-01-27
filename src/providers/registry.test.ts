@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 // Import from index to trigger auto-registration
-import { ProviderRegistry, ProviderType, BaseProviderConfig, PROVIDER_METADATA } from './index';
+import { ProviderRegistry, ProviderType, BaseProviderConfig, PROVIDER_METADATA } from './index.js';
 
 describe('ProviderRegistry', () => {
   beforeEach(() => {

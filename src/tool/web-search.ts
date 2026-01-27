@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseTool, ToolResult } from './base';
+import { BaseTool, ToolResult } from './base.js';
 import { tavily } from '@tavily/core';
 
 export class WebSearchTool extends BaseTool<any> {

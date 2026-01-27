@@ -5,7 +5,7 @@
  */
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import type { Route, RouteState } from '../types';
+import type { Route, RouteState } from '../types/index.js';
 
 // ============================================================================
 // Route Context Interface
@@ -69,7 +69,11 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setParams,
   };
 
-  return React.createElement(RouteContext.Provider, { value }, children);
+  return (
+    <RouteContext.Provider value={value}>
+      {children}
+    </RouteContext.Provider>
+  );
 };
 
 // ============================================================================

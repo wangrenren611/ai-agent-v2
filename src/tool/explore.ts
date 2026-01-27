@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseTool, ToolResult } from './base';
+import { BaseTool, ToolResult } from './base.js';
 
 const schema = z.object({
   prompt: z.string().describe('Specific description of the exploration task'),

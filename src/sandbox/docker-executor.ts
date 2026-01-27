@@ -20,8 +20,8 @@ import type {
     SandboxConfig,
     SandboxExecutionResult,
     SandboxResources,
-} from './types';
-import { ScopedLogger } from '../util/log';
+} from './types.js';
+import { ScopedLogger } from '../util/log.js';
 
 /**
  * 默认 Docker 镜像（轻量级、包含 bash）

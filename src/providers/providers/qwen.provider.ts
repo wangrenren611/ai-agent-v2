@@ -3,10 +3,10 @@
  * 采用通用 OpenAICompatibleProvider。
  */
 
-import { BaseProviderConfig } from '../base';
-import { OpenAIAdapter } from '../adapters/openai-adapter';
-import { ProviderMetadata } from '../config';
-import { OpenAICompatibleProvider } from './openai-compatible.base';
+import { BaseProviderConfig } from '../base.js';
+import { OpenAIAdapter } from '../adapters/openai-adapter.js';
+import { ProviderMetadata } from '../config.js';
+import { OpenAICompatibleProvider } from './openai-compatible.base.js';
 
 export const QWEN_METADATA: ProviderMetadata = {
   type: 'qwen' as any,

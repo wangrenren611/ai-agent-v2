@@ -13,7 +13,7 @@ import {
   createValidationMiddleware,
   createTimeoutMiddleware,
   createRetryMiddleware,
-} from './index';
+} from './index.js';
 
 describe('EventBus', () => {
   let bus: EventBus;

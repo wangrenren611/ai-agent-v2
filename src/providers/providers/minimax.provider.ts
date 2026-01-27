@@ -3,9 +3,9 @@
  * 使用 MiniMaxAdapter（自定义鉴权 Bearer {groupId}.{apiKey}），其余流程复用通用基类。
  */
 
-import { MiniMaxAdapter } from '../adapters/minimax-adapter';
-import { ProviderMetadata } from '../config';
-import { OpenAICompatibleProvider, OpenAICompatibleConfig } from './openai-compatible.base';
+import { MiniMaxAdapter } from '../adapters/minimax-adapter.js';
+import { ProviderMetadata } from '../config.js';
+import { OpenAICompatibleProvider, OpenAICompatibleConfig } from './openai-compatible.base.js';
 
 export const MINIMAX_METADATA: ProviderMetadata = {
   type: 'minimax' as any,

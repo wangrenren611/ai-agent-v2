@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { QwenProvider } from './qwen.provider';
-import { BaseProviderConfig, Message } from '../../base';
+import { QwenProvider } from './qwen.provider.js';
+import { BaseProviderConfig, Message } from '../../base.js';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;

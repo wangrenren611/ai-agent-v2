@@ -16,7 +16,7 @@ import type {
     SkillLoaderOptions,
     SkillMetadata,
     SkillFrontmatter
-} from './types';
+} from './types.js';
 
 /**
  * 默认技能目录

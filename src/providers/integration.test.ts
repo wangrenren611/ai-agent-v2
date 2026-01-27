@@ -9,7 +9,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 // Import from index to trigger auto-registration
-import { ProviderRegistry, ProviderType, BaseProviderConfig, Message } from './index';
+import { ProviderRegistry, ProviderType, BaseProviderConfig, Message } from './index.js';
 
 // Mock fetch for all tests
 const mockFetch = vi.fn();

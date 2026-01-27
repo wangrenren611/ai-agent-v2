@@ -9,9 +9,9 @@
  * - GLM (with custom endpoint path)
  */
 
-import { BaseAPIAdapter, APIRequestBody, APIResponse } from './base-adapter';
-import { Message, LLMOptions } from '../base';
-import { DEFAULT_TEMPERATURE } from '../../agent/types';
+import { BaseAPIAdapter, APIRequestBody, APIResponse } from './base-adapter.js';
+import { Message, LLMOptions } from '../base.js';
+import { DEFAULT_TEMPERATURE } from '../../agent/types.js';
 
 export interface OpenAIAdapterOptions {
   /** Endpoint path override (e.g., '/api/paas/v4/chat/completions') */

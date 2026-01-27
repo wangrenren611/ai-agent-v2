@@ -1,9 +1,9 @@
 import z from 'zod';
-import { BaseTool, ToolResult } from './base';
-import { DESCRIPTION_WRITE } from './todowrite';
+import { BaseTool, ToolResult } from './base.js';
+import { DESCRIPTION_WRITE } from './todowrite.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { ToolRegistry } from './registry';
+import { ToolRegistry } from './registry/index.js';
 
 const Status = z.enum(['pending', 'in_progress', 'completed', 'cancelled']);
 const Priority = z.enum(['high', 'medium', 'low']);

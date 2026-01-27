@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseTool, ToolResult } from './base';
+import { BaseTool, ToolResult } from './base.js';
 
 const EXPLORE_CONFIG = {
   name: 'explore',

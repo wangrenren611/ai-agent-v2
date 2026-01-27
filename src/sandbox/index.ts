@@ -6,9 +6,9 @@
  * 沙箱执行器的统一导出
  */
 
-export * from './types';
-export * from './base';
-export * from './docker-executor';
+export * from './types.js';
+export * from './base.js';
+export * from './docker-executor.js';
 
 // =============================================================================
 // 默认导出
@@ -18,9 +18,9 @@ export {
     createSandboxFactory,
     SandboxExecutorFactory,
     type SandboxFactoryConfig,
-} from './base';
+} from './base.js';
 
 export {
     createDockerSandbox,
     DockerSandboxExecutor,
-} from './docker-executor';
+} from './docker-executor.js';

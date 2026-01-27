@@ -3,10 +3,10 @@
  * 单例模式，管理所有可用的工具
  */
 
-import { BaseTool, ToolResult } from '../base';
-import { AgentContext } from '../../context';
-import { SchemaConverter } from './schema-converter';
-import type { ToolContext, ToolRegistryConfig, ToolRegistryState } from './types';
+import { BaseTool, ToolResult } from '../base.js';
+import { AgentContext } from '../../context/index.js';
+import { SchemaConverter } from './schema-converter.js';
+import type { ToolContext, ToolRegistryConfig, ToolRegistryState } from './types.js';
 
 /**
  * 工具注册表类

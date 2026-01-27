@@ -3,7 +3,7 @@
  * 用于在 Agent 执行过程中发布和监听事件
  */
 
-import { ToolSchema } from "../providers/base";
+import { ToolSchema } from '../providers/base.js';
 
 /**
  * Agent 生命周期事件

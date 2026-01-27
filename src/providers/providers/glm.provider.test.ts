@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { GLMProvider } from './glm.provider';
-import { BaseProviderConfig, Message } from '../../base';
+import { GLMProvider } from './glm.provider.js';
+import { BaseProviderConfig, Message } from '../../base.js';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;

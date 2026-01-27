@@ -7,7 +7,7 @@
  *
  * @example
  * ```ts
- * import { initializeSkills, getSkillLoader, createSkillTool } from './skills';
+ * import { initializeSkills, getSkillLoader, createSkillTool } from './skills.js';
  *
  * // 初始化技能系统
  * await initializeSkills({ hotReload: true });
@@ -30,14 +30,14 @@ export type {
     SkillMetadata,
     SkillLoaderOptions,
     SkillFrontmatter
-} from './types';
+} from './types.js';
 
 // 加载器
 export {
     SkillLoader,
     getSkillLoader,
     initializeSkills
-} from './loader';
+} from './loader.js';
 
 // 解析器
 export {
@@ -46,7 +46,7 @@ export {
     extractFileReferences,
     extractShellCommands,
     formatSkillContent
-} from './parser';
+} from './parser.js';
 
 // 工具 - 新的 API
 export {
@@ -55,6 +55,6 @@ export {
     defaultSkillTool,
     simpleSkillTool,
     type SkillToolResult
-} from './skill-tool';
+} from './skill-tool.js';
 
 

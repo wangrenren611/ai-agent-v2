@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { MiniMaxAdapter } from './minimax-adapter';
-import { Message, LLMOptions } from '../base';
-import { DEFAULT_TEMPERATURE } from '../../../agent/types';
+import { MiniMaxAdapter } from './minimax-adapter.js';
+import { Message, LLMOptions } from '../base.js';
+import { DEFAULT_TEMPERATURE } from '../../../agent/types.js';
 
 describe('MiniMaxAdapter', () => {
   let adapter: MiniMaxAdapter;

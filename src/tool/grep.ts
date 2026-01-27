@@ -3,7 +3,7 @@ import * as readline from 'node:readline';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
-import { BaseTool, ToolResult } from './base';
+import { BaseTool, ToolResult } from './base.js';
 
 const schema = z.object({
   pattern: z.string().min(1).describe('Regex pattern'),

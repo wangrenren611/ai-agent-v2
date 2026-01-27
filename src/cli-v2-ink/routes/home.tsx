@@ -6,7 +6,7 @@
 
 import React, { useState } from 'react';
 import { Box, Text, useInput } from 'ink';
-import type { RouteContextValue } from '../context/route';
+import type { RouteContextValue } from '../context/route.js';
 
 interface HomeProps {
   navigate: RouteContextValue['navigate'];
@@ -66,37 +66,39 @@ const Home: React.FC<HomeProps> = ({ navigate }) => {
     }
   });
 
-  return React.createElement(
-    Box,
-    { flexDirection: 'column' },
-    React.createElement(Box, { marginBottom: 1 },
-      React.createElement(Text, { bold: true, color: 'cyan' }, 'Welcome to AI Agent v2')
-    ),
-    React.createElement(Box, { marginBottom: 2 },
-      React.createElement(Text, { dimColor: true }, 'Type a message to start chatting')
-    ),
-    React.createElement(Box, { marginBottom: 1 },
-      React.createElement(Text, { dimColor: true }, '当前模型: '),
-      React.createElement(Text, { bold: true }, currentModel),
-      React.createElement(Text, { dimColor: true }, '  (输入 "model <name>" 切换)')
-    ),
-    notice && React.createElement(Box, { marginBottom: 1 },
-      React.createElement(Text, { color: 'yellow' }, notice)
-    ),
-    React.createElement(Box, { flexDirection: 'column', marginBottom: 1 },
-      React.createElement(Box, {},
-        React.createElement(Text, { dimColor: true }, 'Press '),
-        React.createElement(Text, { bold: true }, 'q'),
-        React.createElement(Text, { dimColor: true }, ' to quit')
-      )
-    ),
-    React.createElement(Box, { marginTop: 2, flexDirection: 'column' },
-      React.createElement(Box, {},
-        React.createElement(Text, { color: 'cyan', bold: true }, '> '),
-        React.createElement(Text, null, input),
-        React.createElement(Text, { backgroundColor: 'gray' }, ' ')
-      )
-    )
+  return (
+    <Box flexDirection="column">
+      <Box marginBottom={1}>
+        <Text bold color="cyan">Welcome to AI Agent v2</Text>
+      </Box>
+      <Box marginBottom={2}>
+        <Text dimColor>Type a message to start chatting</Text>
+      </Box>
+      <Box marginBottom={1}>
+        <Text dimColor>当前模型: </Text>
+        <Text bold>{currentModel}</Text>
+        <Text dimColor>  (输入 "model &lt;name&gt;" 切换)</Text>
+      </Box>
+      {notice && (
+        <Box marginBottom={1}>
+          <Text color="yellow">{notice}</Text>
+        </Box>
+      )}
+      <Box flexDirection="column" marginBottom={1}>
+        <Box>
+          <Text dimColor>Press </Text>
+          <Text bold>q</Text>
+          <Text dimColor> to quit</Text>
+        </Box>
+      </Box>
+      <Box marginTop={2} flexDirection="column">
+        <Box>
+          <Text color="cyan" bold>&gt; </Text>
+          <Text>{input}</Text>
+          <Text backgroundColor="gray"> </Text>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

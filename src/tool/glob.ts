@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import fg from 'fast-glob';
 import { resolve } from 'path';
-import { BaseTool, ToolResult } from './base';
+import { BaseTool, ToolResult } from './base.js';
 
 const schema = z.object({
     pattern: z.string().describe('Glob pattern like **/*.ts or src/**/*.test.ts'),

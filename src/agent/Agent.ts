@@ -4,7 +4,7 @@
  *
  * @module Agent
  */
-import { TypedEventBus } from '../util/event-bus';
+import { TypedEventBus } from '../util/event-bus/index.js';
 import {
     AgentEvents,
     AgentConfig,
@@ -20,14 +20,14 @@ import {
     MAX_NETWORK_RETRIES,
     VALID_FINISH_REASONS,
     ToolSchema,
-} from './types';
-import { ToolError } from './ToolError';
-import { isRetryableError, isPermanentError, isAbortedError, LLMAuthError, LLMNotFoundError } from '../providers/errors';
-import { ScopedLogger } from '../util/log';
-import { SessionManager } from '../session-v2';
-import { ToolRegistry } from '../tool/registry';
-import { Compaction } from '../session-v2/compaction';
-import { AgentContext, getAgentContext } from '../context';
+} from './types.js';
+import { ToolError } from './ToolError.js';
+import { isRetryableError, isPermanentError, isAbortedError, LLMAuthError, LLMNotFoundError } from '../providers/errors.js';
+import { ScopedLogger } from '../util/log.js';
+import { SessionManager } from '../session-v2/index.js';
+import { ToolRegistry } from '../tool/registry/index.js';
+import { Compaction } from '../session-v2/compaction.js';
+import { AgentContext, getAgentContext } from '../context/index.js';
 
 // =============================================================================
 // 错误信息接口（内部使用）
@@ -273,7 +273,7 @@ export class Agent {
             );
             log('info', `totalUsed: ${totalUsed}/${usableLimit}`);
 
-            const { isCompacted, list: llmMessages } = await this.compaction.compact(
+            const { isCompacted, newHistory: llmMessages } = await this.compaction.compact(
                 [{ role: 'system', content: this.systemPrompt }, ...messages],
                 tools
             );

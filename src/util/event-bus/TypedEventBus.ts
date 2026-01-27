@@ -12,9 +12,9 @@ import type {
   Middleware,
   EventMetadata,
   EventMetrics,
-} from './types';
-import { EventBus } from './EventBus';
-import { ScopedEventBus } from './ScopedEventBus';
+} from './types.js';
+import { EventBus } from './EventBus.js';
+import { ScopedEventBus } from './ScopedEventBus.js';
 
 /**
  * 类型安全的事件总线（泛型版本）

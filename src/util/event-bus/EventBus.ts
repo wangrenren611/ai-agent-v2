@@ -18,8 +18,8 @@ import type {
   Middleware,
   EventContext,
   EventMetadata,
-} from './types';
-import { ScopedEventBus } from './ScopedEventBus';
+} from './types.js';
+import { ScopedEventBus } from './ScopedEventBus.js';
 
 /**
  * 事件总线主类

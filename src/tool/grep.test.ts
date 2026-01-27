@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import path from 'path';
 import fs from 'node:fs/promises';
-import GrepTool from './grep';
+import GrepTool from './grep.js';
 
 describe('GrepTool', () => {
   // 检查 ripgrep 是否可用

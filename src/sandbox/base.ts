@@ -6,9 +6,9 @@
  * 沙箱执行器抽象基类
  */
 
-import { execCommandAsync } from '../util/platform-cmd';
-import type { ISandboxExecutor, SandboxConfig, SandboxExecutionResult } from './types';
-import { ScopedLogger } from '../util/log';
+import { execCommandAsync } from '../util/platform-cmd.js';
+import type { ISandboxExecutor, SandboxConfig, SandboxExecutionResult } from './types.js';
+import { ScopedLogger } from '../util/log.js';
 
 /**
  * 直接执行沙箱（无隔离）

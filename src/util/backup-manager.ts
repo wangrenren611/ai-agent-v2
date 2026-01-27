@@ -9,7 +9,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import { ScopedLogger } from './log';
+import { ScopedLogger } from './log.js';
 
 /**
  * 备份信息

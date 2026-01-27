@@ -6,9 +6,9 @@
  * - Different endpoint path: /v1/text/chatcompletion_v2
  */
 
-import { BaseAPIAdapter, APIRequestBody, APIResponse } from './base-adapter';
-import { Message, LLMOptions } from '../base';
-import { DEFAULT_TEMPERATURE } from '../../agent/types';
+import { BaseAPIAdapter, APIRequestBody, APIResponse } from './base-adapter.js';
+import { Message, LLMOptions } from '../base.js';
+import { DEFAULT_TEMPERATURE } from '../../agent/types.js';
 
 export interface MiniMaxAdapterOptions {
   /** Group ID for authentication */

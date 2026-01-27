@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { HTTPClient } from './http-client';
-import { LLMRetryableError } from '../../errors';
+import { HTTPClient } from './http-client.js';
+import { LLMRetryableError } from '../../errors.js';
 
 describe('HTTPClient', () => {
   let httpClient: HTTPClient;

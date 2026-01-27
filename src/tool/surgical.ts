@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { z } from 'zod';
-import { BaseTool, ToolResult } from './base';
+import { BaseTool, ToolResult } from './base.js';
 import chalk from 'chalk';
-import { getBackupManager } from '../util/backup-manager';
+import { getBackupManager } from '../util/backup-manager.js';
 
 export class SurgicalEditTool extends BaseTool<any> {
 

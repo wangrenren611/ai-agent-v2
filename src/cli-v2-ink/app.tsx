@@ -6,11 +6,11 @@
 
 import React, { useMemo } from 'react';
 import { Box } from 'ink';
-import { RouteProvider, useRoute } from './context/route';
-import { ThemeProvider } from './context/theme';
-import Home from './routes/home';
-import Session from './routes/session';
-import Settings from './routes/settings';
+import { RouteProvider, useRoute } from './context/route.js';
+import { ThemeProvider } from './context/theme.js';
+import Home from './routes/home.js';
+import Session from './routes/session.js';
+import Settings from './routes/settings.js';
 
 // ============================================================================
 // Main App Component
@@ -22,32 +22,30 @@ const AppContent: React.FC = () => {
   const renderRoute = useMemo(() => {
     switch (routeState.current) {
       case 'home':
-        return React.createElement(Home, { navigate: routeContext.navigate });
+        return <Home navigate={routeContext.navigate} />;
       case 'session':
-        return React.createElement(Session, { navigate: routeContext.navigate });
+        return <Session navigate={routeContext.navigate} />;
       case 'settings':
-        return React.createElement(Settings, { navigate: routeContext.navigate });
+        return <Settings navigate={routeContext.navigate} />;
       default:
-        return React.createElement(Home, { navigate: routeContext.navigate });
+        return <Home navigate={routeContext.navigate} />;
     }
   }, [routeState.current, routeContext.navigate]);
 
-  return React.createElement(
-    Box,
-    { flexDirection: 'column', paddingX: 2 },
-    renderRoute
+  return (
+    <Box flexDirection="column" paddingX={2}>
+      {renderRoute}
+    </Box>
   );
 };
 
 const App: React.FC = () => {
-  return React.createElement(
-    ThemeProvider,
-    null,
-    React.createElement(
-      RouteProvider,
-      null,
-      React.createElement(AppContent)
-    )
+  return (
+    <ThemeProvider>
+      <RouteProvider>
+        <AppContent />
+      </RouteProvider>
+    </ThemeProvider>
   );
 };
 

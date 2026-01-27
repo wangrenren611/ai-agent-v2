@@ -3,9 +3,9 @@
  * 现基于通用 OpenAICompatibleProvider，复用 openai.ts 同步的请求/流处理逻辑。
  */
 
-import { OpenAIAdapter } from '../adapters/openai-adapter';
-import { ProviderMetadata, getProviderMetadata } from '../config';
-import { OpenAICompatibleProvider, OpenAICompatibleConfig } from './openai-compatible.base';
+import { OpenAIAdapter } from '../adapters/openai-adapter.js';
+import { ProviderMetadata, getProviderMetadata } from '../config.js';
+import { OpenAICompatibleProvider, OpenAICompatibleConfig } from './openai-compatible.base.js';
 
 /**
  * OpenAI Provider metadata

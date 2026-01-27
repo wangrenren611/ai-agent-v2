@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { StreamParser } from './stream-parser';
+import { StreamParser } from './stream-parser.js';
 
 describe('StreamParser', () => {
   describe('parseSseLine', () => {

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Log from '../util/log';
+import Log from '../util/log.js';
 
 export const connectDB = async () => {
    if(!process.env.MONGODB_URI){

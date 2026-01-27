@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ToolRegistry, BaseTool, registerDefaultTools } from './index';
+import { ToolRegistry, BaseTool, registerDefaultTools } from './index.js';
 import { z } from 'zod';
 
 // 测试用工具

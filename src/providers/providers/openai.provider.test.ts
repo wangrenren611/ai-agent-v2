@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { OpenAIProvider } from './openai.provider';
-import { BaseProviderConfig, Message } from '../../base';
+import { OpenAIProvider } from './openai.provider.js';
+import { BaseProviderConfig, Message } from '../../base.js';
 
 // Mock global fetch
 const mockFetch = vi.fn();

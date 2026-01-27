@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { MiniMaxProvider } from './minimax.provider';
-import { BaseProviderConfig, Message } from '../../base';
+import { MiniMaxProvider } from './minimax.provider.js';
+import { BaseProviderConfig, Message } from '../../base.js';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;

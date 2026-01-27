@@ -9,13 +9,13 @@ import {
   LLMOptions,
   Message,
   BaseProviderConfig,
-} from '../base';
-import { ProviderMetadata } from '../config';
-import { BaseAPIAdapter } from '../adapters/base-adapter';
-import { HTTPClient } from '../utils/http-client';
-import { StreamParser } from '../utils/stream-parser';
-import { LLMError } from '../errors';
-import { DEFAULT_TEMPERATURE } from '../../agent/types';
+} from '../base.js';
+import { ProviderMetadata } from '../config.js';
+import { BaseAPIAdapter } from '../adapters/base-adapter.js';
+import { HTTPClient } from '../utils/http-client.js';
+import { StreamParser } from '../utils/stream-parser.js';
+import { LLMError } from '../errors.js';
+import { DEFAULT_TEMPERATURE } from '../../agent/types.js';
 
 export interface OpenAICompatibleConfig extends BaseProviderConfig {
   organization?: string;
@@ -149,7 +149,7 @@ export abstract class OpenAICompatibleProvider extends LLMProvider {
     const apiResponse = this.adapter.transformResponse(data);
 
     return {
-      content: apiResponse.content || '',
+      content: typeof apiResponse.content === 'string' ? apiResponse.content : '',
       role: 'assistant',
       type: 'text',
       tool_calls: apiResponse.tool_calls && apiResponse.tool_calls.length > 0 ? apiResponse.tool_calls : undefined,

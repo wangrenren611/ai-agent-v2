@@ -5,7 +5,7 @@
  * 
  * @example
  * ```ts
- * import { ToolRegistry } from './index';
+ * import { ToolRegistry } from './index.js';
  *
  * // 获取所有工具
  * const tools = ToolRegistry.getAll();
@@ -18,27 +18,27 @@
  * ```
  */
 
-import { ToolRegistry } from './registry/ToolRegistry';
-import BashTool from './bash';
-import GlobTool from './glob';
-import { ReadFileTool } from './file';
-import { WriteFileTool } from './file';
-import GrepTool from './grep';
-import { SurgicalEditTool } from './surgical';
-import { BatchReplaceTool } from './batch-replace';
-import TodoTools from './todo';
-import { initializeMcp } from '../mcp/index';
-import { WebSearchTool } from './web-search';
-import { WebFetchTool } from './web-fetch';
-import { SkillTool, initializeSkills } from '../skills';
+import { ToolRegistry } from './registry/ToolRegistry.js';
+import BashTool from './bash.js';
+import GlobTool from './glob.js';
+import { ReadFileTool } from './file.js';
+import { WriteFileTool } from './file.js';
+import GrepTool from './grep.js';
+import { SurgicalEditTool } from './surgical.js';
+import { BatchReplaceTool } from './batch-replace.js';
+import TodoTools from './todo.js';
+import { initializeMcp } from '../mcp/index.js';
+import { WebSearchTool } from './web-search.js';
+import { WebFetchTool } from './web-fetch.js';
+import { SkillTool, initializeSkills } from '../skills/index.js';
 
 // =============================================================================
 // 重新导出
 // =============================================================================
 
-export { ToolRegistry } from './registry/ToolRegistry';
-export { BaseTool } from './base';
-export type { ToolResult } from './base';
+export { ToolRegistry } from './registry/ToolRegistry.js';
+export { BaseTool } from './base.js';
+export type { ToolResult } from './base.js';
 
 // =============================================================================
 // 默认工具注册
@@ -75,7 +75,7 @@ export function registerDefaultTools(): void {
  * 
  * @example
  * ```ts
- * import { registerDefaultToolsAsync } from './tool';
+ * import { registerDefaultToolsAsync } from './tool.js';
  *
  * // 使用默认配置路径
  * await registerDefaultToolsAsync();
@@ -119,12 +119,12 @@ export async function registerDefaultToolsAsync(configPath?: string) {
 // 工具导出
 // =============================================================================
 
-export { default as BashTool } from './bash';
-export { getBashParser } from './bash-parser';
-export type { CommandInfo, SecurityIssue, ParseResult } from './bash-parser';
-export { BatchReplaceTool } from './batch-replace';
-export { default as TaskTool } from './task';
+export { default as BashTool } from './bash.js';
+export { getBashParser } from './bash-parser.js';
+export type { CommandInfo, SecurityIssue, ParseResult } from './bash-parser.js';
+export { BatchReplaceTool } from './batch-replace.js';
+export { default as TaskTool } from './task.js';
 
-export { initializeSkills, getSkillLoader } from '../skills/loader';
-export type { Skill, SkillMetadata, SkillLoaderOptions } from '../skills/types';
-export { default as CompleteTaskTool } from './complete-task';
+export { initializeSkills, getSkillLoader } from '../skills/loader.js';
+export type { Skill, SkillMetadata, SkillLoaderOptions } from '../skills/types.js';
+export { default as CompleteTaskTool } from './complete-task.js';

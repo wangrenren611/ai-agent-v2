@@ -1,5 +1,5 @@
 import path from "node:path";
-import { LLMProvider, Message } from "../providers/base";
+import { LLMProvider, Message } from '../providers/base.js';
 import fs, { mkdir } from 'node:fs/promises';
 
 

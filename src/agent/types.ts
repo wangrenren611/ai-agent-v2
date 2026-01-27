@@ -2,7 +2,7 @@
  * Agent 类型定义和常量
  */
 
-import { LLMProvider } from "../providers/base";
+import { LLMProvider } from '../providers/base.js';
 
 // =============================================================================
 // 常量定义

@@ -16,7 +16,7 @@ import {
   PROVIDER_METADATA,
   getProviderMetadata,
   getProviderTypes,
-} from './config';
+} from './config.js';
 
 describe('ProviderType', () => {
   it('should have all provider types', () => {

@@ -12,8 +12,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { SurgicalEditTool } from './surgical';
-import { getBackupManager } from '../util/backup-manager';
+import { SurgicalEditTool } from './surgical.js';
+import { getBackupManager } from '../util/backup-manager.js';
 
 // 测试文件路径
 const TEST_DIR = path.join(process.cwd(), '.test_surgical');

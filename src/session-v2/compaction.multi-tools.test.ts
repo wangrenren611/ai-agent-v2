@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { Compaction } from './compaction';
-import { LLMProvider } from '../providers/base';
-import type { Message } from '../providers/base';
+import { Compaction } from './compaction.js';
+import { LLMProvider } from '../providers/base.js';
+import type { Message } from '../providers/base.js';
 
 // Mock LLM Provider
 class MockLLMProvider extends LLMProvider {

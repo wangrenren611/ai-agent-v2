@@ -1,4 +1,4 @@
-import Log from '../util/log';
+import Log from '../util/log.js';
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 

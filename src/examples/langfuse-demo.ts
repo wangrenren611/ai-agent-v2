@@ -6,7 +6,7 @@
  * 演示如何在项目中使用 Langfuse 进行追踪和监控
  */
 
-import { createSessionTracker, flushTraces } from '../observability/langfuse';
+import { createSessionTracker, flushTraces } from '../observability/langfuse.js';
 import dotenv from 'dotenv';
 
 const env = process.env.NODE_ENV || 'development';

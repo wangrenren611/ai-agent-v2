@@ -3,10 +3,10 @@
  * 初始化并启动 AI Agent 应用
  */
 import dotenv from 'dotenv';
-import { Agent } from './agent';
-import { ProviderRegistry, ProviderType } from './providers';
-import {operatorPrompt} from './prompts/operator';
-import { registerDefaultToolsAsync, ToolRegistry } from './tool';
+import { Agent } from './agent/index.js';
+import { ProviderRegistry, ProviderType } from './providers/index.js';
+import {operatorPrompt} from './prompts/operator.js';
+import { registerDefaultToolsAsync, ToolRegistry } from './tool/index.js';
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}`, override: true });
 

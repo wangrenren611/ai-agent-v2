@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { z } from 'zod';
-import { BaseTool, ToolResult } from './base';
-import { getBackupManager } from '../util/backup-manager';
+import { BaseTool, ToolResult } from './base.js';
+import { getBackupManager } from '../util/backup-manager.js';
 import chalk from 'chalk';
 
 export class RollbackTool extends BaseTool<any> {

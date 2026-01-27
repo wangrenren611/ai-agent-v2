@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseTool, ToolResult } from './base';
+import { BaseTool, ToolResult } from './base.js';
 
 const schema = z.object({
   finalAnswer: z.string().min(1, "Final answer cannot be empty.").describe('The final response to the user'),

@@ -8,8 +8,8 @@
  * - 测试环境中创建独立的测试环境
  */
 
-import type { EventHandler, AsyncEventHandler, Subscription, EventMetadata } from './types';
-import { EventBus } from './EventBus';
+import type { EventHandler, AsyncEventHandler, Subscription, EventMetadata } from './types.js';
+import { EventBus } from './EventBus.js';
 
 /**
  * 作用域事件总线

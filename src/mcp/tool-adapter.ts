@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { BaseTool, ToolResult } from '../tool/base';
-import type { McpClient, Tool as McpTool } from './client';
-import { ToolCallResponse } from './types';
-import { jsonSchemaToZod } from './json-schema-to-zod';
+import { BaseTool, ToolResult } from '../tool/base.js';
+import type { McpClient, Tool as McpTool } from './client.js';
+import { ToolCallResponse } from './types.js';
+import { jsonSchemaToZod } from './json-schema-to-zod.js';
 
 export class McpToolAdapter extends BaseTool<z.ZodType<any>> {
   private client: McpClient;

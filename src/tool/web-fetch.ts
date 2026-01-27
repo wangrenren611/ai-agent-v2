@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseTool, ToolResult } from './base';
+import { BaseTool, ToolResult } from './base.js';
 import TurndownService from 'turndown';
 
 // 声明 HTMLRewriter 全局类型

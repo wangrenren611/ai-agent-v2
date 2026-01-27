@@ -5,13 +5,13 @@
  * Supports auto-detection from environment variables.
  */
 
-import { LLMProvider } from './base';
+import { LLMProvider } from './base.js';
 import {
   ProviderType,
   ProviderConfig,
   BaseProviderConfig,
   getProviderMetadata,
-} from './config';
+} from './config.js';
 
 /**
  * Provider constructor with metadata

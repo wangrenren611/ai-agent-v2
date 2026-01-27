@@ -4,13 +4,13 @@
  * - 保持旧测试用例预期的默认值与错误返回格式
  */
 
-import { DEFAULT_TEMPERATURE } from '../agent/types';
-import { Message, LLMOptions, LLMResponse } from './base';
+import { DEFAULT_TEMPERATURE } from '../agent/types.js';
+import { Message, LLMOptions, LLMResponse } from './base.js';
 import {
   OpenAIProvider as CoreOpenAIProvider,
   OPENAI_METADATA,
   OpenAIProviderConfig as CoreOpenAIConfig,
-} from './providers/openai.provider';
+} from './providers/openai.provider.js';
 
 export interface OpenAIConfig extends CoreOpenAIConfig {}
 

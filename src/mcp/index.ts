@@ -9,22 +9,22 @@
 // 公共 API
 // =============================================================================
 
-export * from './types';
-export * from './client';
-export * from './tool-adapter';
-export * from './manager';
-export * from './config-loader';
-export * from './json-schema-to-zod';
+export * from './types.js';
+export * from './client.js';
+export * from './tool-adapter.js';
+export * from './manager.js';
+export * from './config-loader.js';
+export * from './json-schema-to-zod.js';
 
 // =============================================================================
 // 便捷导出
 // =============================================================================
 
-export { initializeMcp, getMcpManager } from './manager';
-export { loadMcpConfig, findConfigFile } from './config-loader';
-export { McpClient, ConnectionState } from './client';
-export { McpToolAdapter, createToolAdapters } from './tool-adapter';
-export { jsonSchemaToZod } from './json-schema-to-zod';
+export { initializeMcp, getMcpManager } from './manager.js';
+export { loadMcpConfig, findConfigFile } from './config-loader.js';
+export { McpClient, ConnectionState } from './client.js';
+export { McpToolAdapter, createToolAdapters } from './tool-adapter.js';
+export { jsonSchemaToZod } from './json-schema-to-zod.js';
 
 // =============================================================================
 // 类型
@@ -36,6 +36,6 @@ export type {
   Tool,
   ToolCallRequest,
   ToolCallResponse,
-} from './types';
+} from './types.js';
 
-export type { McpConfigFile as ConfigFile } from './config-loader';
+export type { McpConfigFile as ConfigFile } from './config-loader.js';

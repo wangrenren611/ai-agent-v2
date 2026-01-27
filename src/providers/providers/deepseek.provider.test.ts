@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { DeepSeekProvider } from './deepseek.provider';
-import { BaseProviderConfig, Message } from '../../base';
+import { DeepSeekProvider } from './deepseek.provider.js';
+import { BaseProviderConfig, Message } from '../../base.js';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;

@@ -19,8 +19,8 @@ import type {
   McpServerConfig,
   Tool,
   ToolCallResponse,
-} from './types';
-import { ConnectionState } from './types';
+} from './types.js';
+import { ConnectionState } from './types.js';
 
 // =============================================================================
 // MCP 客户端

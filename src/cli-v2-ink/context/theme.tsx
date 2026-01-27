@@ -5,7 +5,7 @@
  */
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import type { Theme, ThemeState } from '../types';
+import type { Theme, ThemeState } from '../types/index.js';
 
 // ============================================================================
 // Default Theme
@@ -85,7 +85,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     toggleMode,
   };
 
-  return React.createElement(ThemeContext.Provider, { value }, children);
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
 };
 
 export const useTheme = () => {

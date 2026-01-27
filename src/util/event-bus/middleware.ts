@@ -10,7 +10,7 @@
  * 5. 重试中间件：自动重试失败的操作
  */
 
-import type { Middleware, EventContext } from './types';
+import type { Middleware, EventContext } from './types.js';
 
 /**
  * 创建日志中间件

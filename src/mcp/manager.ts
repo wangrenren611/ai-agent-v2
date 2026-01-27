@@ -5,12 +5,12 @@
  * 负责启动、停止和协调所有 MCP 服务器
  */
 
-import { McpClient } from './client';
-import { createToolAdapters } from './tool-adapter';
-import { ToolRegistry } from '../tool/index';
-import { loadMcpConfig } from './config-loader';
-import type { McpServerConfig,  McpConnectionInfo } from './types';
-import { ConnectionState } from './types';
+import { McpClient } from './client.js';
+import { createToolAdapters } from './tool-adapter.js';
+import { ToolRegistry } from '../tool/index.js';
+import { loadMcpConfig } from './config-loader.js';
+import type { McpServerConfig,  McpConnectionInfo } from './types.js';
+import { ConnectionState } from './types.js';
 
 // =============================================================================
 // MCP 管理器

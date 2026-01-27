@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { OpenAIAdapter } from './openai-adapter';
-import { Message, LLMOptions } from '../base';
-import { DEFAULT_TEMPERATURE } from '../../../agent/types';
+import { OpenAIAdapter } from './openai-adapter.js';
+import { Message, LLMOptions } from '../base.js';
+import { DEFAULT_TEMPERATURE } from '../../../agent/types.js';
 
 describe('OpenAIAdapter', () => {
   let adapter: OpenAIAdapter;

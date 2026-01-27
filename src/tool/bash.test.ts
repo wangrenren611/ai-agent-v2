@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import BashTool from './bash';
+import BashTool from './bash.js';
 
 describe('BashTool', () => {
     const isWindows = process.platform === 'win32';

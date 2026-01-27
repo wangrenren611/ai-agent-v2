@@ -6,12 +6,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Box, Text, useInput, useApp } from 'ink';
-import { Agent } from '../../agent';
-import { OpenAIProvider, ProviderRegistry, ProviderType } from '../../providers';
-import { operatorPrompt } from '../../prompts/operator';
-import { registerDefaultToolsAsync, ToolRegistry } from '../../tool';
-import { CLI_TEMPERATURE } from '../../agent/types';
-import type { RouteContextValue } from '../context/route';
+import { Agent } from '../../agent/index.js';
+import { ProviderRegistry, ProviderType } from '../../providers/index.js';
+import { operatorPrompt } from '../../prompts/operator.js';
+import { registerDefaultToolsAsync, ToolRegistry } from '../../tool/index.js';
+import type { RouteContextValue } from '../context/route.js';
 
 // ============================================================================
 // Types
@@ -48,10 +47,10 @@ const LoadingSpinner: React.FC<{ text?: string }> = ({ text = 'Thinking' }) => {
     return () => clearInterval(timer);
   }, []);
 
-  return React.createElement(
-    Text,
-    { bold: true, color: 'yellow' },
-    frames[frame] + ' ' + text
+  return (
+    <Text bold color="yellow">
+      {frames[frame]} {text}
+    </Text>
   );
 };
 
@@ -60,30 +59,28 @@ const LoadingSpinner: React.FC<{ text?: string }> = ({ text = 'Thinking' }) => {
 // ============================================================================
 
 const Header: React.FC<{ isProcessing: boolean; status: string; model: string }> = ({ isProcessing, status, model }) => {
-  return React.createElement(
-    Box,
-    {
-      borderStyle: 'single',
-      borderColor: 'gray',
-      paddingX: 1,
-      justifyContent: 'space-between',
-    },
-    React.createElement(
-      Box,
-      null,
-      React.createElement(Text, { bold: true, color: 'cyan' }, 'AI Agent v2'),
-      React.createElement(Text, { dimColor: true, color: 'gray' }, ' · '),
-      React.createElement(Text, { dimColor: true }, process.cwd().split('/').pop() || process.cwd()),
-      React.createElement(Text, { dimColor: true, color: 'gray' }, ' · '),
-      React.createElement(Text, { dimColor: true }, `Model: ${model}`)
-    ),
-    React.createElement(
-      Box,
-      null,
-      isProcessing
-        ? React.createElement(LoadingSpinner, { text: status })
-        : React.createElement(Text, { dimColor: true, color: 'gray' }, status)
-    )
+  return (
+    <Box
+      borderStyle="single"
+      borderColor="gray"
+      paddingX={1}
+      justifyContent="space-between"
+    >
+      <Box>
+        <Text bold color="cyan">AI Agent v2</Text>
+        <Text dimColor color="gray"> · </Text>
+        <Text dimColor>{process.cwd().split('/').pop() || process.cwd()}</Text>
+        <Text dimColor color="gray"> · </Text>
+        <Text dimColor>Model: {model}</Text>
+      </Box>
+      <Box>
+        {isProcessing ? (
+          <LoadingSpinner text={status} />
+        ) : (
+          <Text dimColor color="gray">{status}</Text>
+        )}
+      </Box>
+    </Box>
   );
 };
 
@@ -121,7 +118,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
         // Initialize tools
         await registerDefaultToolsAsync();
         const tools = ToolRegistry.getSchemas();
-        setStatus(`Ready �� ${tools.length} tools`);
+        setStatus(`Ready · ${tools.length} tools`);
         const llmProvider = ProviderRegistry.createFromEnv(ProviderType.KIMI);
         // Create provider
   
@@ -331,23 +328,21 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
   const renderMessage = (msg: ChatMessage, index: number) => {
     if (msg.role === 'tool-call') {
       // Tool call message
-      const icon = msg.toolStatus === 'calling' ? '?' : msg.toolStatus === 'success' ? '?' : '?';
+      const icon = msg.toolStatus === 'calling' ? '⏳' : msg.toolStatus === 'success' ? '✓' : '✗';
       const color = msg.toolStatus === 'calling' ? 'yellow' :
                     msg.toolStatus === 'success' ? 'green' : 'red';
 
-      return React.createElement(
-        Box,
-        { key: `tool-${index}-${msg.timestamp.getTime()}`, flexDirection: 'column', marginBottom: 1 },
-        React.createElement(
-          Box,
-          null,
-         React.createElement(Text, { bold: true, color }, `? ${msg.toolName}(${msg.toolArgs || ''})`)
-        ),
-        msg.toolOutput && React.createElement(
-          Box,
-          { paddingLeft: 2 },
-          React.createElement(Text, { dimColor: true, color: 'gray' }, `  ${msg.toolOutput}`)
-        )
+      return (
+        <Box key={`tool-${index}-${msg.timestamp.getTime()}`} flexDirection="column" marginBottom={1}>
+          <Box>
+            <Text bold color={color}>{icon} {msg.toolName}({msg.toolArgs || ''})</Text>
+          </Box>
+          {msg.toolOutput && (
+            <Box paddingLeft={2}>
+              <Text dimColor color="gray">  {msg.toolOutput}</Text>
+            </Box>
+          )}
+        </Box>
       );
     }
 
@@ -355,23 +350,19 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
     const prefix = msg.role === 'user' ? '❯' : '⏺';
     const roleColor = msg.role === 'user' ? 'cyan' : 'green';
 
-    return React.createElement(
-      Box,
-      { key: `msg-${index}-${msg.timestamp.getTime()}`, flexDirection: 'column', marginBottom: 1 },
-      React.createElement(
-        Box,
-        null,
-        React.createElement(Text, { bold: true, color: roleColor }, `${prefix} ${msg.content.split('\n')[0]}`)
-      ),
-      msg.content.includes('\n') && React.createElement(
-        Box,
-        { paddingLeft: 2 },
-        React.createElement(
-          Text,
-          { dimColor: msg.isStreaming, wrap: 'wrap' },
-          msg.content.split('\n').slice(1).join('\n')
-        )
-      )
+    return (
+      <Box key={`msg-${index}-${msg.timestamp.getTime()}`} flexDirection="column" marginBottom={1}>
+        <Box>
+          <Text bold color={roleColor}>{prefix} {msg.content.split('\n')[0]}</Text>
+        </Box>
+        {msg.content.includes('\n') && (
+          <Box paddingLeft={2}>
+            <Text dimColor={msg.isStreaming} wrap="wrap">
+              {msg.content.split('\n').slice(1).join('\n')}
+            </Text>
+          </Box>
+        )}
+      </Box>
     );
   };
 
@@ -389,69 +380,58 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
     }
 
     if (allMessages.length === 0) {
-      return React.createElement(
-        Box,
-        { flexGrow: 1, justifyContent: 'center', paddingY: 2 },
-        React.createElement(Text, { dimColor: true, color: 'gray' }, 'No messages yet. Start chatting!')
+      return (
+        <Box flexGrow={1} justifyContent="center" paddingY={2}>
+          <Text dimColor color="gray">No messages yet. Start chatting!</Text>
+        </Box>
       );
     }
 
-    return React.createElement(
-      Box,
-      { flexDirection: 'column', flexGrow: 1, paddingY: 1 },
-      ...allMessages.slice(-20).map((msg, index) => renderMessage(msg, index))
+    return (
+      <Box flexDirection="column" flexGrow={1} paddingY={1}>
+        {allMessages.slice(-20).map((msg, index) => renderMessage(msg, index))}
+      </Box>
     );
   };
 
   // Loading state
   if (!ready) {
-    return React.createElement(
-      Box,
-      { flexDirection: 'column', paddingX: 2 },
-      React.createElement(Text, { bold: true, color: 'cyan' }, 'AI Agent CLI'),
-      React.createElement(Text, { dimColor: true }, status)
+    return (
+      <Box flexDirection="column" paddingX={2}>
+        <Text bold color="cyan">AI Agent CLI</Text>
+        <Text dimColor>{status}</Text>
+      </Box>
     );
   }
 
-  return React.createElement(
-    Box,
-    { flexDirection: 'column' },
-    // Header
-    React.createElement(Header, { isProcessing, status, model: selectedModel }),
-    // Messages area
-    React.createElement(
-      Box,
-      {
-        flexGrow: 1,
-        flexDirection: 'column',
-        paddingY: 1,
-      },
-      renderMessages()
-    ),
-    // Separator
-    React.createElement(
-      Box,
-      null,
-      React.createElement(Text, { dimColor: true, color: 'gray' }, '---'.repeat(Math.min(process.stdout.columns || 80, 80)))
-    ),
-    // Input area
-    React.createElement(
-      Box,
-      null,
-      React.createElement(Text, { bold: true, color: 'cyan' }, '? '),
-      React.createElement(Text, null, input),
-      React.createElement(Text, { backgroundColor: 'gray' }, ' ')
-    ),
-    // Help text
-    React.createElement(
-      Box,
-      null,
-      React.createElement(Text, { dimColor: true, color: 'gray' }, 'Esc: Back ; Ctrl+C: Exit')
-    )
+  return (
+    <Box flexDirection="column">
+      {/* Header */}
+      <Header isProcessing={isProcessing} status={status} model={selectedModel} />
+      {/* Messages area */}
+      <Box
+        flexGrow={1}
+        flexDirection="column"
+        paddingY={1}
+      >
+        {renderMessages()}
+      </Box>
+      {/* Separator */}
+      <Box>
+        <Text dimColor color="gray">{'---'.repeat(Math.min(process.stdout.columns || 80, 80))}</Text>
+      </Box>
+      {/* Input area */}
+      <Box>
+        <Text bold color="cyan">❯ </Text>
+        <Text>{input}</Text>
+        <Text backgroundColor="gray"> </Text>
+      </Box>
+      {/* Help text */}
+      <Box>
+        <Text dimColor color="gray">Esc: Back ; Ctrl+C: Exit</Text>
+      </Box>
+    </Box>
   );
 };
 
 export default Session;
-
-
-

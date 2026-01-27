@@ -7,8 +7,8 @@
  */
 
 import readline from 'readline';
-import { ScopedLogger } from '../util/log';
-import { AgentContext, ConfirmationRequest } from './index';
+import { ScopedLogger } from '../util/log.js';
+import { AgentContext, ConfirmationRequest } from './index.js';
 
 const logger = new ScopedLogger('PermissionCLI');
 

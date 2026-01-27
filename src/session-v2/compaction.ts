@@ -1,5 +1,5 @@
-import { Message, LLMProvider } from "../providers/base";
-import { ScopedLogger } from "../util/log";
+import { Message, LLMProvider } from '../providers/base.js';
+import { ScopedLogger } from '../util/log.js';
 
 export class Compaction {
   private readonly maxTokens: number;
@@ -51,203 +51,141 @@ export class Compaction {
   }
 
   /**
-   * 性能优化：构建消息列表中 tool 消息的索引映射
-   * 时间复杂度：O(m)，其中 m 是 messages 的长度
-   * @returns Map<tool_call_id, message>
+   * 计算消息历史中所有消息的总 token 使用量
+   * 时间复杂度：O(n)，其中 n 是 history 的长度
    */
-  private buildToolMessageMap(messages: Message[]): Map<string, Message> {
-    const map = new Map<string, Message>();
-
-    for (const msg of messages) {
-      if (msg.role === 'tool' && msg.tool_call_id) {
-        map.set(msg.tool_call_id, msg);
-      }
-    }
-
-    return map;
+  private calculateTotalUsage(messages: Message[],tools:any[]): number {
+    // 使用更精确的 token 计算
+    return messages.reduce((sum, msg) => {
+      // 基础 token 开销（角色标记等）
+      const baseTokens = 4;
+      // 内容 token（使用字符数/4 作为粗略估计）
+      const contentStr = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+      const contentTokens = Math.ceil(contentStr.length / 4);
+      // tool_calls 的 token 开销
+      const toolTokens = msg.tool_calls
+        ? msg.tool_calls.reduce((tSum, call) => {
+            return tSum + Math.ceil(call.function.name.length / 4) + Math.ceil(call.function.arguments.length / 4);
+          }, 0)
+        : 0;
+      return sum + baseTokens + contentTokens + toolTokens;
+    }, 0)+JSON.stringify(tools).length/4;
   }
 
-  async compact(history: Message[],tools:any[]): Promise<{
-    isCompacted: boolean,
-    summaryMessage: Message | null,
-    list: Message[]
-  }> {
-    const totalUsed = this.calculateTotalUsage(history,tools);
-    const usableLimit = this.maxTokens - this.maxOutputTokens;
-    const threshold = usableLimit * this.triggerRatio;
+  /**
+   * 检查是否需要压缩
+   */
+  shouldCompact(messages: Message[], tools: any[]): boolean {
+    const { totalUsed, usableLimit } = this.getToken(messages, tools);
+    const shouldCompact = totalUsed > usableLimit;
 
-    // 只有当消息数量超过保留数量且 token 达到阈值时，才触发压缩
-    const shouldCompact = history.length > this.keepMessagesNum && totalUsed >= threshold;
-     history = history.filter(msg => msg.role !== 'system');
-    // 如果没达到压缩条件，直接返回原数据
-    if (!shouldCompact) {
-      return {
-        isCompacted: false,
-        summaryMessage: null,
-        list: history
-      };
+    if (shouldCompact) {
+      this.logger.info(
+        `[Compaction] 需要压缩: 使用量 ${Math.round(totalUsed)} > 阈值 ${Math.round(usableLimit)} (限制: ${this.maxTokens}, 保留: ${this.maxOutputTokens})`
+      );
     }
 
-    this.logger.info(
-      `[Compaction] 触发压缩。当前 Token: ${totalUsed}, 阈值: ${Math.floor(threshold)}`
+    return shouldCompact;
+  }
+
+  /**
+   * 异步摘要函数
+   */
+  private async summarizer(text: string, previousSummary: string): Promise<string> {
+    const prompt = previousSummary
+      ? `基于之前的摘要：\n${previousSummary}\n\n新的对话内容：\n${text}\n\n请更新摘要，保留关键信息：`
+      : `请对以下对话进行简要摘要，保留关键信息：\n\n${text}`;
+
+    const response = await this.llmProvider.generate(
+      [{ role: "user", content: prompt }],
+      { temperature: 0.3 }
     );
 
-    let activeMessages = history.slice(-this.keepMessagesNum); // 保护区
-    let pendingMessages = history.slice(0, -this.keepMessagesNum); // 待压缩区
+    return response?.content || "摘要生成失败";
+  }
 
-    // 限制保护区的最大膨胀倍数（防止从 6 条膨胀到 100+ 条）
-    const MAX_ACTIVE_SIZE = this.keepMessagesNum * 2;
+  /**
+   * 执行压缩
+   * 策略：
+   * 1. 保留最近 keepMessagesNum 条消息作为"活跃区"
+   * 2. 将活跃区之前的消息进行摘要
+   * 3. 将摘要作为一条 assistant 消息插入到活跃区之前
+   */
+  async compact(history: Message[], tools: any[]): Promise<{
+    isCompacted: boolean;
+    summaryMessage?: Message;
+    newHistory: Message[];
+  }> {
+    if (!this.shouldCompact(history, tools)) {
+      return { isCompacted: false, newHistory: history };
+    }
 
-    // 检查保护区的所有 tool 消息，确保它们的配对 assistant 以及所有相关的 tool 回复都被保留
-    // 需要处理多个 assistant 的情况（连续多次工具调用）
+    // 1. 分离活跃区和待压缩区
+    const activeMessages = history.slice(-this.keepMessagesNum);
+    let pendingMessages = history.slice(0, -this.keepMessagesNum);
 
-    // 性能优化：一次性构建所有索引，避免 O(n²) 的多次查找
-    // 时间复杂度：O(n + m + k)，其中 n=history长度，m=pending长度，k=active长度
-    const toolCallToAssistantIndex = this.buildToolCallToAssistantIndex(history);
-    const pendingToolMap = this.buildToolMessageMap(pendingMessages);
-    const activeToolMap = this.buildToolMessageMap(activeMessages);
+    // 2. 智能保护：确保待压缩区结尾的 tool/tool_call 对完整
+    // 从后往前遍历待压缩区，找到第一个需要保护的 assistant
+    const toolCallIndexMap = this.buildToolCallToAssistantIndex(pendingMessages);
+    let protectCount = 0;
 
-    const toolMessagesInActive = activeMessages.filter(m =>
-      m.role === 'tool' && m.tool_call_id  // 过滤掉无效的 tool_call_id
-    );
+    for (let i = pendingMessages.length - 1; i >= 0; i--) {
+      const msg = pendingMessages[i];
 
-    if (toolMessagesInActive.length > 0) {
-      // 收集所有需要保留的 assistant 消息和需要重新排序的 tool 回复
-      // 修复：将 tool 回复与对应的 assistant 分组，确保消息顺序正确
-      const assistantsToKeep: Map<string, { message: Message; index: number; tools: Message[] }> = new Map();
-      // 跟踪从 pendingMessages 移到 toolsToKeep 的 tool_call_id
-      const movedToolCallIds = new Set<string>();
-
-      // 计算分割点，用于判断 assistant 在哪个区域
-      // history[:splitPoint] = pendingMessages
-      // history[splitPoint:] = activeMessages
-      const splitPoint = history.length - this.keepMessagesNum;
-
-      // 修复：识别唯一需要处理的 assistant 索引
-      // 这确保我们只处理每个 assistant 一次，但会收集该 assistant 的所有 tools
-      const uniqueAssistantIndices = new Set<number>();
-      for (const toolMessage of toolMessagesInActive) {
-        const toolCallId = toolMessage.tool_call_id;
-        if (!toolCallId) continue;
-        const assistantIndex = toolCallToAssistantIndex.get(toolCallId);
-        if (assistantIndex !== undefined) {
-          uniqueAssistantIndices.add(assistantIndex);
+      if (msg.role === 'tool' && msg.tool_call_id) {
+        // 找到这个 tool 对应的 assistant
+        const assistantIndex = toolCallIndexMap.get(msg.tool_call_id);
+        if (assistantIndex !== undefined && assistantIndex < pendingMessages.length) {
+          // 需要保护从 assistantIndex 到当前位置的所有消息
+          const messagesToProtect = pendingMessages.slice(assistantIndex);
+          protectCount += messagesToProtect.length;
+          activeMessages.unshift(...messagesToProtect);
+          pendingMessages = pendingMessages.slice(0, assistantIndex);
+          break; // 只处理最靠近活跃区的一对
         }
       }
+    }
 
-      // 为每个唯一的 assistant 处理一次，收集其所有 tools
-      for (const assistantIndex of uniqueAssistantIndices) {
-        // 从 history 中获取 assistant 消息
-        const assistantMessage = history[assistantIndex];
-        if (!assistantMessage || !assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
-          continue;
+    if (protectCount > 0) {
+      this.logger.info(`[Compaction] 智能保护: 将 ${protectCount} 条消息移到活跃区以保持 tool 调用完整性`);
+    }
+
+    // 额外保护：确保活跃区以 user 或 assistant 消息开始（不以 tool 开始）
+    if (activeMessages.length > 0 && activeMessages[0].role === 'tool') {
+      // 找到这个 tool 对应的 assistant
+      const toolMsg = activeMessages[0];
+      if (toolMsg.tool_call_id) {
+        const assistantIndex = toolCallIndexMap.get(toolMsg.tool_call_id);
+        if (assistantIndex !== undefined && assistantIndex < pendingMessages.length) {
+          // 将对应的 assistant 移到活跃区开头
+          const assistantMsg = pendingMessages[assistantIndex];
+          pendingMessages = pendingMessages.filter((_, idx) => idx !== assistantIndex);
+          activeMessages.unshift(assistantMsg);
+          this.logger.info(`[Compaction] 额外保护: 将 assistant 消息移到活跃区开头`);
         }
+      }
+    }
 
-        const assistantKey = assistantIndex.toString();
-        const toolCalls = assistantMessage.tool_calls?.filter(call => call.id) || [];
+    // 统计信息
+    const totalTools = pendingMessages.filter(m => m.role === 'tool').length;
+    const totalAssistants = pendingMessages.filter(m => m.role === 'assistant' && m.tool_calls).length;
+    if (totalTools > 0 || totalAssistants > 0) {
+      // 验证所有 tool 调用是否都有对应的 assistant
+      const toolCallIds = new Set(pendingMessages.filter(m => m.role === 'tool').map(m => m.tool_call_id));
+      const assistantCallIds = new Set(
+        pendingMessages
+          .filter(m => m.role === 'assistant' && m.tool_calls)
+          .flatMap(m => m.tool_calls?.map(c => c.id) || [])
+      );
 
-        // 收集该 assistant 的所有 tools（从两个区域按 tool_calls 顺序收集）
-        const allTools: Message[] = [];
-        for (const toolCall of toolCalls) {
-          // 先检查 active 区域，再检查 pending 区域
-          let toolMessage = activeToolMap.get(toolCall.id);
-          if (!toolMessage) {
-            toolMessage = pendingToolMap.get(toolCall.id);
-            if (toolMessage) {
-              movedToolCallIds.add(toolCall.id); // 跟踪从 pending 移动的 tool
-            }
-          }
-          if (toolMessage) {
-            allTools.push(toolMessage);
-          }
-        }
+      const orphanedTools = [...toolCallIds].filter((id): id is string => id !== undefined && !assistantCallIds.has(id));
+      const orphanedAssistants = [...assistantCallIds].filter(id => !toolCallIds.has(id));
 
-        const toolCallIds = toolCalls.map(c => c.id);
-
-        // 无论 assistant 在哪个区域，都从 activeMessages 中移除它的 tools（稍后会重新添加）
-        // 这避免 tools 在 activeMessages 中被重复计算
-        activeMessages = activeMessages.filter(m => {
-          // 如果 assistant 在 active 区域，也要移除它
-          if (assistantIndex >= splitPoint && m === assistantMessage) return false;
-          // 移除这些 tool 回复（无论 assistant 在哪，都要移除 active 中的 tools）
-          if (m.role === 'tool' && toolCallIds.includes(m.tool_call_id || '')) return false;
-          return true;
-        });
-
-        // 记录这个 assistant 需要保留，以及它的所有 tools
-        assistantsToKeep.set(assistantKey, {
-          message: assistantMessage,
-          index: assistantIndex,
-          tools: allTools,
-        });
-
-        this.logger.info(
-          `[Compaction] 处理 assistant（索引 ${assistantIndex}）：` +
-          `${toolCalls.length} 个 tool_calls，收集到 ${allTools.length} 个 tool 回复`
-        );
+      if (orphanedTools.length > 0) {
+        this.logger.warn(`[Compaction] 警告: 发现 ${orphanedTools.length} 个孤立的 tool 消息（无对应 assistant）`);
       }
 
-      // 将需要保留的 assistant 和 tool 回复按正确顺序加入保护区
-      if (assistantsToKeep.size > 0) {
-        // 按索引排序 assistants（保持原始顺序）
-        const sortedAssistantsWithTools = Array.from(assistantsToKeep.values())
-          .sort((a, b) => a.index - b.index);
-
-        // 从 pendingMessages 中移除这些 assistants（如果它们在 pendingMessages 中）
-        // 同时移除已移动的 tool 消息
-        // 修复：使用 splitPoint 而不是 pendingMessages.length
-        // item.index 是原 history 数组的索引，需要与 splitPoint 比较
-        const indicesToRemove = Array.from(assistantsToKeep.values())
-          .filter(item => item.index < splitPoint)
-          .map(item => item.index);
-
-        if (indicesToRemove.length > 0 || movedToolCallIds.size > 0) {
-          pendingMessages = pendingMessages.filter((msg, i) => {
-            // 移除 assistant 消息
-            if (indicesToRemove.includes(i)) return false;
-            // 移除已移动的 tool 消息
-            if (msg.role === 'tool' && msg.tool_call_id && movedToolCallIds.has(msg.tool_call_id)) return false;
-            return true;
-          });
-        }
-
-        // 构建新的 activeMessages，将每个 assistant 与它的 tools 交错排列
-        // 正确的结构应该是：Assistant1, Tool1, Tool2, Assistant2, Tool3, Tool4, ...
-        const newActiveMessages: Message[] = [];
-
-        for (const { message: assistantMsg, tools: assistantTools } of sortedAssistantsWithTools) {
-          newActiveMessages.push(assistantMsg);
-          newActiveMessages.push(...assistantTools);
-        }
-
-        // 添加剩余的 activeMessages
-        newActiveMessages.push(...activeMessages);
-
-        // 检查是否超过最大限制
-        if (newActiveMessages.length > MAX_ACTIVE_SIZE) {
-          this.logger.warn(
-            `[Compaction] 保护区膨胀：从 ${this.keepMessagesNum} 条增长到 ${newActiveMessages.length} 条` +
-            `(超过最大限制 ${MAX_ACTIVE_SIZE})，将进行裁剪`
-          );
-
-          // 计算 assistants 和 tools 的总消息数
-          const totalAssistantsAndTools = sortedAssistantsWithTools.reduce(
-            (sum, item) => sum + 1 + item.tools.length, 0);
-
-          // 裁剪：保留前面的 assistants 和 tools，裁剪后面的原始 activeMessages
-          const overflow = newActiveMessages.length - MAX_ACTIVE_SIZE;
-          if (overflow > 0 && totalAssistantsAndTools < MAX_ACTIVE_SIZE) {
-            // 可以安全地裁剪后面的消息
-            newActiveMessages.length = MAX_ACTIVE_SIZE;
-          }
-        }
-
-        activeMessages = newActiveMessages;
-
-        // 计算统计信息
-        const totalAssistants = sortedAssistantsWithTools.length;
-        const totalTools = sortedAssistantsWithTools.reduce((sum, item) => sum + item.tools.length, 0);
-
+      if (orphanedAssistants.length > 0) {
         this.logger.info(
           `[Compaction] 已将 ${totalAssistants} 个 assistant 和 ${totalTools} 个 tool 回复移到保护区` +
           `（保护区大小：${activeMessages.length}）`
@@ -258,7 +196,8 @@ export class Compaction {
     // 3. 提取之前的摘要（如果存在）
     let previousSummary = "";
     if (pendingMessages.length > 0 && pendingMessages[0].type === "summary") {
-      previousSummary = pendingMessages[0].content;
+      const summaryContent = pendingMessages[0].content;
+      previousSummary = typeof summaryContent === 'string' ? summaryContent : JSON.stringify(summaryContent);
       pendingMessages = pendingMessages.slice(1);
     }
 
@@ -268,10 +207,11 @@ export class Compaction {
       .map((m) => {
         const prefix = m.type ? `[${m.role}:${m.type}]` : `[${m.role}]`;
         // 如果内容过长（如巨大的代码输出），在摘要前进行初步截断
+        const contentStr = typeof m.content === 'string' ? m.content : JSON.stringify(m.content);
         const content =
-          m.content.length > 2000
-            ? m.content.slice(0, 1000) + "...(省略)..."
-            : m.content;
+          contentStr.length > 2000
+            ? contentStr.slice(0, 1000) + "...(省略)..."
+            : contentStr;
         return `${prefix}: ${content}`;
       })
       .join("\n");
@@ -298,75 +238,7 @@ export class Compaction {
     return {
       isCompacted: true,
       summaryMessage,
-      list: newHistory
+      newHistory,
     };
-
-  }
-
-  /**
-   * 计算整个对话数组的 Token 用量
-   */
-  public calculateTotalUsage(messages: Message[],tools:any[]): number {
-    return [...messages,...tools].reduce((acc, m) => {
-      // 每条消息基础开销 4 tokens (role, name, newline)
-      return acc + this.estimate(JSON.stringify(m)) + 4;
-    }, 0);
-  }
-
-  /**
-   * 估算单段文本的 Token
-   */
-  private estimate(text: string): number {
-    if (!text) return 0;
-    return Math.ceil(
-      text.length / 4,
-    );
-  }
-
-  async summarizer(textToSummarize: string, previousSummary?: string) {
-
-
-    const spinner = this.logger.spinner("上下文压缩...");
-
-    const llmResponse = await this.llmProvider.generate(
-      [
-        {
-          role: "user",
-          content: `You are an expert conversation compressor. Compress the conversation history into a structured summary organized in the following 8 sections:
-1. **Primary Request and Intent**: What is the user's core goal?
-2. **Key Technical Concepts**: Frameworks, libraries, tech stacks, etc., involved in the conversation.
-3. **Files and Code Sections**: All file paths mentioned or modified.
-4. **Errors and Fixes**: Record error messages encountered and their solutions.
-5. **Problem Solving**: The thought process and decision path for solving the problem.
-6. **All User Messages**: Preserve key instructions and feedback from the user.
-7. **Pending Tasks**: Work items that remain unfinished.
-8. **Current Work**: The progress at the point the conversation was interrupted.
-
-${previousSummary ? `<previous_summary>
-  ${previousSummary}
-</previous_summary>
-` : ''}
-
-<current_mesage_history>
-${textToSummarize}
-</current_mesage_history>
-
-  ## Requirements:
-- Maintain high density and accuracy of information
-- Highlight key technical decisions and solutions
-- Ensure continuity of context
-- Retain all important file paths
-- Use concise English expression
-`,
-        },
-      ],
-      {
-        model: process.env.AI_MODEL,
-        max_tokens: 8000,
-      },
-    );
-    spinner.succeed("上下文压缩成功");
-    return llmResponse?.content || '';
-
   }
 }
