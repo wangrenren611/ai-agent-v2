@@ -314,6 +314,7 @@ export class Agent {
                         stream: streamEnabled,
                         streamCallback: wrappedStreamCallback,
                         abortSignal: currentAbortSignal,
+                        temperature: options?.temperature,
                     }
                 );
 

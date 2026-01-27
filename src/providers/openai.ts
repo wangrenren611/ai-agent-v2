@@ -10,6 +10,7 @@ import {
   LLMOptions,
   Message,
 } from './base';
+import { DEFAULT_TEMPERATURE } from '../agent/types';
 import {
   LLMError,
   createErrorFromStatus,
@@ -110,7 +111,6 @@ const DEFAULT_MODEL = 'gpt-4o-mini';
 const DEFAULT_BASE_URL = 'https://api.openai.com/v1';
 const DEFAULT_MAX_TOKENS = 200 * 1000;
 const DEFAULT_MAX_OUTPUT_TOKENS = 8000;
-const DEFAULT_TEMPERATURE = 0.1;
 const CHAT_COMPLETIONS_PATH = '/chat/completions';
 
 // =============================================================================
@@ -243,7 +243,7 @@ export class OpenAIProvider extends LLMProvider {
   }): Record<string, unknown> {
     const { messages, model, maxTokens, temperature, tools, stream } = params;
 
-    const body: Record<string, unknown> = {
+    const body: Record<string, any> = {
       model: model || this.model,
       messages: messages.map(cleanMessage).filter((msg: Record<string, any>) => msg !== null || msg?.content !== ''),
       max_tokens: maxTokens || this.maxOutputTokens,
@@ -251,7 +251,7 @@ export class OpenAIProvider extends LLMProvider {
       stream: stream ?? false,
       reasoning_split: true,
     };
-
+    console.log('body', {...body,messages: body?.messages?.[ body.messages.length - 1]});
     if (tools && tools.length > 0) {
       body.tools = tools;
     }

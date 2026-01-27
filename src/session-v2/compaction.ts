@@ -1,6 +1,6 @@
 import { Message, LLMProvider } from "../providers/base";
-import { OpenAIProvider } from "../providers/openai";
 import { ScopedLogger } from "../util/log";
+import { COMPACT_SUMMARY_TEMPERATURE } from "../agent/types";
 
 export class Compaction {
   private readonly maxTokens: number;
@@ -364,7 +364,7 @@ ${textToSummarize}
       {
         model: process.env.AI_MODEL,
         max_tokens: 8000,
-        temperature: 0.3,
+        temperature: COMPACT_SUMMARY_TEMPERATURE,
       },
     );
     spinner.succeed("上下文压缩成功");

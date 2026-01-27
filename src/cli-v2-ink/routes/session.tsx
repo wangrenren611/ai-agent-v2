@@ -10,6 +10,7 @@ import { Agent } from '../../agent';
 import { OpenAIProvider } from '../../providers/openai';
 import { operatorPrompt } from '../../prompts/operator';
 import { registerDefaultToolsAsync, ToolRegistry } from '../../tool';
+import { CLI_TEMPERATURE } from '../../agent/types';
 import type { RouteContextValue } from '../context/route';
 
 // ============================================================================
@@ -116,7 +117,6 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
           apiKey: process.env.OPENAI_API_KEY || process.env.DEEPSEEK_API_KEY || '',
           baseURL: process.env.OPENAI_API_BASE_URL || process.env.DEEPSEEK_BASE_URL || '',
         });
-
         // Create agent
         const newAgent = new Agent({
           model: process.env.AI_MODEL || 'gpt-4o',
@@ -215,7 +215,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
 
             setMessages((prev: ChatMessage[]) => {
               return prev.map((msg, idx) => {
-                if (idx === activeToolCall.index && msg.role === 'tool-call') {
+                if (idx === activeToolCall?.index && msg.role === 'tool-call') {
                   return {
                     ...msg,
                     toolStatus: success ? 'success' : 'error',
@@ -241,7 +241,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
             setMessages([{ role: 'user', content: pendingMessage, timestamp: new Date() }]);
             setIsProcessing(true);
             setStatus('Thinking...');
-            newAgent.run(pendingMessage, { stream: true }).catch((error: Error) => {
+            newAgent.run(pendingMessage, { stream: true, temperature: CLI_TEMPERATURE }).catch((error: Error) => {
               setMessages((prev: ChatMessage[]) => [...prev, {
                 role: 'system',
                 content: `Error: ${error.message}`,
@@ -295,7 +295,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
         setIsProcessing(true);
         setStatus('Thinking...');
 
-        agent.run(trimmedInput, { stream: true }).catch((error: Error) => {
+        agent.run(trimmedInput, { stream: true, temperature: CLI_TEMPERATURE }).catch((error: Error) => {
           setMessages((prev: ChatMessage[]) => [...prev, {
             role: 'system',
             content: `Error: ${error.message}`,
@@ -318,7 +318,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
   });
 
   // Render single message
-  const renderMessage = (msg: ChatMessage) => {
+  const renderMessage = (msg: ChatMessage, index: number) => {
     if (msg.role === 'tool-call') {
       // Tool call message
       const icon = msg.toolStatus === 'calling' ? '⟳' : msg.toolStatus === 'success' ? '✓' : '✗';
@@ -327,7 +327,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
 
       return React.createElement(
         Box,
-        { key: `${msg.timestamp.getTime()}`, flexDirection: 'column', marginBottom: 1 },
+        { key: `tool-${index}-${msg.timestamp.getTime()}`, flexDirection: 'column', marginBottom: 1 },
         React.createElement(
           Box,
           null,
@@ -347,7 +347,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
 
     return React.createElement(
       Box,
-      { key: `${msg.timestamp.getTime()}`, flexDirection: 'column', marginBottom: 1 },
+      { key: `msg-${index}-${msg.timestamp.getTime()}`, flexDirection: 'column', marginBottom: 1 },
       React.createElement(
         Box,
         null,
@@ -389,7 +389,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
     return React.createElement(
       Box,
       { flexDirection: 'column', flexGrow: 1, paddingY: 1 },
-      ...allMessages.slice(-20).map(msg => renderMessage(msg))
+      ...allMessages.slice(-20).map((msg, index) => renderMessage(msg, index))
     );
   };
 

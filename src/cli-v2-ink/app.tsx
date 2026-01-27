@@ -5,7 +5,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { Box, Text } from 'ink';
+import { Box } from 'ink';
 import { RouteProvider, useRoute } from './context/route';
 import { ThemeProvider } from './context/theme';
 import Home from './routes/home';

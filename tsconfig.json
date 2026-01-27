@@ -2,8 +2,8 @@
   "exclude": ["dist", "__tests__", "node_modules", "src/cli-ui/**/*", "src/cli-ink/**/*", "**/*.test.ts", "src/ui/cli/**/*", "src/ui/blessed/**/*"],
   "compilerOptions": {
     "lib": ["ESNext"],
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "types": ["node"],
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,

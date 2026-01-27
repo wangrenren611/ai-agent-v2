@@ -15,6 +15,12 @@ export const DEFAULT_MAX_TOKENS = 16000;
 export const MAX_NETWORK_RETRIES = 3;
 export const VALID_FINISH_REASONS = ['stop', 'eos', undefined] as const;
 
+/** Temperature 默认值 */
+export const DEFAULT_TEMPERATURE = 0.1;           // LLM Provider 默认值
+export const CHAT_TEMPERATURE = 0.7;              // 对话场景推荐值
+export const COMPACT_SUMMARY_TEMPERATURE = 0.3;   // 摘要生成（稳定性）
+export const CLI_TEMPERATURE = 1;                 // CLI 交互模式
+
 // =============================================================================
 // 类型定义
 // =============================================================================
@@ -158,6 +164,8 @@ export interface AgentRunOptions {
     streamCallback?: (chunk: StreamChunk) => void;
     /** 取消信号 */
     abortSignal?: AbortSignal;
+    /** 温度 */
+    temperature?: number;
 }
 
 /** Agent 响应 */
