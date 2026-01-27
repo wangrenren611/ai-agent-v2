@@ -9,7 +9,7 @@ console.log('AI_MODEL:', process.env.AI_MODEL || 'deepseek-chat (default)');
 // Test imports
 try {
   const { Agent } = await import('./src/agent/index.ts');
-  const { OpenAIProvider } = await import('./src/providers/openai.ts');
+  const { OpenAIProvider } = await import('./src/providers/providers/openai.provider.ts');
   const { operatorPrompt } = await import('./src/prompts/operator.ts');
   const { registerDefaultToolsAsync, ToolRegistry } = await import('./src/tool/index.ts');
 

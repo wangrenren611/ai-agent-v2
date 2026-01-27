@@ -1,4 +1,4 @@
-export interface ProviderConfig {
+export interface BaseProviderConfig {
   /** API key or credentials */
   apiKey?: string;
   /** Base URL for API */
@@ -7,11 +7,22 @@ export interface ProviderConfig {
   model?: string;
   /** Maximum tokens */
   maxTokens?: number;
+  /** Maximum output tokens to generate */
+  maxOutputTokens?: number;
   /** Temperature */
   temperature?: number;
+  /** Request timeout in milliseconds */
+  timeout?: number;
+  /** Maximum number of retries */
+  maxRetries?: number;
+  /** Enable debug logging */
+  debug?: boolean;
   /** Additional options */
   [key: string]: unknown;
 }
+
+
+
 export interface ToolSchema {
   type: 'function';
   function: {
@@ -55,10 +66,18 @@ export interface LLMOptions {
   abortSignal?: AbortSignal
 }
 
+export type MessageContentPart =
+  | { type: 'text'; text: string }
+  | { type: 'image_url'; image_url: { url: string } };
+
+export type MessageContent = string | MessageContentPart[];
+
 export type Message = {
   role: 'user' | 'system' | 'assistant' | 'tool';
-  content: string;
+  content: MessageContent;
   type?: 'text' | 'tool' | 'tool_call'| 'summary';
+  /** 思维链/推理内容，部分模型（如 Kimi）在启用 thinking 时要求携带 */
+  reasoning_content?: string;
   /** Tool call ID (required for tool response messages) */
   tool_call_id?: string;
   /** Tool calls (for assistant messages that request tool execution) */
@@ -97,7 +116,7 @@ export type LLMResponse = {
 
 export abstract class LLMProvider{
    protected constructor(
-    protected readonly config: ProviderConfig
+    protected readonly config: BaseProviderConfig
    ) {}
 
    abstract maxOutputTokens:number;

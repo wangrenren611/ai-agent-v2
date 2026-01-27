@@ -2,7 +2,7 @@
  * ToolRegistry 类型定义
  */
 
-import type { ToolResult } from './base';
+import type { ToolResult } from '../base';
 
 /**
  * 工具执行上下文

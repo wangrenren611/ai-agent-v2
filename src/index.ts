@@ -4,20 +4,19 @@
  */
 import dotenv from 'dotenv';
 import { Agent } from './agent';
-import { OpenAIProvider } from './providers/openai';
+import { ProviderRegistry, ProviderType } from './providers';
 import {operatorPrompt} from './prompts/operator';
 import { registerDefaultToolsAsync, ToolRegistry } from './tool';
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}`, override: true });
 
 async function main() {
-   const llmProvider = new OpenAIProvider({
-    apiKey: process.env.OPENAI_API_KEY || '',
-    baseURL: process.env.OPENAI_API_BASE_URL || '',
-});
+   // Auto-detect and create provider from environment variables
+   // Supports: OPENAI_API_KEY, DEEPSEEK_API_KEY, KIMI_API_KEY, GLM_API_KEY, MINIMAX_API_KEY, QWEN_API_KEY
+const llmProvider = ProviderRegistry.createFromEnv(ProviderType.KIMI);
 
 await registerDefaultToolsAsync();
-console.log(ToolRegistry.getSchemas());
+
 const agent = new Agent({
     model: process.env.AI_MODEL || 'gpt-4o',
     llmProvider,
@@ -26,18 +25,22 @@ const agent = new Agent({
         vcs: process.env.VCS || 'git',
         language: process.env.PROJECT_LANGUAGE || '',
     }),
+    temperature: 0.6,
     tools:ToolRegistry.getSchemas(),
-   
+
 });
 agent.start();
 
-agent.run('执行测试/Users/wrr/work/ai-agent-v2/src/agent/index.test.ts',{
+agent.run('当前目录有什么',{
     stream:true,
+ 
 });
 
 agent.on('stream-chunk', (message) => {
     // console.log(message.content);
-    process.stdout.write(message.content || '');
+    if ('content' in message && typeof message.content === 'string') {
+      process.stdout.write(message.content || '');
+    }
 });
 }
 main();

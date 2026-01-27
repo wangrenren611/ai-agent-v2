@@ -77,7 +77,8 @@ export interface LLMResponse {
 export interface Message {
     role: 'user' | 'assistant' | 'system' | 'tool';
     type?: 'text' | 'summary';
-    content: string;
+    content: import('../providers/base').MessageContent; // 对齐 provider 定义，支持 text / image_url 复合内容
+    reasoning_content?: string;
     tool_call_id?: string;
 }
 
@@ -148,6 +149,10 @@ export interface AgentConfig {
     sessionId?: string;
     /** 默认模型名称 */
     model?: string;
+    /** 默认温度，Agent 层统一控制 */
+    temperature: number;
+    /** 榛樿娓╁害锛岀敤鎴峰彲閫氳繃 Agent 閰嶇疆缁欏畾 */
+
 }
 
 /** Agent 运行选项 */
@@ -166,6 +171,7 @@ export interface AgentRunOptions {
     abortSignal?: AbortSignal;
     /** 温度 */
     temperature?: number;
+    /** 思考配置 */
 }
 
 /** Agent 响应 */

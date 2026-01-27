@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text, useInput, useApp } from 'ink';
 import { Agent } from '../../agent';
-import { OpenAIProvider } from '../../providers/openai';
+import { OpenAIProvider, ProviderRegistry, ProviderType } from '../../providers';
 import { operatorPrompt } from '../../prompts/operator';
 import { registerDefaultToolsAsync, ToolRegistry } from '../../tool';
 import { CLI_TEMPERATURE } from '../../agent/types';
@@ -40,6 +40,7 @@ const LoadingSpinner: React.FC<{ text?: string }> = ({ text = 'Thinking' }) => {
   const [frame, setFrame] = useState(0);
   const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 
+
   useEffect(() => {
     const timer = setInterval(() => {
       setFrame((prev: number) => (prev + 1) % frames.length);
@@ -58,7 +59,7 @@ const LoadingSpinner: React.FC<{ text?: string }> = ({ text = 'Thinking' }) => {
 // Header Component
 // ============================================================================
 
-const Header: React.FC<{ isProcessing: boolean; status: string }> = ({ isProcessing, status }) => {
+const Header: React.FC<{ isProcessing: boolean; status: string; model: string }> = ({ isProcessing, status, model }) => {
   return React.createElement(
     Box,
     {
@@ -72,7 +73,9 @@ const Header: React.FC<{ isProcessing: boolean; status: string }> = ({ isProcess
       null,
       React.createElement(Text, { bold: true, color: 'cyan' }, 'AI Agent v2'),
       React.createElement(Text, { dimColor: true, color: 'gray' }, ' · '),
-      React.createElement(Text, { dimColor: true }, process.cwd().split('/').pop() || process.cwd())
+      React.createElement(Text, { dimColor: true }, process.cwd().split('/').pop() || process.cwd()),
+      React.createElement(Text, { dimColor: true, color: 'gray' }, ' · '),
+      React.createElement(Text, { dimColor: true }, `Model: ${model}`)
     ),
     React.createElement(
       Box,
@@ -98,6 +101,14 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [ready, setReady] = useState(false);
 
+  // 获取当前模型（Home 里通过 "model xxx" 可切换）
+  const getSelectedModel = () =>
+    (global as any).__selectedModel ||
+    process.env.AI_MODEL ||
+    'gpt-4o';
+
+  const selectedModel = getSelectedModel();
+
   // Initialize Agent
   useEffect(() => {
     const initAgent = async () => {
@@ -110,23 +121,22 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
         // Initialize tools
         await registerDefaultToolsAsync();
         const tools = ToolRegistry.getSchemas();
-        setStatus(`Ready · ${tools.length} tools`);
-
+        setStatus(`Ready �� ${tools.length} tools`);
+        const llmProvider = ProviderRegistry.createFromEnv(ProviderType.KIMI);
         // Create provider
-        const llmProvider = new OpenAIProvider({
-          apiKey: process.env.OPENAI_API_KEY || process.env.DEEPSEEK_API_KEY || '',
-          baseURL: process.env.OPENAI_API_BASE_URL || process.env.DEEPSEEK_BASE_URL || '',
-        });
+  
         // Create agent
         const newAgent = new Agent({
-          model: process.env.AI_MODEL || 'gpt-4o',
-          llmProvider,
+          model: selectedModel,
+          llmProvider,  
+          temperature: 0.6,
           systemPrompt: operatorPrompt({
             directory: process.env.PROJECT_DIRECTORY || process.cwd(),
             vcs: process.env.VCS || 'git',
             language: process.env.PROJECT_LANGUAGE || 'Chinese',
           }),
           tools,
+        
         });
 
         // Start agent
@@ -241,7 +251,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
             setMessages([{ role: 'user', content: pendingMessage, timestamp: new Date() }]);
             setIsProcessing(true);
             setStatus('Thinking...');
-            newAgent.run(pendingMessage, { stream: true, temperature: CLI_TEMPERATURE }).catch((error: Error) => {
+            newAgent.run(pendingMessage, { stream: true }).catch((error: Error) => {
               setMessages((prev: ChatMessage[]) => [...prev, {
                 role: 'system',
                 content: `Error: ${error.message}`,
@@ -295,7 +305,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
         setIsProcessing(true);
         setStatus('Thinking...');
 
-        agent.run(trimmedInput, { stream: true, temperature: CLI_TEMPERATURE }).catch((error: Error) => {
+        agent.run(trimmedInput, { stream: true }).catch((error: Error) => {
           setMessages((prev: ChatMessage[]) => [...prev, {
             role: 'system',
             content: `Error: ${error.message}`,
@@ -321,7 +331,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
   const renderMessage = (msg: ChatMessage, index: number) => {
     if (msg.role === 'tool-call') {
       // Tool call message
-      const icon = msg.toolStatus === 'calling' ? '⟳' : msg.toolStatus === 'success' ? '✓' : '✗';
+      const icon = msg.toolStatus === 'calling' ? '?' : msg.toolStatus === 'success' ? '?' : '?';
       const color = msg.toolStatus === 'calling' ? 'yellow' :
                     msg.toolStatus === 'success' ? 'green' : 'red';
 
@@ -331,7 +341,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
         React.createElement(
           Box,
           null,
-          React.createElement(Text, { bold: true, color }, `⏺ ${msg.toolName}(${msg.toolArgs || ''})`)
+         React.createElement(Text, { bold: true, color }, `? ${msg.toolName}(${msg.toolArgs || ''})`)
         ),
         msg.toolOutput && React.createElement(
           Box,
@@ -407,7 +417,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
     Box,
     { flexDirection: 'column' },
     // Header
-    React.createElement(Header, { isProcessing, status }),
+    React.createElement(Header, { isProcessing, status, model: selectedModel }),
     // Messages area
     React.createElement(
       Box,
@@ -422,13 +432,13 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
     React.createElement(
       Box,
       null,
-      React.createElement(Text, { dimColor: true, color: 'gray' }, '─'.repeat(Math.min(process.stdout.columns || 80, 80)))
+      React.createElement(Text, { dimColor: true, color: 'gray' }, '---'.repeat(Math.min(process.stdout.columns || 80, 80)))
     ),
     // Input area
     React.createElement(
       Box,
       null,
-      React.createElement(Text, { bold: true, color: 'cyan' }, '❯ '),
+      React.createElement(Text, { bold: true, color: 'cyan' }, '? '),
       React.createElement(Text, null, input),
       React.createElement(Text, { backgroundColor: 'gray' }, ' ')
     ),
@@ -436,9 +446,12 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
     React.createElement(
       Box,
       null,
-      React.createElement(Text, { dimColor: true, color: 'gray' }, 'Esc: Back · Ctrl+C: Exit')
+      React.createElement(Text, { dimColor: true, color: 'gray' }, 'Esc: Back ; Ctrl+C: Exit')
     )
   );
 };
 
 export default Session;
+
+
+

@@ -57,6 +57,7 @@ export class Agent {
     private readonly maxLoop: number;
     private readonly noProgressLimit: number;
     private readonly compaction: Compaction;
+    private readonly temperature: number;
 
     // -------------------------------------------------------------------------
     // 公开属性
@@ -113,6 +114,8 @@ export class Agent {
         this.sessionManager.maxTokens = maxTokens;
 
         // 初始化上下文压缩器
+        this.temperature = config.temperature;
+
         this.compaction = new Compaction({
             maxTokens,
             maxOutputTokens: maxOutput,
@@ -303,7 +306,7 @@ export class Agent {
                     : (chunk: StreamChunk) => {
                           this.events.emit('stream-chunk', chunk);
                       };
-
+                
                 // 调用 LLM
                 const llmResponse = await this.llmProvider.generate(
                     [{ role: 'system', content: this.systemPrompt }, ...llmMessages],
@@ -314,10 +317,10 @@ export class Agent {
                         stream: streamEnabled,
                         streamCallback: wrappedStreamCallback,
                         abortSignal: currentAbortSignal,
-                        temperature: options?.temperature,
+                        temperature: this.temperature,
                     }
                 );
-
+                    console.log( this.temperature);
                 if (!llmResponse) {
                     throw new Error('LLM response is null');
                 }
