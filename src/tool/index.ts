@@ -37,7 +37,8 @@ import { SkillTool, initializeSkills } from '../skills';
 // =============================================================================
 
 export { ToolRegistry } from './registry/ToolRegistry';
-export { BaseTool, ToolResult } from './base';
+export { BaseTool } from './base';
+export type { ToolResult } from './base';
 
 // =============================================================================
 // 默认工具注册

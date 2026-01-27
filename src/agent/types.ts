@@ -129,7 +129,7 @@ export interface AgentConfig {
     /** 系统提示词 */
     systemPrompt: string;
     /** 默认工具列表 */
-    defaultTools?: ToolSchema[];
+    tools?: ToolSchema[];
     /** 最大循环次数，0 或 null 表示无限制 */
     maxLoop?: number | null;
     /** 最大 token 数 */
@@ -140,10 +140,14 @@ export interface AgentConfig {
     noProgressLimit?: number;
     /** 会话 ID */
     sessionId?: string;
+    /** 默认模型名称 */
+    model?: string;
 }
 
 /** Agent 运行选项 */
 export interface AgentRunOptions {
+    /** 模型名称 */
+    model?: string;
     /** 静默模式（通过事件输出） */
     silent?: boolean;
     /** 覆盖默认工具 */

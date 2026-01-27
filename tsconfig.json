@@ -1,5 +1,5 @@
 {
-  "exclude": ["dist", "__tests__", "node_modules", "src/cli-ui/**/*", "src/cli-ink/**/*", "**/*.test.ts"],
+  "exclude": ["dist", "__tests__", "node_modules", "src/cli-ui/**/*", "src/cli-ink/**/*", "**/*.test.ts", "src/ui/cli/**/*", "src/ui/blessed/**/*"],
   "compilerOptions": {
     "lib": ["ESNext"],
     "module": "CommonJS",
@@ -14,7 +14,9 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "target": "ESNext",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "jsx": "react",
+    "jsxFactory": "React.createElement"
   },
   "include": [
     "./src/**/*",

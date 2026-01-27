@@ -8,4 +8,5 @@ export type { ToolContext, ToolRegistryConfig, ToolRegistryState } from './types
 export { SchemaConverter } from './schema-converter';
 
 // 向后兼容：从旧位置导入
-export { BaseTool, ToolResult } from '../base';
+export { BaseTool } from '../base';
+export type { ToolResult } from '../base';

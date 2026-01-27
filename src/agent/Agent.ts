@@ -13,13 +13,13 @@ import {
     LLMResponse,
     Message,
     StreamChunk,
-    ToolSchema,
     ToolResult,
     ToolCall,
     DEFAULT_MAX_LOOP,
     DEFAULT_NO_PROGRESS_LIMIT,
     MAX_NETWORK_RETRIES,
     VALID_FINISH_REASONS,
+    ToolSchema,
 } from './types';
 import { ToolError } from './ToolError';
 import { isRetryableError, isPermanentError, isAbortedError, LLMAuthError, LLMNotFoundError } from '../providers/errors';
@@ -64,6 +64,8 @@ export class Agent {
     public readonly sessionManager: SessionManager;
     public readonly context: AgentContext;
     public readonly events: TypedEventBus<AgentEvents>;
+    model: string | undefined;
+    tools: ToolSchema[];
 
     // -------------------------------------------------------------------------
     // 构造函数
@@ -74,13 +76,15 @@ export class Agent {
         this.systemPrompt = config.systemPrompt;
         this.maxLoop = config.maxLoop ?? DEFAULT_MAX_LOOP;
         this.noProgressLimit = Math.max(0, config.noProgressLimit ?? DEFAULT_NO_PROGRESS_LIMIT);
-
+        this.model = config.model;
+        this.tools = config.tools || [];
         // 初始化上下文
         this.context = getAgentContext({
             session: {
                 sessionId: config.sessionId || `session_${Date.now()}`,
                 userId: 'default',
             },
+            
         });
         this.context.initialize();
 
@@ -93,6 +97,8 @@ export class Agent {
             sessionDir: this.context.sessionDir,
             llmProvider: this.llmProvider,
         });
+
+    
 
         // 设置 AgentContext 到 ToolRegistry
         ToolRegistry.setAgentContext(this.context);
@@ -119,20 +125,23 @@ export class Agent {
     // -------------------------------------------------------------------------
 
     /** 启动 Agent，初始化会话 */
-    start(): void {
-        this.sessionManager.init();
+   async start(): Promise<void> {
+       await  this.sessionManager.init();
     }
-
+     on(event: keyof AgentEvents, listener: (data: AgentEvents[typeof event]) => void): void {
+        this.events.on(event, listener);
+    }
     /**
      * 运行 Agent 处理用户查询
      */
     async run(query: string, options?: AgentRunOptions): Promise<AgentResponse | null> {
         // 运行时状态
-        const tools = options?.tools ?? [];
+        const tools = [...this.tools, ...(options?.tools ?? [])];
         const silent = options?.silent ?? false;
         const streamEnabled = options?.stream ?? false;
         const streamCallback = options?.streamCallback;
         const abortSignal = options?.abortSignal;
+        const model = options?.model ?? this.model;
 
         // 错误计数
         let consecutiveErrorCount = 0;
@@ -154,8 +163,6 @@ export class Agent {
 
         // 辅助方法：创建 spinner
         let spinner: ReturnType<ScopedLogger['spinner']> | null = null;
-        const createSpinner = (text: string) => (silent ? null : this.logger.spinner(text));
-        const stopSpinner = () => { if (spinner) { spinner.stop(); spinner = null; } };
 
         // 辅助方法：完成响应
         const complete = (content: string): AgentResponse => {
@@ -186,8 +193,6 @@ export class Agent {
 
             // 取消错误
             if (info.isAborted) {
-                stopSpinner();
-                spinner?.fail?.('Task cancelled');
                 log('info', 'Task cancelled by user');
                 complete('[Task cancelled]');
                 this.events.emit('cancelled', { reason: 'user_abort' });
@@ -199,7 +204,6 @@ export class Agent {
                 networkErrorCount++;
                 const backoffMs = (error as { getBackoff(n: number): number }).getBackoff(networkErrorCount);
 
-                spinner?.warn?.(`Retryable error (attempt ${networkErrorCount}): ${info.message}`);
                 log('warn', `Retryable error (attempt ${networkErrorCount}): ${info.message}`);
 
                 if (networkErrorCount > MAX_NETWORK_RETRIES) {
@@ -214,8 +218,6 @@ export class Agent {
 
             // 永久性错误（认证、模型不存在等）
             if (info.isPermanent) {
-                stopSpinner();
-                spinner?.fail?.('Permanent error occurred');
                 log('error', `Permanent error: ${info.message}`);
 
                 let userMessage = `API Error: ${info.message}`;
@@ -235,8 +237,6 @@ export class Agent {
             }
 
             // 未知错误
-            stopSpinner();
-            spinner?.fail?.(`Error: ${info.message}`);
             log('error', `Unexpected error: ${info.message}`);
 
             if (++consecutiveErrorCount > this.noProgressLimit) {
@@ -282,9 +282,8 @@ export class Agent {
             // 发送思考开始事件
             this.events.emit('thinking', { step });
 
-            // 创建 spinner
-            stopSpinner();
-            spinner = createSpinner(`Thinking-${step}...`);
+         
+           
 
             // 构建 AbortController
             const abortController = new AbortController();
@@ -296,13 +295,8 @@ export class Agent {
 
             try {
                 // 构建流式回调
-                let spinnerStopped = false;
                 const wrappedStreamCallback = streamCallback
                     ? (chunk: StreamChunk) => {
-                          if (!spinnerStopped && spinner) {
-                              spinner.stop();
-                              spinnerStopped = true;
-                          }
                           streamCallback(chunk);
                           this.events.emit('stream-chunk', chunk);
                       }
@@ -314,7 +308,7 @@ export class Agent {
                 const llmResponse = await this.llmProvider.generate(
                     [{ role: 'system', content: this.systemPrompt }, ...llmMessages],
                     {
-                        model: process.env.AI_MODEL,
+                        model,
                         tools: tools.length > 0 ? tools : undefined,
                         max_tokens: this.sessionManager.maxOutputTokens,
                         stream: streamEnabled,
@@ -335,7 +329,6 @@ export class Agent {
                 const { hasToolCalls, hasError } = await this.handleToolCalls(llmResponse, { silent, spinner, log, complete });
 
                 if (hasError) {
-                    spinner?.warn?.('Tool execution had errors');
                     log('warn', 'Tool execution had errors');
                     if (++consecutiveErrorCount > this.noProgressLimit) {
                         return complete(
@@ -351,12 +344,10 @@ export class Agent {
 
                 // 检查是否需要返回
                 if (!hasToolCalls) {
-                    const messages = this.sessionManager.getMessages();
                     const { finishReason, content } = llmResponse;
 
                     // 检查 finishReason
                     if (!VALID_FINISH_REASONS.includes(finishReason as typeof VALID_FINISH_REASONS[number])) {
-                        spinner?.fail?.(`Unexpected finishReason: ${finishReason}`);
                         log('error', `Unexpected finishReason: ${finishReason}`);
                         if (++consecutiveErrorCount > this.noProgressLimit) {
                             return complete(`Max error limit reached: unexpected finishReason "${finishReason}"`);
@@ -366,7 +357,6 @@ export class Agent {
 
                     // 检查空响应
                     if (!content || content.trim() === '') {
-                        spinner?.warn?.('LLM returned empty response');
                         log('warn', 'LLM returned empty response');
                         if (++consecutiveErrorCount > this.noProgressLimit) {
                             return complete(`Agent stopped: ${consecutiveErrorCount} consecutive empty responses`);
