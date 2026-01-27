@@ -1,6 +1,8 @@
 /**
  * TypedEventBus - 类型安全的事件总线
  * 支持强类型事件定义
+ *
+ * 使用泛型约束事件类型，提供编译时类型检查
  */
 
 import type {
@@ -12,12 +14,15 @@ import type {
   EventMetrics,
 } from './types';
 import { EventBus } from './EventBus';
+import { ScopedEventBus } from './ScopedEventBus';
 
 /**
  * 类型安全的事件总线（泛型版本）
  */
 export class TypedEventBus<TEvents extends Record<string, any>> {
   private bus = new EventBus();
+
+  // ==================== 订阅方法 ====================
 
   on<TEvent extends keyof TEvents>(
     event: TEvent,
@@ -49,6 +54,8 @@ export class TypedEventBus<TEvents extends Record<string, any>> {
     return this.bus.onceAsync(event as string, handler);
   }
 
+  // ==================== 发布方法 ====================
+
   async emit<TEvent extends keyof TEvents>(
     event: TEvent,
     data: TEvents[TEvent],
@@ -56,6 +63,8 @@ export class TypedEventBus<TEvents extends Record<string, any>> {
   ): Promise<void> {
     return this.bus.emit(event as string, data, metadata);
   }
+
+  // ==================== 取消订阅方法 ====================
 
   off<TEvent extends keyof TEvents>(event: TEvent, handlerId: string): boolean {
     return this.bus.off(event as string, handlerId);
@@ -65,6 +74,8 @@ export class TypedEventBus<TEvents extends Record<string, any>> {
     this.bus.offAll(event as string);
   }
 
+  // ==================== 中间件方法 ====================
+
   use(middleware: Middleware): void {
     this.bus.use(middleware);
   }
@@ -72,6 +83,8 @@ export class TypedEventBus<TEvents extends Record<string, any>> {
   useForEvent<TEvent extends keyof TEvents>(event: TEvent, middleware: Middleware<TEvents[TEvent]>): void {
     this.bus.useForEvent(event as string, middleware);
   }
+
+  // ==================== 查询方法 ====================
 
   listenerCount(event?: keyof TEvents): number {
     return this.bus.listenerCount(event as string);
@@ -89,10 +102,8 @@ export class TypedEventBus<TEvents extends Record<string, any>> {
     this.bus.resetMetrics(event as string);
   }
 
-  /**
-   * 创建类型安全的作用域事件总线
-   * 修复：添加缺失的 createScopedBus 方法
-   */
+  // ==================== 高级功能 ====================
+
   createScopedBus(scope: string): TypedScopedEventBus<TEvents> {
     return new TypedScopedEventBus(this.bus, scope);
   }
@@ -113,6 +124,12 @@ export class TypedScopedEventBus<TEvents extends Record<string, any>> {
     private parent: EventBus,
     private scope: string
   ) {}
+
+  private scopedEvent(event: string): string {
+    return `${this.scope}.${event}`;
+  }
+
+  // ==================== 订阅方法 ====================
 
   on<TEvent extends keyof TEvents>(
     event: TEvent,
@@ -144,6 +161,8 @@ export class TypedScopedEventBus<TEvents extends Record<string, any>> {
     return this.parent.onceAsync(this.scopedEvent(event as string), handler);
   }
 
+  // ==================== 发布方法 ====================
+
   async emit<TEvent extends keyof TEvents>(
     event: TEvent,
     data: TEvents[TEvent],
@@ -155,13 +174,14 @@ export class TypedScopedEventBus<TEvents extends Record<string, any>> {
     });
   }
 
+  // ==================== 取消订阅方法 ====================
+
   off<TEvent extends keyof TEvents>(event: TEvent, handlerId: string): boolean {
     return this.parent.off(this.scopedEvent(event as string), handlerId);
   }
 
   offAll(event?: keyof TEvents): void {
     if (event === undefined) {
-      // 清除当前作用域的所有事件
       const prefix = `${this.scope}.`;
       const allEvents = this.parent.eventNames();
       for (const e of allEvents) {
@@ -174,6 +194,8 @@ export class TypedScopedEventBus<TEvents extends Record<string, any>> {
     }
   }
 
+  // ==================== 中间件方法 ====================
+
   use(middleware: Middleware): void {
     this.parent.use(middleware);
   }
@@ -182,25 +204,24 @@ export class TypedScopedEventBus<TEvents extends Record<string, any>> {
     this.parent.useForEvent(this.scopedEvent(event as string), middleware);
   }
 
+  // ==================== 查询方法 ====================
+
   listenerCount(event?: keyof TEvents): number {
     if (event === undefined) {
       const prefix = `${this.scope}.`;
       const allEvents = this.parent.eventNames();
-      let total = 0;
-      for (const e of allEvents) {
-        if (e.startsWith(prefix)) {
-          total += this.parent.listenerCount(e);
-        }
-      }
-      return total;
+      return allEvents
+        .filter(e => e.startsWith(prefix))
+        .reduce((total, e) => total + this.parent.listenerCount(e), 0);
     }
     return this.parent.listenerCount(this.scopedEvent(event as string));
   }
 
   eventNames(): string[] {
     const prefix = `${this.scope}.`;
-    const allEvents = this.parent.eventNames();
-    return allEvents.filter(e => e.startsWith(prefix)).map(e => e.substring(prefix.length));
+    return this.parent.eventNames()
+      .filter(e => e.startsWith(prefix))
+      .map(e => e.substring(prefix.length));
   }
 
   getMetrics(event?: keyof TEvents): EventMetrics | Map<string, EventMetrics> {
@@ -237,14 +258,12 @@ export class TypedScopedEventBus<TEvents extends Record<string, any>> {
     }
   }
 
+  // ==================== 高级功能 ====================
+
   waitFor<TEvent extends keyof TEvents>(
     event: TEvent,
     timeout?: number
   ): Promise<TEvents[TEvent]> {
     return this.parent.waitFor(this.scopedEvent(event as string), timeout);
-  }
-
-  private scopedEvent(event: string): string {
-    return `${this.scope}.${event}`;
   }
 }

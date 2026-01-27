@@ -1,50 +1,44 @@
 [
   {
-    "id": "t_1",
-    "content": "P0: 修复 TypedEventBus.createScopedBus 不存在问题",
+    "id": "1",
+    "content": "分析 src/index.ts 当前结构",
     "status": "completed",
     "priority": "high"
   },
   {
-    "id": "t_2",
-    "content": "P0: 修复中间件上下文传递不匹配",
+    "id": "2",
+    "content": "添加启动横幅和进度信息",
     "status": "completed",
     "priority": "high"
   },
   {
-    "id": "t_3",
-    "content": "P0: 修复超时中间件逻辑错误",
-    "status": "completed",
-    "priority": "high"
-  },
-  {
-    "id": "t_4",
-    "content": "P0: 修复错误消息编码问题",
-    "status": "completed",
-    "priority": "high"
-  },
-  {
-    "id": "t_5",
-    "content": "P1: 优化测试断言逻辑",
+    "id": "3",
+    "content": "添加环境配置信息打印",
     "status": "completed",
     "priority": "medium"
   },
   {
-    "id": "t_6",
-    "content": "P1: 调整性能测试期望值",
+    "id": "4",
+    "content": "添加工具注册详情打印",
     "status": "completed",
     "priority": "medium"
   },
   {
-    "id": "t_7",
-    "content": "P1: 添加中间件优先级支持",
+    "id": "5",
+    "content": "添加 Agent 初始化信息",
     "status": "completed",
     "priority": "medium"
   },
   {
-    "id": "t_8",
-    "content": "P2: 性能优化",
+    "id": "6",
+    "content": "添加会话和缓存目录信息",
     "status": "completed",
-    "priority": "low"
+    "priority": "medium"
+  },
+  {
+    "id": "7",
+    "content": "验证类型检查",
+    "status": "completed",
+    "priority": "high"
   }
 ]

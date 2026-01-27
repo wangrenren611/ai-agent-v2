@@ -1,0 +1,142 @@
+[
+  {
+    "role": "user",
+    "type": "text",
+    "content": "Test max loop"
+  },
+  {
+    "content": "Loop 0",
+    "role": "assistant",
+    "type": "tool_call",
+    "tool_calls": [
+      {
+        "id": "c0",
+        "type": "function",
+        "function": {
+          "name": "bash",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "finishReason": "tool_calls",
+    "usage": {
+      "prompt_tokens": 10,
+      "completion_tokens": 5,
+      "total_tokens": 15
+    }
+  },
+  {
+    "role": "tool",
+    "type": "text",
+    "content": "ok",
+    "tool_call_id": "c0"
+  },
+  {
+    "content": "Loop 1",
+    "role": "assistant",
+    "type": "tool_call",
+    "tool_calls": [
+      {
+        "id": "c1",
+        "type": "function",
+        "function": {
+          "name": "bash",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "finishReason": "tool_calls",
+    "usage": {
+      "prompt_tokens": 10,
+      "completion_tokens": 5,
+      "total_tokens": 15
+    }
+  },
+  {
+    "role": "tool",
+    "type": "text",
+    "content": "ok",
+    "tool_call_id": "c1"
+  },
+  {
+    "content": "Loop 2",
+    "role": "assistant",
+    "type": "tool_call",
+    "tool_calls": [
+      {
+        "id": "c2",
+        "type": "function",
+        "function": {
+          "name": "bash",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "finishReason": "tool_calls",
+    "usage": {
+      "prompt_tokens": 10,
+      "completion_tokens": 5,
+      "total_tokens": 15
+    }
+  },
+  {
+    "role": "tool",
+    "type": "text",
+    "content": "ok",
+    "tool_call_id": "c2"
+  },
+  {
+    "content": "Loop 3",
+    "role": "assistant",
+    "type": "tool_call",
+    "tool_calls": [
+      {
+        "id": "c3",
+        "type": "function",
+        "function": {
+          "name": "bash",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "finishReason": "tool_calls",
+    "usage": {
+      "prompt_tokens": 10,
+      "completion_tokens": 5,
+      "total_tokens": 15
+    }
+  },
+  {
+    "role": "tool",
+    "type": "text",
+    "content": "ok",
+    "tool_call_id": "c3"
+  },
+  {
+    "content": "Loop 4",
+    "role": "assistant",
+    "type": "tool_call",
+    "tool_calls": [
+      {
+        "id": "c4",
+        "type": "function",
+        "function": {
+          "name": "bash",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "finishReason": "tool_calls",
+    "usage": {
+      "prompt_tokens": 10,
+      "completion_tokens": 5,
+      "total_tokens": 15
+    }
+  },
+  {
+    "role": "tool",
+    "type": "text",
+    "content": "ok",
+    "tool_call_id": "c4"
+  }
+]

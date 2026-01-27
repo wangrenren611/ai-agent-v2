@@ -3,7 +3,6 @@
  * 统一管理所有事件总线相关的类型
  */
 
-import type { z } from 'zod';
 
 export type EventHandler<T = any> = (data: T) => void | Promise<void>;
 export type AsyncEventHandler<T = any> = (data: T) => Promise<void>;
@@ -21,6 +20,8 @@ export interface EventContext<T = any> {
   metadata: EventMetadata;
   abort: () => void;
   isAborted: boolean;
+  /** 错误回调，用于将处理器错误传递给中间件 */
+  onError?: (error: Error) => void;
 }
 
 export interface Middleware<T = any> {

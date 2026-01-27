@@ -1,6 +1,12 @@
 /**
  * EventBus - 主事件总线类
  * 核心功能：事件订阅、发布、取消订阅
+ *
+ * 设计原则：
+ * 1. 所有错误都被捕获并记录，绝不向调用方抛出
+ * 2. 支持同步/异步事件处理
+ * 3. 支持全局和事件特定的中间件
+ * 4. 支持类型安全和作用域隔离
  */
 
 import type {
@@ -11,6 +17,7 @@ import type {
   EventMetrics,
   Middleware,
   EventContext,
+  EventMetadata,
 } from './types';
 import { ScopedEventBus } from './ScopedEventBus';
 
@@ -35,6 +42,8 @@ export class EventBus {
       ...options,
     };
   }
+
+  // ==================== 订阅方法 ====================
 
   /**
    * 订阅事件（同步处理）
@@ -75,6 +84,8 @@ export class EventBus {
     return subscription;
   }
 
+  // ==================== 发布方法 ====================
+
   /**
    * 发布事件
    */
@@ -86,6 +97,8 @@ export class EventBus {
     const eventMetrics = this.getOrCreateMetrics(event);
     eventMetrics.totalEvents++;
 
+    let onErrorCallback: ((error: Error) => void) | undefined;
+
     const context: EventContext<T> = {
       event,
       data,
@@ -96,9 +109,14 @@ export class EventBus {
       },
       abort: () => {},
       isAborted: false,
+      get onError() {
+        return onErrorCallback;
+      },
+      set onError(callback: ((error: Error) => void) | undefined) {
+        onErrorCallback = callback;
+      },
     };
 
-    // 设置 abort 函数
     context.abort = () => {
       context.isAborted = true;
     };
@@ -109,6 +127,8 @@ export class EventBus {
 
     eventMetrics.lastEventTime = Date.now();
   }
+
+  // ==================== 取消订阅方法 ====================
 
   /**
    * 移除事件监听器
@@ -155,6 +175,8 @@ export class EventBus {
     }
   }
 
+  // ==================== 中间件方法 ====================
+
   /**
    * 添加全局中间件
    */
@@ -171,14 +193,14 @@ export class EventBus {
     this.middlewares.set(event, middlewares);
   }
 
+  // ==================== 查询方法 ====================
+
   /**
    * 获取事件监听器数量
    */
   listenerCount(event?: string): number {
     if (event) {
-      const syncCount = this.handlers.get(event)?.size || 0;
-      const asyncCount = this.asyncHandlers.get(event)?.size || 0;
-      return syncCount + asyncCount;
+      return (this.handlers.get(event)?.size || 0) + (this.asyncHandlers.get(event)?.size || 0);
     }
 
     let total = 0;
@@ -196,15 +218,9 @@ export class EventBus {
    */
   eventNames(): string[] {
     const events = new Set<string>();
-    for (const event of this.handlers.keys()) {
-      events.add(event);
-    }
-    for (const event of this.asyncHandlers.keys()) {
-      events.add(event);
-    }
-    for (const event of this.middlewares.keys()) {
-      events.add(event);
-    }
+    this.handlers.keys().forEach(e => events.add(e));
+    this.asyncHandlers.keys().forEach(e => events.add(e));
+    this.middlewares.keys().forEach(e => events.add(e));
     return Array.from(events);
   }
 
@@ -228,6 +244,8 @@ export class EventBus {
       this.metrics.clear();
     }
   }
+
+  // ==================== 高级功能 ====================
 
   /**
    * 等待特定事件（Promise 形式）
@@ -255,9 +273,8 @@ export class EventBus {
     return new ScopedEventBus(this, scope);
   }
 
-  /**
-   * 私有方法
-   */
+  // ==================== 私有方法 ====================
+
   private subscribe<T>(
     event: string,
     handler: EventHandler<T> | AsyncEventHandler<T>,
@@ -293,61 +310,38 @@ export class EventBus {
     };
   }
 
-  private async executeMiddlewares(middlewares: Middleware[], context: EventContext): Promise<void> {
-    let index = 0;
-
-    const next = async (): Promise<void> => {
-      if (index >= middlewares.length || context.isAborted) {
-        return;
-      }
-
-      const middleware = middlewares[index];
-      index++;
-
-      try {
-        await middleware(context, next);
-      } catch (error) {
-        this.handleError(context.event, error, context);
-        throw error;
-      }
-    };
-
-    await next();
-  }
-
   /**
-   * 执行中间件并在最后执行处理器
-   * 这允许错误从处理器传播回中间件
+   * 执行中间件和处理器
+   * 核心原则：所有错误都被捕获并记录，绝不向调用方抛出
    */
-  private async executeMiddlewaresWithHandlers(middlewares: Middleware[], context: EventContext): Promise<void> {
+  private async executeMiddlewaresWithHandlers(
+    middlewares: Middleware[],
+    context: EventContext
+  ): Promise<void> {
     let index = 0;
 
     const executeHandlers = async (): Promise<void> => {
-      if (context.isAborted) {
-        return;
-      }
+      if (context.isAborted) return;
 
       const event = context.event;
       const data = context.data;
-      const errors: Error[] = [];
 
       // 执行同步处理器
       const syncHandlers = this.handlers.get(event);
       if (syncHandlers) {
         for (const handler of syncHandlers.values()) {
-          if (context.isAborted) break; // 检查是否被中止
+          if (context.isAborted) break;
           const startTime = Date.now();
           try {
             handler(data);
-            const executionTime = Date.now() - startTime;
-            this.updateMetrics(event, executionTime, false);
+            this.updateMetrics(event, Date.now() - startTime, false);
           } catch (error) {
-            const executionTime = Date.now() - startTime;
-            this.updateMetrics(event, executionTime, true);
-            this.handleError(event, error, context);
+            this.updateMetrics(event, Date.now() - startTime, true);
             const err = error instanceof Error ? error : new Error(String(error));
-            errors.push(err);
-            // 不抛出错误，让其他处理器继续执行
+            this.handleError(event, err, context);
+            if (context.onError) {
+              context.onError(err);
+            }
           }
         }
       }
@@ -355,63 +349,32 @@ export class EventBus {
       // 执行异步处理器
       const asyncHandlers = this.asyncHandlers.get(event);
       if (asyncHandlers && this.options.enableAsync) {
-        const totalHandlers = (syncHandlers?.size || 0) + asyncHandlers.size;
-
-        // 如果只有一个处理器，直接执行以允许错误传播
-        if (totalHandlers === 1 && asyncHandlers.size === 1) {
-          const handler = Array.from(asyncHandlers.values())[0];
-          const startTime = Date.now();
-          try {
-            if (context.isAborted) return;
-            await handler(data);
-            const executionTime = Date.now() - startTime;
-            this.updateMetrics(event, executionTime, false);
-          } catch (error) {
-            const executionTime = Date.now() - startTime;
-            this.updateMetrics(event, executionTime, true);
-            this.handleError(event, error, context);
-            // 让错误传播给中间件
-            throw error;
-          }
-        } else {
-          // 多个处理器，并行执行，错误不互相影响
-          const promises: Promise<void>[] = [];
-          for (const handler of asyncHandlers.values()) {
-            promises.push(
-              (async () => {
-                if (context.isAborted) return;
-                const startTime = Date.now();
-                try {
-                  await handler(data);
-                  const executionTime = Date.now() - startTime;
-                  this.updateMetrics(event, executionTime, false);
-                } catch (error) {
-                  const executionTime = Date.now() - startTime;
-                  this.updateMetrics(event, executionTime, true);
-                  this.handleError(event, error, context);
-                  const err = error instanceof Error ? error : new Error(String(error));
-                  errors.push(err);
+        const promises: Promise<void>[] = [];
+        for (const handler of asyncHandlers.values()) {
+          promises.push(
+            (async () => {
+              if (context.isAborted) return;
+              const startTime = Date.now();
+              try {
+                await handler(data);
+                this.updateMetrics(event, Date.now() - startTime, false);
+              } catch (error) {
+                this.updateMetrics(event, Date.now() - startTime, true);
+                const err = error instanceof Error ? error : new Error(String(error));
+                this.handleError(event, err, context);
+                if (context.onError) {
+                  context.onError(err);
                 }
-              })()
-            );
-          }
-
-          // 等待所有处理器完成
-          await Promise.all(promises);
+              }
+            })()
+          );
         }
-      }
-
-      // 如果只有一个处理器且出错，抛出错误以允许中间件捕获
-      // 如果有多个处理器，错误不影响其他处理器，中间件也无需捕获
-      const totalHandlers = (syncHandlers?.size || 0) + (asyncHandlers?.size || 0);
-      if (errors.length > 0 && totalHandlers === 1) {
-        throw errors[0];
+        await Promise.all(promises);
       }
     };
 
     const next = async (): Promise<void> => {
       if (index >= middlewares.length || context.isAborted) {
-        // 所有中间件执行完毕，执行处理器
         await executeHandlers();
         return;
       }
@@ -423,7 +386,6 @@ export class EventBus {
         await middleware(context, next);
       } catch (error) {
         this.handleError(context.event, error, context);
-        throw error;
       }
     };
 
@@ -433,8 +395,6 @@ export class EventBus {
   private handleError(event: string, error: unknown, context: EventContext): void {
     const metrics = this.getOrCreateMetrics(event);
     metrics.errors++;
-
-    // 可以在这里添加错误日志、错误上报等
     console.error(`EventBus error for event "${event}":`, error, context);
   }
 
@@ -443,7 +403,7 @@ export class EventBus {
   }
 
   private generateHandlerId(): string {
-    return `handler_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `handler_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
   private getOrCreateMetrics(event: string): EventMetrics {
@@ -471,24 +431,14 @@ export class EventBus {
     const metrics = this.getOrCreateMetrics(event);
 
     if (!isError) {
-      // 只有非错误才更新平均执行时间
-      const previousValidEvents = metrics.totalEvents - metrics.errors - 1; // -1 因为 totalEvents 在 emit 中已经递增
+      const previousValidEvents = metrics.totalEvents - metrics.errors - 1;
       const totalTime = metrics.avgExecutionTime * Math.max(0, previousValidEvents) + executionTime;
       const currentValidEvents = metrics.totalEvents - metrics.errors;
       metrics.avgExecutionTime = currentValidEvents > 0 ? totalTime / currentValidEvents : 0;
     }
 
-    // 更新错误计数
     if (isError) {
       metrics.errors++;
     }
-  }
-
-  private createTimeoutPromise(event: string): Promise<void> {
-    return new Promise((_, reject) => {
-      setTimeout(() => {
-        reject(new Error(`Event "${event}" handler timeout after ${this.options.defaultTimeout}ms`));
-      }, this.options.defaultTimeout);
-    });
   }
 }

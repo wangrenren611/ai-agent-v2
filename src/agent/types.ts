@@ -1,103 +1,164 @@
 /**
- * Agent 类型定义
- * 统一管理 Agent 相关的所有类型
+ * Agent 类型定义和常量
  */
 
-import type { ToolSchema, Message, StreamChunk, LLMProvider } from '../providers/base';
-import type { ToolResult } from '../tool/base';
-import type { AgentContext } from '../context';
+import { LLMProvider } from "../providers/base";
 
 // =============================================================================
-// Agent 配置
+// 常量定义
 // =============================================================================
 
-/**
- * Agent 配置接口
- */
-export interface AgentConfig {
-  /** LLM Provider */
-  llmProvider: LLMProvider;
-  /** 系统提示词 */
-  systemPrompt: string;
-  /** 默认工具列表（可选），不传则使用 ToolRegistry 中所有工具 */
-  defaultTools?: ToolSchema[];
-  /** 最大循环次数，0 或 null 表示无限制，默认 1024 */
-  maxLoop?: number | null;
-  /** 最大 token 数，默认 8000 */
-  maxTokens?: number;
-  /** 最大输出 token 数，默认 8000 */
-  maxOutputTokens?: number;
-  /** 工具并发上限，默认 1 */
-  toolConcurrency?: number;
-  /** 单次工具调用超时（毫秒），默认 300000 (5分钟) */
-  toolTimeoutMs?: number;
-  /** 连续错误次数上限，默认 2 */
-  noProgressLimit?: number;
-  /** 会话 ID */
-  sessionId?: string;
+export const DEFAULT_MAX_LOOP = 1024;
+export const DEFAULT_NO_PROGRESS_LIMIT = 2;
+export const DEFAULT_MAX_OUTPUT_TOKENS = 8000;
+export const DEFAULT_MAX_TOKENS = 16000;
+export const MAX_NETWORK_RETRIES = 3;
+export const VALID_FINISH_REASONS = ['stop', 'eos', undefined] as const;
+
+// =============================================================================
+// 类型定义
+// =============================================================================
+
+/** 流式输出块 */
+export interface StreamChunk {
+    content?: string;
+    tool_calls?: Array<{
+        index: number;
+        delta: {
+            type?: 'function';
+            function?: {
+                name?: string;
+                arguments?: string;
+            };
+        };
+    }>;
+    finish_reason?: string;
 }
 
-/**
- * Agent 运行选项
- */
-export interface AgentRunOptions {
-  /** 静默模式 */
-  silent?: boolean;
-  /** 自定义工具列表 */
-  tools?: ToolSchema[];
-  /** 启用流式响应 */
-  stream?: boolean;
-  /** 流式回调函数 */
-  streamCallback?: (chunk: StreamChunk) => void;
-  /** Abort signal for cancelling the request */
-  abortSignal?: AbortSignal;
+/** 工具结果 */
+export interface ToolResult {
+    success: boolean;
+    data?: unknown;
+    metadata?: Record<string, unknown>;
+    error?: string;
 }
 
-/**
- * Agent 响应
- */
-export interface AgentResponse {
-  content: string;
-  role: Message['role'];
-  type?: Message['type'];
+/** 工具调用 */
+export interface ToolCall {
+    id: string;
+    type: 'function';
+    function: {
+        name: string;
+        arguments: string;
+    };
+}
+
+/** LLM 响应 */
+export interface LLMResponse {
+    content: string;
+    role: 'assistant';
+    type?: 'text' | 'tool' | 'tool_call' | 'summary';
+    tool_calls?: ToolCall[];
+    finishReason?: string;
+    usage?: {
+        prompt_tokens: number;
+        completion_tokens: number;
+        total_tokens: number;
+    };
+}
+
+/** 会话消息 */
+export interface Message {
+    role: 'user' | 'assistant' | 'system' | 'tool';
+    type?: 'text' | 'summary';
+    content: string;
+    tool_call_id?: string;
+}
+
+/** 工具 Schema */
+export interface ToolSchema {
+    type: 'function';
+    function: {
+        name: string;
+        description: string;
+        strict?: boolean;
+        parameters: Record<string, unknown>;
+    };
 }
 
 // =============================================================================
-// Agent 内部类型
+// Agent 事件类型
 // =============================================================================
 
-/**
- * 工具调用结果
- */
-export interface ToolCallResult {
-  /** 是否有工具调用 */
-  hasToolCalls: boolean;
-  /** 是否有错误 */
-  hasError: boolean;
-}
-
-/**
- * Agent 状态
- */
-export enum AgentState {
-  Idle = 'idle',
-  Thinking = 'thinking',
-  ExecutingTools = 'executing_tools',
-  Error = 'error',
-  Stopped = 'stopped',
-}
-
-/**
- * Agent 事件
- */
+/** Agent 事件类型定义 */
 export interface AgentEvents {
-  'agent:start': { sessionId: string };
-  'agent:end': { sessionId: string; duration: number };
-  'agent:error': { sessionId: string; error: Error };
-  'agent:tool:start': { toolName: string; args: Record<string, unknown> };
-  'agent:tool:end': { toolName: string; result: ToolResult; duration: number };
-  'agent:llm:start': { sessionId: string; messageCount: number };
-  'agent:llm:end': { sessionId: string; response: any; duration: number };
-  'agent:compaction:start': { sessionId: string; tokenCount: number };
-  'agent:compaction:end': { sessionId: string; compressedCount: number };
+    /** 流式输出块事件 */
+    'stream-chunk': StreamChunk;
+    /** 工具调用开始事件 */
+    'tool-call': { toolName: string; args: unknown };
+    /** 工具调用完成事件 */
+    'tool-result': { toolName: string; result: ToolResult; duration: number };
+    /** 错误事件 */
+    'error': { error: Error; phase: string };
+    /** 会话消息事件 */
+    'message': { message: Message };
+    /** 日志事件（静默模式下使用） */
+    'log': { level: 'info' | 'warn' | 'error'; message: string };
+    /** 开始思考事件 */
+    'thinking': { step: number };
+    /** 思考结束事件 */
+    'thinking-end': { step: number; hasToolCalls: boolean };
+    /** 工具调用组开始事件 */
+    'tool-calls-start': { count: number };
+    /** 工具调用组结束事件 */
+    'tool-calls-end': { count: number; hasErrors: boolean; summary: string };
+    /** 任务完成事件 */
+    'complete': { response: AgentResponse };
+    /** 任务取消事件 */
+    'cancelled': { reason: string };
+}
+
+// =============================================================================
+// Agent 配置和选项
+// =============================================================================
+
+/** Agent 配置 */
+export interface AgentConfig {
+    /** LLM 提供者 */
+    llmProvider: LLMProvider;
+    /** 系统提示词 */
+    systemPrompt: string;
+    /** 默认工具列表 */
+    defaultTools?: ToolSchema[];
+    /** 最大循环次数，0 或 null 表示无限制 */
+    maxLoop?: number | null;
+    /** 最大 token 数 */
+    maxTokens?: number;
+    /** 最大输出 token 数 */
+    maxOutputTokens?: number;
+    /** 连续错误次数上限 */
+    noProgressLimit?: number;
+    /** 会话 ID */
+    sessionId?: string;
+}
+
+/** Agent 运行选项 */
+export interface AgentRunOptions {
+    /** 静默模式（通过事件输出） */
+    silent?: boolean;
+    /** 覆盖默认工具 */
+    tools?: ToolSchema[];
+    /** 启用流式响应 */
+    stream?: boolean;
+    /** 流式回调函数 */
+    streamCallback?: (chunk: StreamChunk) => void;
+    /** 取消信号 */
+    abortSignal?: AbortSignal;
+}
+
+/** Agent 响应 */
+export interface AgentResponse {
+    content: string;
+    role: Message['role'];
+    type?: Message['type'];
 }

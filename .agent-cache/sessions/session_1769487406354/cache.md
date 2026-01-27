@@ -1,0 +1,20 @@
+```
+{
+  "role": "user",
+  "type": "text",
+  "content": "你好"
+}
+```
+```
+{
+  "content": "你好！我是 QPSCode，一个专注于软件开发的 AI 助手。\n\n我可以在这个项目中帮助你：\n- 理解和探索代码库结构\n- 修复 bug 和解决错误\n- 实现新功能\n- 代码重构和优化\n- 运行测试和构建\n\n当前工作目录是 `/Users/wrr/work/ai-agent-v2`，这是一个多会话 AI 代理项目，使用了 DDD 架构设计。\n\n你需要我帮你做什么？",
+  "role": "assistant",
+  "type": "text",
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "finishReason": "stop"
+}
+```

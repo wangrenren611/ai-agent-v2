@@ -5,7 +5,7 @@ import { ScopedLogger } from "../util/log";
 export class Compaction {
   private readonly maxTokens: number;
   private readonly maxOutputTokens: number;
-  private readonly triggerRatio = 0.92; // 92% 触发压缩
+  private readonly triggerRatio = 0.90; // 92% 触发压缩
   private keepMessagesNum: number = 40;
   logger: ScopedLogger;
   llmProvider: LLMProvider;
@@ -18,8 +18,8 @@ export class Compaction {
     this.keepMessagesNum = config.keepMessagesNum || this.keepMessagesNum;
   }
 
-  getToken(history: Message[]) {
-    const totalUsed = this.calculateTotalUsage(history);
+  getToken(history: Message[],tools:any[]) {
+    const totalUsed = this.calculateTotalUsage(history,tools);
     const usableLimit = this.maxTokens - this.maxOutputTokens;
 
     return {
@@ -68,18 +68,18 @@ export class Compaction {
     return map;
   }
 
-  async compact(history: Message[]): Promise<{
+  async compact(history: Message[],tools:any[]): Promise<{
     isCompacted: boolean,
     summaryMessage: Message | null,
     list: Message[]
   }> {
-    const totalUsed = this.calculateTotalUsage(history);
+    const totalUsed = this.calculateTotalUsage(history,tools);
     const usableLimit = this.maxTokens - this.maxOutputTokens;
     const threshold = usableLimit * this.triggerRatio;
 
     // 只有当消息数量超过保留数量且 token 达到阈值时，才触发压缩
     const shouldCompact = history.length > this.keepMessagesNum && totalUsed >= threshold;
-
+     history = history.filter(msg => msg.role !== 'system');
     // 如果没达到压缩条件，直接返回原数据
     if (!shouldCompact) {
       return {
@@ -307,8 +307,8 @@ export class Compaction {
   /**
    * 计算整个对话数组的 Token 用量
    */
-  public calculateTotalUsage(messages: Message[]): number {
-    return messages.reduce((acc, m) => {
+  public calculateTotalUsage(messages: Message[],tools:any[]): number {
+    return [...messages,...tools].reduce((acc, m) => {
       // 每条消息基础开销 4 tokens (role, name, newline)
       return acc + this.estimate(JSON.stringify(m)) + 4;
     }, 0);

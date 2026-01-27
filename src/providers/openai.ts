@@ -13,9 +13,8 @@ import {
 import {
   LLMError,
   createErrorFromStatus,
-  isAbortedError,
 } from './errors';
-
+import fs from 'fs';
 // =============================================================================
 // 类型定义
 // =============================================================================
@@ -130,6 +129,7 @@ function createHeaders(apiKey: string, organization?: string): Headers {
 }
 
 function cleanMessage(msg: Message): Record<string, unknown> {
+
   const cleaned: Record<string, unknown> = {
     role: msg.role,
     content: msg.content,
@@ -245,16 +245,18 @@ export class OpenAIProvider extends LLMProvider {
 
     const body: Record<string, unknown> = {
       model: model || this.model,
-      messages: messages.map(cleanMessage),
+      messages: messages.map(cleanMessage).filter((msg: Record<string, any>) => msg !== null || msg?.content !== ''),
       max_tokens: maxTokens || this.maxOutputTokens,
       temperature: temperature ?? DEFAULT_TEMPERATURE,
       stream: stream ?? false,
+      reasoning_split: true,
     };
 
     if (tools && tools.length > 0) {
       body.tools = tools;
     }
-
+    
+    fs.writeFileSync('./openai_request.json', JSON.stringify(body, null, 2));
     return body;
   }
 
@@ -274,7 +276,7 @@ export class OpenAIProvider extends LLMProvider {
     });
 
     console.log('=== API Response ===');
-    console.log('Status:', response.status, response.statusText);
+    console.log('Status:', response.status,);
 
     // 检查 HTTP 错误状态，并在非流式模式下抛出异常
     // 流式模式下会在 generateStream 中单独处理
@@ -315,9 +317,9 @@ export class OpenAIProvider extends LLMProvider {
     const content = message.content || choice.content || '';
     const finishReason = choice.finish_reason;
 
-    console.log(message);
 
-    // 🔧 P0 修复: 优先检测 Token 异常（更严重的 API 故障）
+
+
     const promptTokens = data.usage?.prompt_tokens || 0;
     const completionTokens = data.usage?.completion_tokens || 0;
     const totalTokens = data.usage?.total_tokens || 0;
@@ -335,7 +337,7 @@ export class OpenAIProvider extends LLMProvider {
     // 如果是空 content + finishReason: 'stop'，发出警告但不抛出错误
     // 让 Agent 层的空响应处理逻辑来处理这种情况
     if (!content && !hasToolCalls && finishReason === 'stop') {
-      console.warn('Empty response with finishReason: stop - this will be handled by Agent layer');
+       console.warn('Empty response with finishReason: stop - this will be handled by Agent layer');
     }
 
     return {
