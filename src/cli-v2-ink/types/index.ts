@@ -107,8 +107,6 @@ export interface AgentEventHandlers {
 // ============================================================================
 
 export interface HeaderProps {
-  isProcessing: boolean;
-  status: string;
   model: string;
 }
 

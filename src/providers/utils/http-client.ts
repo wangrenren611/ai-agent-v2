@@ -44,7 +44,7 @@ export class HTTPClient {
   readonly debug: boolean;
 
   constructor(options: HttpClientOptions = {}) {
-    this.defaultTimeout = options.timeout ?? 60000;
+    this.defaultTimeout = options.timeout ?? 1000*60*10;
     this.maxRetries = options.maxRetries ?? 3;
     this.initialRetryDelay = options.initialRetryDelay ?? 1000;
     this.maxRetryDelay = options.maxRetryDelay ?? 10000;

@@ -6,6 +6,7 @@ import React from 'react';
 import { Box, Text } from 'ink';
 import type { ChatMessage } from '../types';
 import ChatMessageComp from './ChatMessage';
+import ErrorMessage from './ErrorMessage';
 import { MAX_DISPLAYED_MESSAGES, MESSAGES, COLORS } from '../utils/constants';
 
 interface MessageListProps {
@@ -17,7 +18,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, currentResponse }) 
   // Display messages with optional streaming response
   const displayedMessages = React.useMemo(() => {
     // If there's a streaming response, temporarily replace the last assistant message
-    // (if it exists) with the streaming version
+    // (if it exists) with streaming version
     const lastMessage = messages[messages.length - 1];
 
     if (currentResponse && lastMessage?.role === 'assistant') {
@@ -46,6 +47,11 @@ const MessageList: React.FC<MessageListProps> = ({ messages, currentResponse }) 
     return messages;
   }, [messages, currentResponse]);
 
+  // Check if last message is a system error
+  const lastMessage = displayedMessages[displayedMessages.length - 1];
+  const hasError = lastMessage?.role === 'system' &&
+                   lastMessage.content.toLowerCase().includes('error');
+
   // Empty state
   if (displayedMessages.length === 0) {
     return (
@@ -59,14 +65,18 @@ const MessageList: React.FC<MessageListProps> = ({ messages, currentResponse }) 
   const visibleMessages = displayedMessages.slice(-MAX_DISPLAYED_MESSAGES);
 
   return (
-    <Box flexDirection="column" flexGrow={1} paddingY={1}>
-      {visibleMessages.map((msg, index) => (
+    <Box flexDirection="column"  >
+      {visibleMessages?.map?.((msg, index) => (
         <ChatMessageComp
           key={`${msg.role}-${index}-${msg.timestamp.getTime()}`}
           message={msg}
           index={index}
         />
       ))}
+      {/* Error indicator */}
+      {hasError && (
+        <ErrorMessage message={lastMessage?.content || 'An error occurred'} />
+      )}
     </Box>
   );
 };

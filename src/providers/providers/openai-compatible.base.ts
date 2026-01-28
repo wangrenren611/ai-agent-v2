@@ -149,7 +149,7 @@ export abstract class OpenAICompatibleProvider extends LLMProvider {
     const apiResponse = this.adapter.transformResponse(data);
 
     return {
-      content: apiResponse.content || '',
+      content: String(apiResponse.content || ''),
       role: 'assistant',
       type: 'text',
       tool_calls: apiResponse.tool_calls && apiResponse.tool_calls.length > 0 ? apiResponse.tool_calls : undefined,

@@ -8,7 +8,6 @@
 // Base class (value) + Base types
 export { LLMProvider } from './base';
 export type {
-  ProviderConfig,
   Message,
   LLMResponse,
   LLMOptions,
@@ -48,7 +47,7 @@ export type {
   GLMConfig,
   MiniMaxConfig,
   QwenConfig,
-  ProviderConfig as FullProviderConfig,
+  ProviderConfig,
   ProviderMetadata,
 } from './config';
 
@@ -106,7 +105,7 @@ import { GLMProvider } from './providers/glm.provider';
 import { MiniMaxProvider } from './providers/minimax.provider';
 import { QwenProvider } from './providers/qwen.provider';
 
-// Register all providers with the registry
+// Register all providers with registry
 ProviderRegistry.register(ProviderType.OPENAI, OpenAIProvider as any);
 ProviderRegistry.register(ProviderType.KIMI, KimiProvider as any);
 ProviderRegistry.register(ProviderType.DEEPSEEK, DeepSeekProvider as any);

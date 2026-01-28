@@ -128,6 +128,7 @@ export interface ProviderMetadata {
 /**
  * Metadata for each provider
  */
+const TIMEOUT = 1000 * 60 * 10;
 export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
   [ProviderType.OPENAI]: {
     type: ProviderType.OPENAI,
@@ -138,7 +139,7 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
     maxOutputTokens: 4096,
     supportsStreaming: true,
     supportsTools: true,
-    defaultTimeout: 60000,
+    defaultTimeout: TIMEOUT,
     defaultMaxRetries: 3,
   },
   [ProviderType.KIMI]: {
@@ -150,7 +151,7 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
     maxOutputTokens: 8000,
     supportsStreaming: true,
     supportsTools: true,
-    defaultTimeout: 60000,
+    defaultTimeout: TIMEOUT,
     defaultMaxRetries: 3,
   },
   [ProviderType.DEEPSEEK]: {
@@ -162,7 +163,7 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
     maxOutputTokens: 8192,
     supportsStreaming: true,
     supportsTools: true,
-    defaultTimeout: 60000,
+    defaultTimeout: TIMEOUT,
     defaultMaxRetries: 3,
   },
   [ProviderType.GLM]: {
@@ -174,7 +175,7 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
     maxOutputTokens: 8192,
     supportsStreaming: true,
     supportsTools: true,
-    defaultTimeout: 60000,
+    defaultTimeout: TIMEOUT,
     defaultMaxRetries: 3,
   },
   [ProviderType.MINIMAX]: {
@@ -186,7 +187,7 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
     maxOutputTokens: 4096,
     supportsStreaming: true,
     supportsTools: true,
-    defaultTimeout: 60000,
+    defaultTimeout: TIMEOUT,      
     defaultMaxRetries: 3,
   },
   [ProviderType.QWEN]: {
@@ -198,7 +199,7 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
     maxOutputTokens: 8192,
     supportsStreaming: true,
     supportsTools: true,
-    defaultTimeout: 60000,
+    defaultTimeout: TIMEOUT,
     defaultMaxRetries: 3,
   },
 };

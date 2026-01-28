@@ -2,7 +2,16 @@
  * Provider Registry
  *
  * Central registry and factory for creating LLM providers.
- * Supports auto-detection from environment variables.
+ * Supports auto-detection from environment variables (like Claude Code).
+ * 
+ * Universal API Key Support:
+ * - ANTHROPIC_API_KEY: Universal key (similar to Claude Code's approach)
+ * - GLM_API_KEY: GLM (Zhipu AI) specific key
+ * - KIMI_API_KEY: Kimi (Moonshot AI) specific key
+ * - DEEPSEEK_API_KEY: DeepSeek specific key
+ * - OPENAI_API_KEY: OpenAI specific key
+ * - MINIMAX_API_KEY: MiniMax specific key
+ * - QWEN_API_KEY: Qwen (Alibaba) specific key
  */
 
 import { LLMProvider } from './base';
@@ -33,6 +42,11 @@ interface RegistryEntry {
  *
  * Manages provider registration and creation.
  * Implements factory pattern for dynamic provider instantiation.
+ * 
+ * Priority order (similar to Claude Code):
+ * 1. ANTHROPIC_API_KEY (universal API key)
+ * 2. Provider-specific API keys (GLM_API_KEY, KIMI_API_KEY, etc.)
+ * 3. AI_MODEL environment variable
  */
 export class ProviderRegistry {
   private static readonly registry = new Map<ProviderType, RegistryEntry>();
@@ -59,7 +73,7 @@ export class ProviderRegistry {
 
     const metadata = getProviderMetadata(config.type);
   
-    // Merge config with defaults from metadata while保留自定义字段
+    // Merge config with defaults from metadata while preserving custom fields
     const baseConfig: BaseProviderConfig = {
       ...config, // keep any provider-specific fields (e.g., organization, apiKeyHeader, extraBody)
       apiKey: config.apiKey,
@@ -79,12 +93,28 @@ export class ProviderRegistry {
   /**
    * Auto-detect and create provider from environment variables
    *
-   * Detection order:
-   * 1. Explicit type parameter
-   * 2. AI_MODEL environment variable
-   * 3. Existing API keys (DEEPSEEK_API_KEY, etc.)
+   * Detection order (similar to Claude Code):
+   * 1. ANTHROPIC_API_KEY (universal key, like Claude Code)
+   * 2. Provider-specific keys (GLM_API_KEY, KIMI_API_KEY, etc.)
+   * 3. AI_MODEL environment variable
+   * 4. Explicit type parameter
    */
   static createFromEnv(type?: ProviderType): LLMProvider {
+    // Priority 1: Check for universal ANTHROPIC_API_KEY (like Claude Code)
+    const universalApiKey = process.env.ANTHROPIC_API_KEY;
+    if (universalApiKey) {
+      console.log('[ProviderRegistry] Using ANTHROPIC_API_KEY (universal key)');
+      
+      // Try to detect provider from AI_MODEL or ANTHROPIC_MODEL
+      const modelFromEnv = process.env.AI_MODEL || process.env.ANTHROPIC_MODEL;
+      const detectedType = modelFromEnv ? this.detectTypeFromModel(modelFromEnv) : null;
+      
+      // Default to GLM if no model specified (like Claude Code defaults)
+      const providerType = detectedType || ProviderType.GLM;
+      
+      return this.createFromEnvWithKey(providerType, universalApiKey);
+    }
+
     // If type is explicitly provided, use it
     if (type) {
       return this.createFromEnvType(type);
@@ -100,7 +130,7 @@ export class ProviderRegistry {
       }
     }
 
-    // Fall back to checking for existing API keys
+    // Fall back to checking for existing API keys (provider-specific)
     // Check in order of preference
     const envTypes: ProviderType[] = [
       ProviderType.DEEPSEEK,
@@ -121,8 +151,14 @@ export class ProviderRegistry {
 
     throw new Error(
       'No provider credentials found in environment. ' +
-      'Please set one of: DEEPSEEK_API_KEY, KIMI_API_KEY, GLM_API_KEY, ' +
-      'MINIMAX_API_KEY, QWEN_API_KEY, or OPENAI_API_KEY'
+      'Please set one of:\n' +
+      '  - ANTHROPIC_API_KEY (universal key, like Claude Code)\n' +
+      '  - DEEPSEEK_API_KEY\n' +
+      '  - KIMI_API_KEY\n' +
+      '  - GLM_API_KEY\n' +
+      '  - MINIMAX_API_KEY\n' +
+      '  - QWEN_API_KEY\n' +
+      '  - OPENAI_API_KEY'
     );
   }
 
@@ -138,7 +174,7 @@ export class ProviderRegistry {
     if (!apiKey) {
       throw new Error(
         `API key not found for ${metadata.name}. ` +
-        `Please set ${this.getEnvKeyName(type)}`
+        `Please set ${this.getEnvKeyName(type)} or ANTHROPIC_API_KEY (universal key)`
       );
     }
 
@@ -147,6 +183,38 @@ export class ProviderRegistry {
 
     // Get model from environment (optional)
     const model = process.env.AI_MODEL || metadata.defaultModel;
+
+    // Build config
+    const config: ProviderConfig = {
+      type,
+      apiKey,
+      baseURL,
+      model,
+      temperature: parseFloat(process.env.TEMPERATURE || '0.7'),
+    };
+
+    // Add MiniMax-specific config
+    if (type === ProviderType.MINIMAX) {
+      (config as any).groupId = process.env.MINIMAX_GROUP_ID;
+    }
+
+    return this.create(config);
+  }
+
+  /**
+   * Create provider with specific API key
+   */
+  private static createFromEnvWithKey(
+    type: ProviderType,
+    apiKey: string
+  ): LLMProvider {
+    const metadata = getProviderMetadata(type);
+
+    // Get base URL from environment (optional)
+    const baseURL = this.getBaseUrlForType(type);
+
+    // Get model from environment (optional)
+    const model = process.env.AI_MODEL || process.env.ANTHROPIC_MODEL || metadata.defaultModel;
 
     // Build config
     const config: ProviderConfig = {

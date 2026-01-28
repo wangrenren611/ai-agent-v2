@@ -5,31 +5,29 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import type { HeaderProps } from '../types';
-import LoadingSpinner from './LoadingSpinner';
 import { getCurrentDirectoryName } from '../utils/helpers';
-import { COLORS } from '../utils/constants';
+import { COLORS, ICONS } from '../utils/constants';
 
-const Header: React.FC<HeaderProps> = ({ isProcessing, status, model }) => {
+const Header: React.FC<HeaderProps> = ({ model }) => {
+  const dirName = getCurrentDirectoryName();
+
   return (
     <Box
-      borderStyle="single"
-      borderColor="gray"
+      borderStyle="round"
+      borderColor={COLORS.PRIMARY}
       paddingX={1}
-      justifyContent="space-between"
+      paddingY={0}
+      marginBottom={1}
     >
-      <Box>
-        <Text bold color={COLORS.PRIMARY}>AI Agent v2</Text>
-        <Text dimColor color={COLORS.DIM}> · </Text>
-        <Text dimColor>{getCurrentDirectoryName()}</Text>
-        <Text dimColor color={COLORS.DIM}> · </Text>
-        <Text dimColor>Model: {model}</Text>
-      </Box>
-      <Box>
-        {isProcessing ? (
-          <LoadingSpinner text={status} />
-        ) : (
-          <Text dimColor color={COLORS.DIM}>{status}</Text>
-        )}
+      <Box justifyContent="space-between" width="100%">
+        <Box>
+          <Text bold color={COLORS.PRIMARY}>{ICONS.ASSISTANT} AI Agent v2</Text>
+        </Box>
+        <Box>
+          <Text dimColor color={COLORS.DIM}>{dirName}</Text>
+          <Text color={COLORS.PRIMARY}> · </Text>
+          <Text color={COLORS.PRIMARY}>{model}</Text>
+        </Box>
       </Box>
     </Box>
   );

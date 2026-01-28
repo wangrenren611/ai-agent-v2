@@ -11,6 +11,7 @@ import type { SessionProps, ChatMessage } from '../types';
 import type { Agent } from '../../agent';
 import Header from './Header';
 import MessageList from './MessageList';
+import StatusIndicator from './StatusIndicator';
 import CustomInput from './CustomInput';
 import { useAgent } from '../hooks/useAgent';
 import { getSelectedModel, getSeparatorLength } from '../utils/helpers';
@@ -156,21 +157,28 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
   const separatorLength = getSeparatorLength();
 
   return (
-    <Box flexDirection="column">
-      {/* Header */}
-      <Header isProcessing={isProcessing} status={status} model={selectedModel} />
+    <Box flexDirection="column" flexGrow={1}>
+      {/* Header - Simplified */}
+      <Header model={selectedModel} />
 
       {/* Messages area */}
       <MessageList messages={messages} currentResponse={currentResponse} />
+  
+      {/* Status Indicator - Below messages, above input */}
+      <StatusIndicator
+        isProcessing={isProcessing}
+        status={status}
+        currentResponse={currentResponse}
+      />
 
       {/* Separator */}
-      <Box>
-        <Text dimColor color={COLORS.DIM}>{'─'.repeat(separatorLength)}</Text>
+      <Box marginBottom={1}>
+        <Text dimColor color={COLORS.DIM}>───────────────</Text>
       </Box>
 
       {/* Input area */}
-      <Box>
-        <Text bold color={COLORS.PRIMARY}>{ICONS.USER} </Text>
+      <Box >
+        <Text bold color={COLORS.PRIMARY} >{ICONS.INPUT} </Text>
         <Box flexGrow={1}>
           <CustomInput
             value={input}
@@ -184,7 +192,7 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
       </Box>
 
       {/* Help text */}
-      <Box>
+      <Box marginBottom={4}>
         <Text dimColor color={COLORS.DIM}>←→: Move cursor | Backspace/Delete: Delete | Esc: Back | Ctrl+C: Exit</Text>
       </Box>
     </Box>

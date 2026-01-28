@@ -86,7 +86,7 @@ const Home: React.FC<HomeProps> = ({ navigate }) => {
       </Box>
       <Box marginTop={2} flexDirection="column">
         <Box>
-          <Text color={COLORS.PRIMARY} bold>{ICONS.USER} </Text>
+          <Text color={COLORS.PRIMARY} bold>{ICONS.INPUT}</Text>
           <TextInput
             value={input}
             onChange={setInput}

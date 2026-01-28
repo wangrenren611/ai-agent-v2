@@ -5,6 +5,7 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import type { ChatMessage } from '../types';
+import MarkdownText from './MarkdownText';
 import { ICONS, COLORS } from '../utils/constants';
 
 interface ChatMessageProps {
@@ -30,11 +31,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, index }) => {
     return (
       <Box key={`tool-${index}-${message.timestamp.getTime()}`} flexDirection="column" marginBottom={1}>
         <Box>
-          <Text bold color={color}>{icon} {message.toolName}({message.toolArgs || ''})</Text>
+          <Text bold color={color}>{icon} {message.toolName}</Text>
+          {message.toolArgs && (
+            <Text dimColor color={COLORS.DIM}>({message.toolArgs})</Text>
+          )}
         </Box>
         {message.toolOutput && (
-          <Box paddingLeft={2}>
-            <Text dimColor color={COLORS.DIM}>  {message.toolOutput}</Text>
+          <Box marginLeft={3}>
+            <Text dimColor color={COLORS.DIM}>{message.toolOutput}</Text>
           </Box>
         )}
       </Box>
@@ -50,7 +54,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, index }) => {
           <Text bold color={COLORS.WARNING}>{ICONS.SYSTEM} {lines[0]}</Text>
         </Box>
         {lines.length > 1 && (
-          <Box paddingLeft={2}>
+          <Box marginLeft={3}>
             <Text dimColor wrap="wrap">
               {lines.slice(1).join('\n')}
             </Text>
@@ -63,20 +67,19 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, index }) => {
   // Regular message (user or assistant)
   const prefix = message.role === 'user' ? ICONS.USER : ICONS.ASSISTANT;
   const roleColor = message.role === 'user' ? COLORS.PRIMARY : COLORS.SECONDARY;
-  const lines = message.content.split('\n');
+
+  // Streaming indicator
+  const streamingIndicator = message.isStreaming ? (
+    <Text dimColor color={COLORS.WARNING}> …</Text>
+  ) : null;
 
   return (
-    <Box key={`msg-${index}-${message.timestamp.getTime()}`} flexDirection="column" marginBottom={1}>
-      <Box>
-        <Text bold color={roleColor}>{prefix} {lines[0]}</Text>
+    <Box key={`msg-${index}-${message.timestamp.getTime()}`} flexDirection="row" >
+      <Box height={1} >
+        <Text bold color={roleColor} >{prefix}</Text>
+        <Text> {streamingIndicator}</Text>
       </Box>
-      {lines.length > 1 && (
-        <Box paddingLeft={2}>
-          <Text dimColor={message.isStreaming} wrap="wrap">
-            {lines.slice(1).join('\n')}
-          </Text>
-        </Box>
-      )}
+      <MarkdownText  content={message.content} isStreaming={message.isStreaming} />
     </Box>
   );
 };
