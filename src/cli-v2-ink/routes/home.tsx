@@ -29,11 +29,89 @@ const Home: React.FC<HomeProps> = ({ navigate }) => {
 
   const [currentModel, setCurrentModel] = useState<string>(getCurrentModel());
 
+  // Match commands based on input
+  const matchedCommands = matchCommands(input);
+
+  // Execute a command
+  const executeCommand = useCallback((command: Command) => {
+    console.log('[Home] Executing command:', command.name);
+    setInput('');
+    setShowCommandList(false);
+
+    switch (command.id) {
+      case 'model':
+        setNotice('请使用 "model <name>" 格式切换模型，例如: model gpt-4o-mini');
+        setTimeout(() => setNotice(null), 3000);
+        break;
+
+      case 'settings':
+      case 'config':
+        navigate('settings');
+        break;
+
+      case 'clear':
+        setNotice('消息历史已在会话页面清空');
+        setTimeout(() => setNotice(null), 2000);
+        break;
+
+      case 'help':
+        setNotice('可用命令: /model, /settings, /clear, /help, /exit');
+        setTimeout(() => setNotice(null), 3000);
+        break;
+
+      case 'exit':
+        process.exit(0);
+        break;
+
+      default:
+        setNotice(`未知命令: ${command.name}`);
+        setTimeout(() => setNotice(null), 2000);
+    }
+  }, [navigate]);
+
+  // Handle input change
+  const handleInputChange = useCallback((value: string) => {
+    console.log('[Home] Input changed:', value);
+    setInput(value);
+
+    // Show/hide command list
+    if (value.startsWith('/')) {
+      console.log('[Home] Showing command list');
+      setShowCommandList(true);
+      setCommandListIndex(0);
+    } else {
+      console.log('[Home] Hiding command list');
+      setShowCommandList(false);
+    }
+  }, []);
+
+  // Handle command list navigation
+  const navigateCommandList = useCallback((direction: 'up' | 'down') => {
+    if (direction === 'up') {
+      setCommandListIndex(prev => (prev > 0 ? prev - 1 : matchedCommands.length - 1));
+    } else {
+      setCommandListIndex(prev => (prev < matchedCommands.length - 1 ? prev + 1 : 0));
+    }
+  }, [matchedCommands.length]);
+
+  // Handle escape
+  const handleEscape = useCallback(() => {
+    if (showCommandList) {
+      setShowCommandList(false);
+    }
+  }, [showCommandList]);
+
   const handleSubmit = (text: string) => {
     const trimmedInput = text.trim();
 
     if (!trimmedInput) {
       setInput('');
+      return;
+    }
+
+    // If command list is shown, execute selected command
+    if (showCommandList && matchedCommands[commandListIndex]) {
+      executeCommand(matchedCommands[commandListIndex]);
       return;
     }
 
@@ -87,15 +165,47 @@ const Home: React.FC<HomeProps> = ({ navigate }) => {
           <Text bold>q</Text>
           <Text dimColor> to quit</Text>
         </Box>
+        <Box>
+          <Text dimColor>Type </Text>
+          <Text bold>/</Text>
+          <Text dimColor> to see commands</Text>
+        </Box>
       </Box>
+
+      {/* Command List */}
+      {showCommandList && (
+        <Box flexDirection="column" paddingX={2} marginBottom={1}>
+          <Box marginBottom={1}>
+            <Text color="cyan" bold>Commands:</Text>
+            <Text color="gray"> (↑↓ navigate, Enter execute, Esc cancel)</Text>
+          </Box>
+          <CommandList
+            keyword={input}
+            selectedIndex={commandListIndex}
+            onSelect={executeCommand}
+          />
+        </Box>
+      )}
+
       <Box marginTop={2} flexDirection="column">
         <Box>
           <Text color={COLORS.PRIMARY} bold>{ICONS.INPUT}</Text>
           <CustomInput
             value={input}
-            onChange={setInput}
+            onChange={handleInputChange}
             onSubmit={handleSubmit}
             placeholder="Type your message..."
+            showCommandList={showCommandList}
+            commandListIndex={commandListIndex}
+            matchedCommandsLength={matchedCommands.length}
+            executeCommand={() => {
+              if (matchedCommands[commandListIndex]) {
+                executeCommand(matchedCommands[commandListIndex]);
+              }
+            }}
+            navigateCommandList={navigateCommandList}
+            onEscape={handleEscape}
+            onExit={() => process.exit(0)}
           />
         </Box>
       </Box>
