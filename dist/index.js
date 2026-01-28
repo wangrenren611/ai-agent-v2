@@ -1,21 +1,35 @@
 /**
  * 主入口文件
  * 初始化并启动 AI Agent 应用
+ * 支持从系统环境变量读取配置（类似 Claude Code）
  */
-import dotenv from 'dotenv';
 import { Agent } from './agent';
-import { ProviderRegistry, ProviderType } from './providers';
+import { ProviderRegistry } from './providers';
 import { operatorPrompt } from './prompts/operator';
 import { registerDefaultToolsAsync, ToolRegistry } from './tool';
-const env = process.env.NODE_ENV || 'development';
-dotenv.config({ path: `.env.${env}`, override: true });
+/**
+ * 创建并启动 Agent
+ *
+ * 配置优先级（类似 Claude Code）:
+ * 1. 系统环境变量（ANTHROPIC_API_KEY, GLM_API_KEY 等）
+ * 2. .env.development 或 .env.production 文件（通过 dotenv）
+ * 3. 代码中的默认值
+ */
 async function main() {
+    // 注意：不再强制加载 .env 文件
+    // 直接使用系统环境变量（类似 Claude Code）
+    // 如果需要 .env 文件支持，可以在 shell 中执行 source .env.development
+    console.log('[Agent] Initializing Agent...');
+    console.log('[Agent] Configuration source: System environment variables');
     // Auto-detect and create provider from environment variables
-    // Supports: OPENAI_API_KEY, DEEPSEEK_API_KEY, KIMI_API_KEY, GLM_API_KEY, MINIMAX_API_KEY, QWEN_API_KEY
-    const llmProvider = ProviderRegistry.createFromEnv(ProviderType.GLM);
+    // 优先使用 ANTHROPIC_API_KEY（通用 API Key，类似 Claude Code）
+    // 其次使用特定提供者的 API Key（GLM_API_KEY, KIMI_API_KEY 等）
+    const llmProvider = ProviderRegistry.createFromEnv();
+    console.log('[Agent] Provider created successfully');
     await registerDefaultToolsAsync();
+    console.log('[Agent] Tools registered');
     const agent = new Agent({
-        model: process.env.AI_MODEL || 'gpt-4o',
+        model: process.env.AI_MODEL || process.env.ANTHROPIC_MODEL || 'gpt-4o',
         llmProvider,
         systemPrompt: operatorPrompt({
             directory: process.env.PROJECT_DIRECTORY || process.cwd(),
@@ -25,7 +39,8 @@ async function main() {
         temperature: 0.1,
         tools: ToolRegistry.getSchemas(),
     });
-    agent.start();
+    await agent.start();
+    console.log('[Agent] Agent started');
     agent.run('当前目录有什么', {
         stream: true,
     });
@@ -36,4 +51,7 @@ async function main() {
         }
     });
 }
-main();
+main().catch((error) => {
+    console.error('[Agent] Failed to start:', error);
+    process.exit(1);
+});

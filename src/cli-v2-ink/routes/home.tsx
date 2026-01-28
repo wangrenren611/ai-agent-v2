@@ -4,11 +4,13 @@
  * Landing screen - type any message to start chatting
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Box, Text } from 'ink';
-import TextInput from 'ink-text-input';
 import type { RouteContextValue } from '../context/route';
 import { ICONS, COLORS } from '../utils/constants';
+import { CustomInput } from '../components';
+import { CommandList } from '../components/CommandList';
+import { Command, matchCommands, findCommand } from '../utils/commands';
 
 interface HomeProps {
   navigate: RouteContextValue['navigate'];
@@ -17,6 +19,8 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ navigate }) => {
   const [input, setInput] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
+  const [showCommandList, setShowCommandList] = useState(false);
+  const [commandListIndex, setCommandListIndex] = useState(0);
 
   const getCurrentModel = () =>
     (global as any).__selectedModel ||
@@ -87,12 +91,11 @@ const Home: React.FC<HomeProps> = ({ navigate }) => {
       <Box marginTop={2} flexDirection="column">
         <Box>
           <Text color={COLORS.PRIMARY} bold>{ICONS.INPUT}</Text>
-          <TextInput
+          <CustomInput
             value={input}
             onChange={setInput}
             onSubmit={handleSubmit}
             placeholder="Type your message..."
-            showCursor={true}
           />
         </Box>
       </Box>

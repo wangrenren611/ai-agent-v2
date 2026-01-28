@@ -1,10 +1,11 @@
 /**
  * Main Application Component (Ink-based)
  *
- * Root component that sets up all providers and renders the appropriate route.
+ * Root component that sets up all providers and renders appropriate route.
+ * Ensures only one TextInput is rendered at a time to avoid conflicts.
  */
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Box } from 'ink';
 import { RouteProvider, useRoute } from './context/route';
 import { ThemeProvider } from './context/theme';
@@ -19,31 +20,26 @@ import Settings from './routes/settings';
 const AppContent: React.FC = () => {
   const [routeState, routeContext] = useRoute();
 
-  const renderRoute = useMemo(() => {
-    switch (routeState.current) {
-      case 'home':
-        return <Home navigate={routeContext.navigate} />;
-      case 'session':
-        return <Session navigate={routeContext.navigate} />;
-      case 'settings':
-        return <Settings navigate={routeContext.navigate} />;
-      default:
-        return <Home navigate={routeContext.navigate} />;
-    }
-  }, [routeState.current, routeContext.navigate]);
-
-  return (
-    <Box flexDirection="column" paddingX={2}>
-      {renderRoute}
-    </Box>
-  );
+  // Direct switch - no useMemo to ensure unmount/remount
+  switch (routeState.current) {
+    case 'home':
+      return <Home navigate={routeContext.navigate} />;
+    case 'session':
+      return <Session navigate={routeContext.navigate} />;
+    case 'settings':
+      return <Settings navigate={routeContext.navigate} />;
+    default:
+      return <Home navigate={routeContext.navigate} />;
+  }
 };
 
 const App: React.FC = () => {
   return (
     <ThemeProvider>
       <RouteProvider>
-        <AppContent />
+        <Box flexDirection="column" paddingX={2}>
+          <AppContent />
+        </Box>
       </RouteProvider>
     </ThemeProvider>
   );

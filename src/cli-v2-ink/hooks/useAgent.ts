@@ -63,7 +63,7 @@ export const useAgent = ({
           language: process.env.PROJECT_LANGUAGE || 'Chinese',
         }),
         tools,
-        sessionId:'session_1769580128861'
+        // sessionId:'session_1769580128861'
       });
 
       // Set up event listeners
