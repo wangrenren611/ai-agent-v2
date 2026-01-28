@@ -5,8 +5,10 @@
  */
 
 import React, { useState } from 'react';
-import { Box, Text, useInput } from 'ink';
+import { Box, Text } from 'ink';
+import TextInput from 'ink-text-input';
 import type { RouteContextValue } from '../context/route';
+import { ICONS, COLORS } from '../utils/constants';
 
 interface HomeProps {
   navigate: RouteContextValue['navigate'];
@@ -23,80 +25,78 @@ const Home: React.FC<HomeProps> = ({ navigate }) => {
 
   const [currentModel, setCurrentModel] = useState<string>(getCurrentModel());
 
-  useInput((inputChar: string, key: any) => {
-    if (key.return) {
-      // Handle Enter key
-      const trimmedInput = input.trim();
+  const handleSubmit = (text: string) => {
+    const trimmedInput = text.trim();
 
-      if (!trimmedInput) {
-        setInput('');
-        return;
-      }
-
-      // Quick command: set model
-      if (trimmedInput.toLowerCase().startsWith('model ')) {
-        const model = trimmedInput.slice(6).trim();
-        if (model) {
-          (global as any).__selectedModel = model;
-          setCurrentModel(model);
-          setNotice(`已切换模型为: ${model}`);
-        } else {
-          setNotice('请输入模型名称，例如: model gpt-4o-mini');
-        }
-        setInput('');
-        return;
-      }
-
-      // Check for quit command
-      if (trimmedInput.toLowerCase() === 'q' || trimmedInput.toLowerCase() === 'quit') {
-        process.exit(0);
-        return;
-      }
-
-      // Navigate to session with the message
-      // Store the message in sessionStorage equivalent (using a global for simplicity)
-      (global as any).__pendingMessage = trimmedInput;
-      navigate('session');
-    } else if (key.ctrl && inputChar === 'c') {
-      process.exit(0);
-    } else if (key.backspace || key.delete) {
-      setInput((prev) => prev.slice(0, -1));
-    } else if (inputChar) {
-      setInput((prev) => prev + inputChar);
+    if (!trimmedInput) {
+      setInput('');
+      return;
     }
-  });
 
-  return React.createElement(
-    Box,
-    { flexDirection: 'column' },
-    React.createElement(Box, { marginBottom: 1 },
-      React.createElement(Text, { bold: true, color: 'cyan' }, 'Welcome to AI Agent v2')
-    ),
-    React.createElement(Box, { marginBottom: 2 },
-      React.createElement(Text, { dimColor: true }, 'Type a message to start chatting')
-    ),
-    React.createElement(Box, { marginBottom: 1 },
-      React.createElement(Text, { dimColor: true }, '当前模型: '),
-      React.createElement(Text, { bold: true }, currentModel),
-      React.createElement(Text, { dimColor: true }, '  (输入 "model <name>" 切换)')
-    ),
-    notice && React.createElement(Box, { marginBottom: 1 },
-      React.createElement(Text, { color: 'yellow' }, notice)
-    ),
-    React.createElement(Box, { flexDirection: 'column', marginBottom: 1 },
-      React.createElement(Box, {},
-        React.createElement(Text, { dimColor: true }, 'Press '),
-        React.createElement(Text, { bold: true }, 'q'),
-        React.createElement(Text, { dimColor: true }, ' to quit')
-      )
-    ),
-    React.createElement(Box, { marginTop: 2, flexDirection: 'column' },
-      React.createElement(Box, {},
-        React.createElement(Text, { color: 'cyan', bold: true }, '> '),
-        React.createElement(Text, null, input),
-        React.createElement(Text, { backgroundColor: 'gray' }, ' ')
-      )
-    )
+    // Quick command: set model
+    if (trimmedInput.toLowerCase().startsWith('model ')) {
+      const model = trimmedInput.slice(6).trim();
+      if (model) {
+        (global as any).__selectedModel = model;
+        setCurrentModel(model);
+        setNotice(`已切换模型为: ${model}`);
+      } else {
+        setNotice('请输入模型名称，例如: model gpt-4o-mini');
+      }
+      setInput('');
+      return;
+    }
+
+    // Check for quit command
+    if (trimmedInput.toLowerCase() === 'q' || trimmedInput.toLowerCase() === 'quit') {
+      process.exit(0);
+      return;
+    }
+
+    // Navigate to session with the message
+    // Store the message in sessionStorage equivalent (using a global for simplicity)
+    (global as any).__pendingMessage = trimmedInput;
+    navigate('session');
+  };
+
+  return (
+    <Box flexDirection="column">
+      <Box marginBottom={1}>
+        <Text bold color={COLORS.PRIMARY}>Welcome to AI Agent v2</Text>
+      </Box>
+      <Box marginBottom={2}>
+        <Text dimColor>Type a message to start chatting</Text>
+      </Box>
+      <Box marginBottom={1}>
+        <Text dimColor>当前模型: </Text>
+        <Text bold>{currentModel}</Text>
+        <Text dimColor>  (输入 "model &lt;name&gt;" 切换)</Text>
+      </Box>
+      {notice && (
+        <Box marginBottom={1}>
+          <Text color={COLORS.WARNING}>{notice}</Text>
+        </Box>
+      )}
+      <Box flexDirection="column" marginBottom={1}>
+        <Box>
+          <Text dimColor>Press </Text>
+          <Text bold>q</Text>
+          <Text dimColor> to quit</Text>
+        </Box>
+      </Box>
+      <Box marginTop={2} flexDirection="column">
+        <Box>
+          <Text color={COLORS.PRIMARY} bold>{ICONS.USER} </Text>
+          <TextInput
+            value={input}
+            onChange={setInput}
+            onSubmit={handleSubmit}
+            placeholder="Type your message..."
+            showCursor={true}
+          />
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

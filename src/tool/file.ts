@@ -154,9 +154,9 @@ export class WriteFileTool extends BaseTool<typeof writeFileSchema> {
     }
 
     // === 备份 ===
-    const backupManager = getBackupManager();
-    await backupManager.initialize();
-    const backupId = await backupManager.backup(fullPath);
+    // const backupManager = getBackupManager();
+    // await backupManager.initialize();
+    // const backupId = await backupManager.backup(fullPath);
 
     // === 底层异常：写入文件失败 ===
     try {
@@ -167,7 +167,7 @@ export class WriteFileTool extends BaseTool<typeof writeFileSchema> {
     }
 
     return this.success(
-      { filePath, backupId },
+      {success: true, filePath },
       { fileSize: content.length }
     );
   }

@@ -8,7 +8,7 @@
 // =============================================================================
 
 export type {
-  ProviderConfig,
+  BaseProviderConfig,
   ToolSchema,
   StreamChunk,
   StreamCallback,

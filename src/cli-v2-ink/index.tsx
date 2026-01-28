@@ -65,5 +65,5 @@ process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.title = 'AI Agent v2';
 
 // Render the app and wait until exit
-const { waitUntilExit } = render(React.createElement(App));
+const { waitUntilExit } = render(<App />);
 waitUntilExit();

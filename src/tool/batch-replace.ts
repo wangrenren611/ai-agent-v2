@@ -42,9 +42,9 @@ export class BatchReplaceTool extends BaseTool<any> {
     }
 
     // === 备份 ===
-    const backupManager = getBackupManager();
-    await backupManager.initialize();
-    const backupId = await backupManager.backup(fullPath);
+    // const backupManager = getBackupManager();
+    // await backupManager.initialize();
+    // const backupId = await backupManager.backup(fullPath);
 
     // === 读取文件并检测换行符类型 ===
     let content: string;
@@ -142,12 +142,12 @@ export class BatchReplaceTool extends BaseTool<any> {
     // === 返回结果 ===
     if (failedCount > 0) {
       return this.success(
-        { filePath, backupId, results, modifiedCount, failedCount },
+        { filePath, results, modifiedCount, failedCount },
         { hasErrors: true }
       );
     }
 
-    return this.success({ filePath, backupId, results, modifiedCount });
+    return this.success({ filePath, results, modifiedCount });
   }
 
   /**

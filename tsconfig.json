@@ -16,7 +16,8 @@
     "target": "ESNext",
     "esModuleInterop": true,
     "jsx": "react",
-    "jsxFactory": "React.createElement"
+    "jsxFactory": "React.createElement",
+    "jsxFragmentFactory": "React.Fragment"
   },
   "include": [
     "./src/**/*",

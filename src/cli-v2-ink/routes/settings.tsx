@@ -4,44 +4,57 @@
  * Configuration interface for themes and other preferences.
  */
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, Text, useInput } from 'ink';
 import type { RouteContextValue } from '../context/route';
+import { COLORS } from '../utils/constants';
 
 interface SettingsProps {
   navigate: RouteContextValue['navigate'];
 }
 
 const Settings: React.FC<SettingsProps> = ({ navigate }) => {
+  const isMounted = useRef(true);
+
   useInput((_inputChar: string, key: any) => {
+    if (!isMounted.current) return;
+
     if (key.escape) {
+      isMounted.current = false;
       navigate('home');
     } else if (key.ctrl && _inputChar === 'c') {
       process.exit(0);
     }
   });
 
-  return React.createElement(
-    Box,
-    { flexDirection: 'column', paddingX: 2, paddingY: 1 },
-    React.createElement(Box, { marginBottom: 1 },
-      React.createElement(Text, { bold: true, color: 'cyan' }, 'Settings')
-    ),
-    React.createElement(Box, { flexDirection: 'column' },
-      React.createElement(Box, {},
-        React.createElement(Text, { bold: true }, 'Theme:'),
-        React.createElement(Text, null, ' '),
-        React.createElement(Text, null, 'Default Dark')
-      ),
-      React.createElement(Box, {},
-        React.createElement(Text, { bold: true }, 'Mode:'),
-        React.createElement(Text, null, ' '),
-        React.createElement(Text, null, 'Dark')
-      ),
-      React.createElement(Box, { marginTop: 1 },
-        React.createElement(Text, { dimColor: true }, 'Press Esc to return to home')
-      )
-    )
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  return (
+    <Box flexDirection="column" paddingX={2} paddingY={1}>
+      <Box marginBottom={1}>
+        <Text bold color={COLORS.PRIMARY}>Settings</Text>
+      </Box>
+      <Box flexDirection="column">
+        <Box>
+          <Text bold>Theme:</Text>
+          <Text> </Text>
+          <Text>Default Dark</Text>
+        </Box>
+        <Box>
+          <Text bold>Mode:</Text>
+          <Text> </Text>
+          <Text>Dark</Text>
+        </Box>
+        <Box marginTop={1}>
+          <Text dimColor>Press Esc to return to home</Text>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

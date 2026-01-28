@@ -66,16 +66,16 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const setTheme = useCallback((themeName: string) => {
     const theme = state.themes[themeName];
     if (theme) {
-      setState((prev) => ({ ...prev, current: theme, mode: theme.mode }));
+      setState((prev: ThemeState) => ({ ...prev, current: theme, mode: theme.mode }));
     }
   }, [state.themes]);
 
   const setMode = useCallback((mode: 'dark' | 'light') => {
-    setState((prev) => ({ ...prev, mode }));
+    setState((prev: ThemeState) => ({ ...prev, mode }));
   }, []);
 
   const toggleMode = useCallback(() => {
-    setState((prev) => ({ ...prev, mode: prev.mode === 'dark' ? 'light' : 'dark' }));
+    setState((prev: ThemeState) => ({ ...prev, mode: prev.mode === 'dark' ? 'light' : 'dark' }));
   }, []);
 
   const value: ThemeContextValue = {
@@ -85,7 +85,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     toggleMode,
   };
 
-  return React.createElement(ThemeContext.Provider, { value }, children);
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
 
 export const useTheme = () => {

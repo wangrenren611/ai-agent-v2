@@ -256,9 +256,9 @@ export class Compaction {
     }
 
     // 3. 提取之前的摘要（如果存在）
-    let previousSummary = "";
+    let previousSummary= "";
     if (pendingMessages.length > 0 && pendingMessages[0].type === "summary") {
-      previousSummary = pendingMessages[0].content;
+      previousSummary = pendingMessages[0].content as string;
       pendingMessages = pendingMessages.slice(1);
     }
 
@@ -363,6 +363,7 @@ ${textToSummarize}
       {
         model: process.env.AI_MODEL,
         max_tokens: 8000,
+        temperature: 0.3,
       },
     );
     spinner.succeed("上下文压缩成功");

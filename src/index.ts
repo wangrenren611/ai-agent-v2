@@ -13,7 +13,7 @@ dotenv.config({ path: `.env.${env}`, override: true });
 async function main() {
    // Auto-detect and create provider from environment variables
    // Supports: OPENAI_API_KEY, DEEPSEEK_API_KEY, KIMI_API_KEY, GLM_API_KEY, MINIMAX_API_KEY, QWEN_API_KEY
-const llmProvider = ProviderRegistry.createFromEnv(ProviderType.KIMI);
+const llmProvider = ProviderRegistry.createFromEnv(ProviderType.GLM);
 
 await registerDefaultToolsAsync();
 
@@ -25,7 +25,7 @@ const agent = new Agent({
         vcs: process.env.VCS || 'git',
         language: process.env.PROJECT_LANGUAGE || '',
     }),
-    temperature: 0.6,
+    temperature: 0.1,
     tools:ToolRegistry.getSchemas(),
 
 });

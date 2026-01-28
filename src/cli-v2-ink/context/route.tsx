@@ -33,7 +33,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   const navigate = useCallback((route: Route, params: Record<string, string> = {}) => {
-    setState((prev) => ({
+    setState((prev: RouteState) => ({
       ...prev,
       current: route,
       params,
@@ -42,7 +42,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   const back = useCallback(() => {
-    setState((prev) => {
+    setState((prev: RouteState) => {
       const history = [...prev.history];
       const previous = history.pop();
       return {
@@ -54,11 +54,11 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   const setRoute = useCallback((route: Route) => {
-    setState((prev) => ({ ...prev, current: route }));
+    setState((prev: RouteState) => ({ ...prev, current: route }));
   }, []);
 
   const setParams = useCallback((params: Record<string, string>) => {
-    setState((prev) => ({ ...prev, params }));
+    setState((prev: RouteState) => ({ ...prev, params }));
   }, []);
 
   const value: RouteContextValue = {
@@ -69,7 +69,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setParams,
   };
 
-  return React.createElement(RouteContext.Provider, { value }, children);
+  return <RouteContext.Provider value={value}>{children}</RouteContext.Provider>;
 };
 
 // ============================================================================
