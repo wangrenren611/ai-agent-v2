@@ -1,4 +1,4 @@
-import { Message, LLMProvider } from "../providers/base";
+import { Message, LLMProvider } from "../providers/providers/base";
 import { ScopedLogger } from "../util/log";
 
 export class Compaction {
@@ -20,7 +20,7 @@ export class Compaction {
   getToken(history: Message[],tools:any[]) {
     const totalUsed = this.calculateTotalUsage(history,tools);
     const usableLimit = this.maxTokens - this.maxOutputTokens;
-
+  
     return {
       totalUsed,
       usableLimit: usableLimit * this.triggerRatio
@@ -361,8 +361,7 @@ ${textToSummarize}
         },
       ],
       {
-        model: process.env.AI_MODEL,
-        max_tokens: 8000,
+        maxTokens: 8000,
         temperature: 0.3,
       },
     );

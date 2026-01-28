@@ -1,22 +1,21 @@
 export interface BaseProviderConfig {
   /** API key or credentials */
-  apiKey?: string;
+  apiKey: string;
   /** Base URL for API */
-  baseURL?: string;
-  /** Model name */
-  model?: string;
-  /** Maximum tokens */
-  maxTokens?: number;
-  /** Maximum output tokens to generate */
-  maxOutputTokens?: number;
-  /** Temperature */
-  temperature?: number;
+  baseURL: string;
   /** Request timeout in milliseconds */
   timeout?: number;
   /** Maximum number of retries */
   maxRetries?: number;
   /** Enable debug logging */
   debug?: boolean;
+  /** 温度 */
+  temperature: number;
+  /** 模型 */
+  model: string;
+  /** 最大 token 数 */
+  maxTokens: number;
+  maxOutputTokens: number;
   /** Additional options */
   [key: string]: unknown;
 }
@@ -53,8 +52,7 @@ export type StreamChunk = {
 export type StreamCallback = (chunk: StreamChunk) => void
 
 export interface LLMOptions {
-  model?: string
-  max_tokens?: number
+  maxTokens?: number
   temperature?: number,
   system_prompt?: string
   tools?: ToolSchema[]
@@ -115,12 +113,14 @@ export type LLMResponse = {
 }
 
 export abstract class LLMProvider{
+   config: BaseProviderConfig;
    protected constructor(
-    protected readonly config: BaseProviderConfig
-   ) {}
+   config: BaseProviderConfig
+   ) { 
+    this.config = config;
+ }
 
-   abstract maxOutputTokens:number;
-   abstract maxTokens:number;
+
    /**
     * 从提供商生成响应
     * @param messages The messages for the model

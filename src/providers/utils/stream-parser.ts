@@ -5,7 +5,7 @@
  * Extracted and generalized from openai.ts implementation.
  */
 
-import { StreamChunk } from '../../providers/base';
+import { StreamChunk } from '../providers/base';
 
 export interface StreamCallbacks {
   /** Called when content chunk is received */
@@ -106,10 +106,10 @@ export class StreamParser {
     const decoder = new TextDecoder();
     let buffer = '';
     let shouldStop = false;
-
+ 
     while (!shouldStop) {
       const { done, value } = await reader.read();
-
+      
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
@@ -141,7 +141,7 @@ export class StreamParser {
     chunk: StreamChunkData,
     callbacks: StreamCallbacks
   ): void {
-    const choice = chunk.choices[0];
+    const choice = chunk?.choices?.[0];
     if (!choice) return;
 
     const delta = choice.delta;

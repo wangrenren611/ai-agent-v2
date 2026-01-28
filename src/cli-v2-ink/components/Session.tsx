@@ -17,7 +17,7 @@ import { CommandList } from './CommandList';
 import { useAgent } from '../hooks/useAgent';
 import { getSelectedModel } from '../utils/helpers';
 import { MESSAGES, COLORS, ICONS } from '../utils/constants';
-import { PROVIDER_METADATA } from '../../providers/config';
+import { PROVIDER_METADATA } from '../../providers';
 import { Command, matchCommands, findCommand } from '../utils/commands';
 
 const Session: React.FC<SessionProps> = ({ navigate }) => {
@@ -183,23 +183,19 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
 
   // Handle input change
   const handleInputChange = useCallback((value: string) => {
-    console.log('[Session] Input changed:', value);
     setInput(value);
 
     // Show/hide command list
     if (value.startsWith('/')) {
-      console.log('[Session] Showing command list');
       setShowCommandList(true);
       setCommandListIndex(0);
     } else {
-      console.log('[Session] Hiding command list');
       setShowCommandList(false);
     }
   }, []);
 
   // Execute a command
   const executeCommand = useCallback((command: Command) => {
-    console.log('[Session] Executing command:', command.name);
     setInput('');
     setShowCommandList(false);
 

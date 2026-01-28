@@ -2,7 +2,7 @@
  * Agent 类型定义和常量
  */
 
-import { LLMProvider } from "../providers/base";
+import { LLMProvider } from "../providers/providers/base";
 
 // =============================================================================
 // 常量定义
@@ -77,7 +77,7 @@ export interface LLMResponse {
 export interface Message {
     role: 'user' | 'assistant' | 'system' | 'tool';
     type?: 'text' | 'summary';
-    content: import('../providers/base').MessageContent; // 对齐 provider 定义，支持 text / image_url 复合内容
+    content: import('../providers/providers/base').MessageContent; // 对齐 provider 定义，支持 text / image_url 复合内容
     reasoning_content?: string;
     tool_call_id?: string;
 }

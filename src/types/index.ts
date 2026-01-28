@@ -16,7 +16,7 @@ export type {
   Message,
   ToolCall,
   LLMResponse,
-} from '../providers/base';
+} from '../providers/providers/base';
 
 export type {
   EventHandler,

@@ -10,8 +10,8 @@ import { Box, Text, useInput } from 'ink';
 import type { RouteContextValue } from '../context/route';
 import { COLORS } from '../utils/constants';
 import { SelectList, SelectListItem } from '../components/SelectList';
-import { ProviderType } from '../../providers';
-import { PROVIDER_METADATA } from '../../providers/config';
+import { ProviderType } from '../../providers/providers';
+import { PROVIDER_METADATA } from '../../providers';
 
 interface SettingsProps {
   navigate: RouteContextValue['navigate'];

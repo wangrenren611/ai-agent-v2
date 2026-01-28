@@ -20,7 +20,6 @@
     "build": "cross-env NODE_ENV=production  tsc",
     "dev": "cross-env NODE_ENV=development  tsx src/index.ts",
     "dev:demo": "cross-env NODE_ENV=development  tsx src/index.ts demo",
-    "dev:cli": "cross-env NODE_ENV=development  tsx src/index.ts cli",
     "dev:blessed": "cross-env NODE_ENV=development node -r esbuild-register ./src/ui/blessed/pure-blessed.ts",
     "dev:ink": "cross-env NODE_ENV=development npx tsx ./src/ui/cli/index.tsx",
     "test": "vitest",
@@ -33,7 +32,8 @@
     "typecheck:cli-v2": "tsc --project src/cli-v2/tsconfig.json --noEmit",
     "setup:env": "bash ./scripts/setup-anthropic-key.sh",
     "test:env": "bash ./scripts/test-config.sh",
-    "setup:provider": "bash ./scripts/config-provider.sh"
+    "setup:provider": "bash ./scripts/config-provider.sh",
+    "dev:cli": "cross-env NODE_ENV=development tsx src/cli-v3-ink/index.tsx"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

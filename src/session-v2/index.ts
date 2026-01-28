@@ -1,5 +1,5 @@
 import path from "node:path";
-import { LLMProvider, Message } from "../providers/base";
+import { LLMProvider, Message } from "../providers/providers/base";
 import fs, { mkdir } from 'node:fs/promises';
 
 
@@ -8,8 +8,6 @@ export class SessionManager {
   messageList: Message[];
   sessionPath: string;
   private saveQueue: Promise<void> = Promise.resolve();
-  maxOutputTokens: number;
-  maxTokens: number;
   llmProvider: LLMProvider;
   
   constructor({
@@ -23,10 +21,7 @@ export class SessionManager {
   }) {
     this.id = sessionId;
     this.messageList = []
-    // 使用传入的 sessionDir 或默认到 .agent-cache/sessions/{sessionId}
     this.sessionPath = sessionDir || path.join('.agent-cache', 'sessions', this.id);
-    this.maxOutputTokens = llmProvider.maxOutputTokens;
-    this.maxTokens = llmProvider.maxTokens
     this.llmProvider = llmProvider;
   }
 

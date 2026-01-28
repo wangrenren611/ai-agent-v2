@@ -22,7 +22,7 @@ import {
     ToolSchema,
 } from './types';
 import { ToolError } from './ToolError';
-import { isRetryableError, isPermanentError, isAbortedError, LLMAuthError, LLMNotFoundError } from '../providers/errors';
+import { isRetryableError, isPermanentError, isAbortedError, LLMAuthError, LLMNotFoundError } from '../providers/providers/errors';
 import { ScopedLogger } from '../util/log';
 import { SessionManager } from '../session-v2';
 import { ToolRegistry } from '../tool/registry';
@@ -65,8 +65,9 @@ export class Agent {
     public readonly sessionManager: SessionManager;
     public readonly context: AgentContext;
     public readonly events: TypedEventBus<AgentEvents>;
-    model: string | undefined;
     tools: ToolSchema[];
+    maxOutputTokens: number;
+    maxTokens: number;
 
     // -------------------------------------------------------------------------
     // 构造函数
@@ -77,8 +78,8 @@ export class Agent {
         this.systemPrompt = config.systemPrompt;
         this.maxLoop = config.maxLoop ?? DEFAULT_MAX_LOOP;
         this.noProgressLimit = Math.max(0, config.noProgressLimit ?? DEFAULT_NO_PROGRESS_LIMIT);
-        this.model = config.model;
         this.tools = config.tools || [];
+ 
         // 初始化上下文
         this.context = getAgentContext({
             session: {
@@ -108,17 +109,16 @@ export class Agent {
         this.logger = new ScopedLogger('Agent');
 
         // 初始化 Token 限制
-        const maxOutput = Math.min(config.maxOutputTokens ?? this.llmProvider.maxOutputTokens, this.llmProvider.maxOutputTokens);
-        const maxTokens = Math.min(config.maxTokens ?? this.llmProvider.maxTokens, this.llmProvider.maxTokens);
-        this.sessionManager.maxOutputTokens = maxOutput;
-        this.sessionManager.maxTokens = maxTokens;
+        this.maxOutputTokens = config.maxOutputTokens || this.llmProvider.config.maxOutputTokens;
+        this.maxTokens =config.maxTokens || this.llmProvider.config.maxTokens;
+       console.log('maxTokens', this.maxTokens);
 
         // 初始化上下文压缩器
-        this.temperature = config.temperature;
+        this.temperature = config.temperature || this.llmProvider.config.temperature;
 
         this.compaction = new Compaction({
-            maxTokens,
-            maxOutputTokens: maxOutput,
+            maxTokens: this.maxTokens,
+            maxOutputTokens: this.maxOutputTokens,
             llmProvider: this.llmProvider,
         });
     }
@@ -144,7 +144,7 @@ export class Agent {
         const streamEnabled = options?.stream ?? false;
         const streamCallback = options?.streamCallback;
         const abortSignal = options?.abortSignal;
-        const model = options?.model ?? this.model;
+    
 
         // 错误计数
         let consecutiveErrorCount = 0;
@@ -311,16 +311,15 @@ export class Agent {
                 const llmResponse = await this.llmProvider.generate(
                     [{ role: 'system', content: this.systemPrompt }, ...llmMessages],
                     {
-                        model,
                         tools: tools.length > 0 ? tools : undefined,
-                        max_tokens: this.sessionManager.maxOutputTokens,
+                        maxTokens: this.llmProvider.config.maxOutputTokens,
                         stream: streamEnabled,
                         streamCallback: wrappedStreamCallback,
                         abortSignal: currentAbortSignal,
                         temperature: this.temperature,
                     }
                 );
-                    console.log( this.temperature);
+                  
                 if (!llmResponse) {
                     throw new Error('LLM response is null');
                 }

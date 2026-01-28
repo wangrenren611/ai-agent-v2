@@ -4,14 +4,15 @@
  * Manages Agent initialization and event handling
  */
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useContext } from 'react';
 import { Agent } from '../../agent';
-import { ProviderRegistry, ProviderType } from '../../providers';
+import { ProviderRegistry, ProviderType } from '../../providers/providers';
 import { operatorPrompt } from '../../prompts/operator';
 import { registerDefaultToolsAsync, ToolRegistry } from '../../tool';
 import type { ChatMessage, ToolCallInfo } from '../types';
 import { formatToolArgs, formatToolOutput } from '../utils/helpers';
 import { INITIAL_DELAY_MS, MESSAGES } from '../utils/constants';
+import { useAgentContext } from '../context/route';
 
 interface UseAgentProps {
   selectedModel: string;
@@ -34,7 +35,8 @@ export const useAgent = ({
 }: UseAgentProps) => {
   const [agent, setAgent] = useState<Agent | null>(null);
   const activeToolCallRef = useRef<Map<string, ToolCallInfo>>(new Map());
-
+  const { aiModel } = useAgentContext();
+  
   const initializeAgent = useCallback(async () => {
     try {
       onStateChange({ status: MESSAGES.LOADING, ready: false });
@@ -50,7 +52,7 @@ export const useAgent = ({
       onStateChange({ status: `${MESSAGES.READY} ${tools.length} tools`, ready: false });
 
       // Create provider
-      const llmProvider = ProviderRegistry.createFromEnv(ProviderType.GLM);
+      const llmProvider = ProviderRegistry.createFromEnv(aiModel);
 
       // Create agent
       const newAgent = new Agent({
@@ -177,7 +179,7 @@ export const useAgent = ({
       });
       onStateChange({ status: 'Error', ready: true });
     }
-  }, [selectedModel, onStateChange, onMessage, onResponseUpdate, onResponseComplete, onProcessingChange, onAgentReady]);
+  }, [selectedModel, onStateChange, aiModel, onMessage, onResponseUpdate, onResponseComplete, onProcessingChange, onAgentReady]);
 
   useEffect(() => {
     initializeAgent();

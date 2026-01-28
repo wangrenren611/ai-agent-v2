@@ -1,114 +1,112 @@
 /**
- * Providers Module
+ * Provider Configuration System
  *
- * Unified export for all provider-related functionality.
- * Auto-registers all providers on import.
+ * Defines types and interfaces for all LLM providers.
+ * Uses discriminated unions for type-safe provider-specific configs.
  */
 
-// Base class (value) + Base types
-export { LLMProvider } from './base';
-export type {
-  Message,
-  LLMResponse,
-  LLMOptions,
-  StreamChunk,
-  StreamCallback,
-  ToolSchema,
-} from './base';
+import { OpenAICompatibleProvider } from "./providers/openai-compatible.base";
 
-// Error types
-export {
-  LLMError,
-  LLMRetryableError,
-  LLMRateLimitError,
-  LLMPermanentError,
-  LLMAuthError,
-  LLMNotFoundError,
-  LLMBadRequestError,
-  LLMAbortedError,
-  createErrorFromStatus,
-  isRetryableError,
-  isPermanentError,
-  isAbortedError,
-} from './errors';
+import { KimiProvider } from "./providers";
 
-// Configuration types
-export {
-  ProviderType,
-  PROVIDER_METADATA,
-  getProviderMetadata,
-  getProviderTypes,
-} from './config';
-export type {
-  BaseProviderConfig,
-  OpenAIConfig,
-  KimiConfig,
-  DeepSeekConfig,
-  GLMConfig,
-  MiniMaxConfig,
-  QwenConfig,
-  ProviderConfig,
-  ProviderMetadata,
-} from './config';
+import { GLMProvider } from "./providers";
 
-// Provider Registry
-export {
-  ProviderRegistry,
-} from './registry';
+import { MiniMaxProvider } from "./providers";
 
-// Adapters
-export {
-  BaseAPIAdapter,
-  OpenAIAdapter,
-  MiniMaxAdapter,
-} from './adapters';
-export type {
-  APIRequestBody,
-  APIResponse,
-  OpenAIAdapterOptions,
-  MiniMaxAdapterOptions,
-} from './adapters';
+import { QwenProvider } from "./providers";
 
-// Utilities
-export {
-  HTTPClient,
-  StreamParser,
-} from './utils';
-export type {
-  HttpClientOptions,
-  StreamCallbacks,
-} from './utils';
+/**
+ * Supported LLM providers
+ */
+export enum ModelType {
+  OPENAI = 'openai',
+  KIMI = 'kimi',
+  DEEPSEEK = 'deepseek',
+  GLM = 'glm-4.7',
+  MINIMAX = 'minimax',
+  QWEN = 'qwen',
+}
 
-// Provider implementations
-export {
-  OpenAIProvider,
-  KimiProvider,
-  DeepSeekProvider,
-  GLMProvider,
-  MiniMaxProvider,
-  QwenProvider,
-  OPENAI_METADATA,
-  KIMI_METADATA,
-  DEEPSEEK_METADATA,
-  GLM_METADATA,
-  MINIMAX_METADATA,
-  QWEN_METADATA,
-} from './providers';
+/**
+ * Base provider configuration - common fields for all providers
+ */
+export interface BaseProviderConfig {
+  /** API key or credentials */
+  apiKey: string;
+  /** Base URL for API (overrides default) */
+  baseURL?: string;
+  /** Model name (overrides default) */
+  model?: string;
+  /** Maximum input tokens (context window) */
+  maxTokens?: number;
+  /** Maximum output tokens to generate */
+  maxOutputTokens?: number;
+  /** Temperature for sampling (0-2) */
+  temperature?: number;
+  /** Request timeout in milliseconds */
+  timeout?: number;
+  /** Maximum number of retries for transient errors */
+  maxRetries?: number;
+  /** Enable debug logging */
+  debug?: boolean;
+}
 
-// Auto-register all providers
-import { ProviderRegistry } from './registry';
-import { ProviderType } from './config';
-import { OpenAIProvider } from './providers/openai.provider';
-import { KimiProvider } from './providers/kimi.provider';
-import { DeepSeekProvider } from './providers/deepseek.provider';
-import { GLMProvider } from './providers/glm.provider';
-import { MiniMaxProvider } from './providers/minimax.provider';
-import { QwenProvider } from './providers/qwen.provider';
 
-// Register all providers with registry
-ProviderRegistry.register(ProviderType.OPENAI, OpenAIProvider as any);
-ProviderRegistry.register(ProviderType.KIMI, KimiProvider as any);
-ProviderRegistry.register(ProviderType.DEEPSEEK, DeepSeekProvider as any);
-ProviderRegistry.register(ProviderType.GLM, GLMProvider as any);
-ProviderRegistry.register(ProviderType.MINIMAX, MiniMaxProvider as any);
-ProviderRegistry.register(ProviderType.QWEN, QwenProvider as any);
+
+ const PROVIDERS: Record<ModelType, () => OpenAICompatibleProvider> = {
+   [ModelType.KIMI]: () => new KimiProvider(
+     {
+       apiKey: process.env.KIMI_API_KEY || '',
+       baseURL: process.env.KIMI_API_BASE || 'https://api.kimi.ai/v1',
+       temperature: 0.7,
+       model: 'kimi-3.5',
+       maxTokens: 2048,
+       maxOutputTokens: 2048,
+     }
+   ),
+   // [ModelType.DEEPSEEK]: DeepseekProvider,
+   [ModelType.GLM]: () => new GLMProvider({
+     apiKey: process.env.GLM_API_KEY || '',
+     baseURL: process.env.GLM_API_BASE || 'https://open.bigmodel.cn/api/coding/paas/v4',
+     temperature: 0.7,
+     model: 'glm-4.7',
+     maxTokens: 200*100,
+     maxOutputTokens: 8000,
+   }),
+   [ModelType.MINIMAX]: () => new MiniMaxProvider({
+     apiKey: process.env.MINIMAX_API_KEY || '',
+     baseURL: process.env.MINIMAX_API_BASE || 'https://api.minimaxi.com/v1',
+     temperature: 0.7,
+     model: 'MiniMax-M2.1',
+     maxTokens: 200*100,
+     maxOutputTokens: 8000,
+   }),
+   [ModelType.QWEN]: () => new QwenProvider({
+     apiKey: process.env.QWEN_API_KEY || '',
+     baseURL: process.env.QWEN_API_BASE || 'https://api.qwen.cn/v1',
+     temperature: 0.7,
+     model: 'qwen-3.5',
+     maxTokens: 2048,
+     maxOutputTokens: 2048,
+   }),
+   [ModelType.OPENAI]: function (): OpenAICompatibleProvider {
+     throw new Error("Function not implemented.");
+   },
+   [ModelType.DEEPSEEK]: function (): OpenAICompatibleProvider {
+     throw new Error("Function not implemented.");
+   }
+ };
+/**
+ * Get provider metadata by type
+ */
+export function getModel(type: ModelType) {
+ 
+  return PROVIDERS[type]();
+}
+
+/**
+ * Get all available provider types
+ */
+export function getModelTypes(): ModelType[] {
+  return Object.keys(PROVIDERS) as ModelType[];
+}

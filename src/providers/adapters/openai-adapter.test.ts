@@ -4,8 +4,9 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { OpenAIAdapter } from './openai-adapter';
-import { Message, LLMOptions } from '../base';
-import { DEFAULT_TEMPERATURE } from '../../../agent/types';
+import { LLMOptions, Message } from '../providers/base';
+import { DEFAULT_TEMPERATURE } from '../../agent/types';
+
 
 describe('OpenAIAdapter', () => {
   let adapter: OpenAIAdapter;
@@ -100,21 +101,21 @@ describe('OpenAIAdapter', () => {
     });
 
     it('should use custom max_tokens from options', () => {
-      const options: LLMOptions = { max_tokens: 2000 };
+      const options: LLMOptions = { model: 'gpt-4o', maxTokens: 2000 };
       const result = adapter.transformRequest(messages, options);
 
       expect(result.max_tokens).toBe(2000);
     });
 
     it('should use custom temperature from options', () => {
-      const options: LLMOptions = { temperature: 0.3 };
+      const options: LLMOptions = { model: 'gpt-4o', temperature: 0.3 };
       const result = adapter.transformRequest(messages, options);
 
       expect(result.temperature).toBe(0.3);
     });
 
     it('should enable streaming when requested', () => {
-      const options: LLMOptions = { stream: true };
+      const options: LLMOptions = { model: 'gpt-4o', stream: true };
       const result = adapter.transformRequest(messages, options);
 
       expect(result.stream).toBe(true);
@@ -132,7 +133,7 @@ describe('OpenAIAdapter', () => {
         },
       ];
 
-      const options: LLMOptions = { tools };
+      const options: LLMOptions = { model: 'gpt-4o', tools };
       const result = adapter.transformRequest(messages, options);
 
       expect(result.tools).toEqual(tools);
@@ -213,7 +214,7 @@ describe('OpenAIAdapter', () => {
     it('should filter out null messages', () => {
       const messagesWithNull: Message[] = [
         { role: 'user', content: 'Hello' },
-        { role: 'assistant', content: null } as Message,
+        { role: 'assistant', content: null } as any,
         { role: 'user', content: 'Continue' },
       ];
 

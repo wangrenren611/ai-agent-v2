@@ -217,17 +217,13 @@ useInput((input, key) => {
 ### Session.tsx
 ```typescript
 const handleInputChange = useCallback((value: string) => {
-  console.log('[Session] Input changed:', value);
-  console.log('[Session] Starts with /:', value.startsWith('/'));
   setInput(value);
 
   // Show command list when input starts with '/'
   if (value.startsWith('/')) {
-    console.log('[Session] Showing command list');
     setShowCommandList(true);
     setCommandListIndex(0);
   } else {
-    console.log('[Session] Hiding command list');
     setShowCommandList(false);
   }
 }, []);

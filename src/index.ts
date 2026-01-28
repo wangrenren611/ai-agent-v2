@@ -4,10 +4,13 @@
  * 支持从系统环境变量读取配置（类似 Claude Code）
  */
 import { Agent } from './agent';
-import { ProviderRegistry, ProviderType } from './providers';
 import {operatorPrompt} from './prompts/operator';
 import { registerDefaultToolsAsync, ToolRegistry } from './tool';
-
+import { getModel, ModelType } from './providers';
+import dotenv from 'dotenv';
+dotenv.config({
+    path: './.env.development',
+});
 /**
  * 创建并启动 Agent
  * 
@@ -24,19 +27,16 @@ async function main() {
    console.log('[Agent] Initializing Agent...');
    console.log('[Agent] Configuration source: System environment variables');
 
-   // Auto-detect and create provider from environment variables
-   // 优先使用 ANTHROPIC_API_KEY（通用 API Key，类似 Claude Code）
-   // 其次使用特定提供者的 API Key（GLM_API_KEY, KIMI_API_KEY 等）
-   const llmProvider = ProviderRegistry.createFromEnv();
+ 
 
    console.log('[Agent] Provider created successfully');
 
    await registerDefaultToolsAsync();
    console.log('[Agent] Tools registered');
 
+       
    const agent = new Agent({
-       model: process.env.AI_MODEL || process.env.ANTHROPIC_MODEL || 'gpt-4o',
-       llmProvider,
+       llmProvider:getModel(ModelType.MINIMAX),
        systemPrompt: operatorPrompt({
            directory: process.env.PROJECT_DIRECTORY || process.cwd(),
            vcs: process.env.VCS || 'git',

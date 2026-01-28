@@ -4,24 +4,9 @@
  */
 
 import { OpenAIAdapter } from '../adapters/openai-adapter';
-import { ProviderMetadata, getProviderMetadata } from '../config';
 import { OpenAICompatibleProvider, OpenAICompatibleConfig } from './openai-compatible.base';
 
-/**
- * OpenAI Provider metadata
- */
-export const OPENAI_METADATA: ProviderMetadata = {
-  type: 'openai' as any,
-  name: 'OpenAI',
-  baseURL: 'https://api.openai.com/v1',
-  defaultModel: 'gpt-4o-mini',
-  maxTokens: 128000,
-  maxOutputTokens: 4096,
-  supportsStreaming: true,
-  supportsTools: true,
-  defaultTimeout: 60000,
-  defaultMaxRetries: 3,
-};
+
 
 export interface OpenAIProviderConfig extends OpenAICompatibleConfig {
   organization?: string;
@@ -30,7 +15,6 @@ export interface OpenAIProviderConfig extends OpenAICompatibleConfig {
 export class OpenAIProvider extends OpenAICompatibleProvider {
   constructor(config: OpenAIProviderConfig) {
     super(
-      OPENAI_METADATA,
       new OpenAIAdapter({
         endpointPath: '/chat/completions',
         organization: config.organization,
@@ -43,5 +27,4 @@ export class OpenAIProvider extends OpenAICompatibleProvider {
   }
 }
 
-// 兼容旧的 getProviderMetadata 用例
-export { getProviderMetadata };
+

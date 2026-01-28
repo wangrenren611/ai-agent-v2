@@ -9,13 +9,12 @@ import {
   LLMOptions,
   Message,
   BaseProviderConfig,
-} from '../base';
-import { ProviderMetadata } from '../config';
+} from './base';
 import { BaseAPIAdapter } from '../adapters/base-adapter';
 import { HTTPClient } from '../utils/http-client';
 import { StreamParser } from '../utils/stream-parser';
-import { LLMError } from '../errors';
-import { DEFAULT_TEMPERATURE } from '../../agent/types';
+import { LLMError } from './errors';
+import { OpenAIAdapter } from '../adapters';
 
 export interface OpenAICompatibleConfig extends BaseProviderConfig {
   organization?: string;
@@ -37,52 +36,45 @@ export interface OpenAICompatibleConfig extends BaseProviderConfig {
   enableReasoningSplit?: boolean;
   /** 兼容 MiniMax：groupId */
   groupId?: string;
+  /** 最大输出 token 数 */
+  maxOutputTokens: number;
+  /** 最大 token 数 */
+  maxTokens: number;
+  model: string;
   /** 温度 */
-  temperature?: number;
+  temperature: number;
+
+
   [key: string]: unknown;
 }
 
 export abstract class OpenAICompatibleProvider extends LLMProvider {
-  readonly adapter: BaseAPIAdapter;
   readonly httpClient: HTTPClient;
   readonly baseURL: string;
-  readonly maxOutputTokens: number;
-  protected readonly metadata: ProviderMetadata;
-  protected readonly rawConfig: OpenAICompatibleConfig;
+  apiKey: string;
+  temperature: number;
+  model: string;
+  maxOutputTokens: number;
+  adapter: OpenAIAdapter;
 
-  get model(): string {
-    return this.config.model || this.metadata.defaultModel;
-  }
-
-  get maxTokens(): number {
-    return this.config.maxTokens || this.metadata.maxTokens;
-  }
-
-  protected constructor(
-    metadata: ProviderMetadata,
-    adapter: BaseAPIAdapter,
-    config: OpenAICompatibleConfig
-  ) {
-    super({
-      apiKey: config.apiKey,
-      model: config.model || metadata.defaultModel,
-      maxTokens: config.maxTokens || metadata.maxTokens,
-      temperature: config.temperature ?? DEFAULT_TEMPERATURE,
-    });
-
-    this.metadata = metadata;
-    this.adapter = adapter;
-    this.rawConfig = {
+   constructor(config: OpenAICompatibleConfig) {
+     super(config);
+     this.apiKey = config.apiKey;
+     this.baseURL = config.baseURL;
+     this.temperature = config.temperature;
+     this.model = config.model;
+     this.maxOutputTokens = config.maxOutputTokens;    
+     this.adapter = new OpenAIAdapter(config);
+     this.config = {
       ...config,
-      baseURL: (config.baseURL || metadata.baseURL).replace(/\/$/, ''),
+      baseURL: (config.baseURL).replace(/\/$/, ''),
     };
     
-    this.baseURL = this.rawConfig.baseURL as string;
-    this.maxOutputTokens = this.rawConfig.maxOutputTokens || metadata.maxOutputTokens;
+    this.baseURL = this.config.baseURL as string;
 
     this.httpClient = new HTTPClient({
-      timeout: config.timeout ?? metadata.defaultTimeout,
-      maxRetries: config.maxRetries ?? metadata.defaultMaxRetries,
+      timeout: config.timeout,
+      maxRetries: config.maxRetries,
       debug: config.debug,
     });
   }
@@ -93,20 +85,16 @@ export abstract class OpenAICompatibleProvider extends LLMProvider {
   ): Promise<LLMResponse | null> {
     if (messages.length === 0) return null;
     const requestBody = this.adapter.transformRequest(messages, {
-      model: options?.model || this.model,
-      max_tokens: options?.max_tokens ?? this.maxOutputTokens,
-      extraBody: (this.rawConfig as any).extraBody,
-      enableReasoningSplit: (this.rawConfig as any).enableReasoningSplit,
-      temperature: this.rawConfig.temperature,
+      model:  this.config.model,
+      max_tokens: options?.maxTokens || this.config.maxTokens,
+      extraBody: (this.config as any).extraBody,
+      enableReasoningSplit: (this.config as any).enableReasoningSplit,
+      temperature: this.config.temperature,
       ...(options || {}),
     } as any);
-    
-    const url = this.resolveEndpoint(String(requestBody.model || this.model));
-    const headers = this.adapter.getHeaders(
-      this.config.apiKey || '',
-      this.rawConfig
-    );
-
+    const url = this.resolveEndpoint();
+    const headers = this.adapter.getHeaders(this.config.apiKey || '' );
+  
     if (options?.stream) {
       return await this.generateStream(url, requestBody, headers, options.streamCallback, options.abortSignal);
     }
@@ -114,21 +102,21 @@ export abstract class OpenAICompatibleProvider extends LLMProvider {
     return await this.generateNonStream(url, requestBody, headers, options?.abortSignal);
   }
 
-  private resolveEndpoint(model: string): string {
+  private resolveEndpoint(): string {
     const base = this.baseURL;
-    const pathCfg = (this.rawConfig as any).chatCompletionsPath;
+    // if (typeof pathCfg === 'function') {
+    //   const custom = pathCfg(model, this.config);
+    //   return custom.startsWith('http') ? custom : `${base}${custom}`;
+    // }
 
-    if (typeof pathCfg === 'function') {
-      const custom = pathCfg(model, this.rawConfig);
-      return custom.startsWith('http') ? custom : `${base}${custom}`;
-    }
-    if (typeof pathCfg === 'string' && pathCfg.length > 0) {
-      return pathCfg.startsWith('http') ? pathCfg : `${base}${pathCfg}`;
-    }
-    if ((this.rawConfig as any).apiVersion && /azure\.com/i.test(base)) {
-      const deployment = (this.rawConfig as any).deploymentId || model;
-      return `${base}/openai/deployments/${deployment}/chat/completions?api-version=${(this.rawConfig as any).apiVersion}`;
-    }
+    // if (typeof pathCfg === 'string' && pathCfg.length > 0) {
+    //   return pathCfg.startsWith('http') ? pathCfg : `${base}${pathCfg}`;
+    // }
+
+    // if ((this.rawConfig as any).apiVersion && /azure\.com/i.test(base)) {
+    //   const deployment = (this.rawConfig as any).deploymentId || model;
+    //   return `${base}/openai/deployments/${deployment}/chat/completions?api-version=${(this.rawConfig as any).apiVersion}`;
+    // }
     return `${base}${this.adapter.getEndpointPath()}`;
   }
 
@@ -138,13 +126,15 @@ export abstract class OpenAICompatibleProvider extends LLMProvider {
     headers: Headers,
     abortSignal?: AbortSignal
   ): Promise<LLMResponse> {
+ 
+
     const response = await this.httpClient.fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
       signal: abortSignal,
     });
-
+      
     const data = await response.json() as Record<string, unknown>;
     const apiResponse = this.adapter.transformResponse(data);
 
@@ -165,22 +155,24 @@ export abstract class OpenAICompatibleProvider extends LLMProvider {
     streamCallback?: LLMOptions['streamCallback'],
     abortSignal?: AbortSignal
   ): Promise<LLMResponse | null> {
+ 
     const response = await this.httpClient.fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
       signal: abortSignal,
     });
-
+ 
     if (!response.body) {
       throw new LLMError('Response body is not readable', 'NO_BODY');
     }
 
     const reader = response.body.getReader();
+
     let accumulatedContent = '';
     const toolCallsMap = new Map<number, { id: string; type: 'function'; function: { name: string; arguments: string } }>();
     let finishReason: string | undefined;
-
+   
     try {
       await StreamParser.parse(reader, {
         onContent: (content) => {

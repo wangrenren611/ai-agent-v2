@@ -10,7 +10,7 @@
  */
 
 import { BaseAPIAdapter, APIRequestBody, APIResponse } from './base-adapter';
-import { Message, LLMOptions } from '../base';
+import { Message, LLMOptions } from '../providers/base';
 import { DEFAULT_TEMPERATURE } from '../../agent/types';
 
 export interface OpenAIAdapterOptions {
@@ -47,7 +47,7 @@ export class OpenAIAdapter extends BaseAPIAdapter {
 
   constructor(options: OpenAIAdapterOptions = {}) {
     super();
-    this.endpointPath = options.endpointPath ?? '/v1/chat/completions';
+    this.endpointPath = options.endpointPath ?? '/chat/completions';
     this.organization = options.organization;
     this.apiKeyHeader = options.apiKeyHeader;
     this.apiKeyPrefix = options.apiKeyPrefix;
@@ -56,7 +56,7 @@ export class OpenAIAdapter extends BaseAPIAdapter {
 
   transformRequest(messages: Message[], options?: OpenAITransformOptions): APIRequestBody {
     const body: APIRequestBody = {
-      model: options?.model || 'gpt-4o-mini',
+      model: options?.model || 'gpt-4o',
       messages: messages
         .map((msg) => this.cleanMessageWithReasoning(msg))
         .filter((msg) => this.isMessageUsable(msg)) as Array<{
@@ -72,7 +72,7 @@ export class OpenAIAdapter extends BaseAPIAdapter {
             };
           }>;
         }>,
-      max_tokens: options?.max_tokens,
+      max_tokens: options?.maxTokens,
       temperature: options?.temperature ?? DEFAULT_TEMPERATURE,
       stream: options?.stream ?? false,
     };

@@ -1,4 +1,4 @@
-import { Message } from "../providers/base";
+import { Message } from "../providers/providers/base";
 import { ScopedLogger } from "../util/log";
 import { connectDB } from "./mongoose";
 import { MessageData } from "./models/message";

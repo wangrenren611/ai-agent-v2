@@ -48,29 +48,23 @@ export default function CustomInput({
     };
   }, []);
 
-  useEffect(() => {
-    console.log('[CustomInput] Props changed:', { value, disabled, focus: !disabled, showCommandList });
-  }, [value, disabled, showCommandList]);
+
 
   const handleSubmit = (newValue: string) => {
-    console.log('[CustomInput] Submit:', newValue, 'showCommandList:', showCommandList);
     
     // If command list is shown, execute selected command
     if (showCommandList && executeCommand) {
-      console.log('[CustomInput] Executing command');
       executeCommand();
       return;
     }
     
     // Otherwise, submit normally
     if (onSubmit && newValue.trim()) {
-      console.log('[CustomInput] Calling onSubmit');
       onSubmit(newValue);
     }
   };
 
   const handleChange = (newValue: string) => {
-    console.log('[CustomInput] Value changed:', newValue);
     onChange(newValue);
   };
 

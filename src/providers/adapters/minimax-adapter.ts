@@ -7,7 +7,7 @@
  */
 
 import { BaseAPIAdapter, APIRequestBody, APIResponse } from './base-adapter';
-import { Message, LLMOptions } from '../base';
+import { Message, LLMOptions } from '../providers/base';
 import { DEFAULT_TEMPERATURE } from '../../agent/types';
 
 export interface MiniMaxAdapterOptions {
@@ -46,7 +46,7 @@ export class MiniMaxAdapter extends BaseAPIAdapter {
             };
           }>;
         }>,
-      max_tokens: options?.max_tokens,
+      max_tokens: options?.maxTokens,
       temperature: options?.temperature ?? DEFAULT_TEMPERATURE,
       stream: options?.stream ?? false,
     };

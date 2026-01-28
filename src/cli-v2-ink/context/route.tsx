@@ -6,6 +6,7 @@
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { Route, RouteState } from '../types';
+import { ProviderType } from '../../providers/providers';
 
 // ============================================================================
 // Route Context Interface
@@ -17,6 +18,8 @@ export interface RouteContextValue {
   back: () => void;
   setRoute: (route: Route) => void;
   setParams: (params: Record<string, string>) => void;
+  setAIMModel: (model: ProviderType) => void;
+  aiModel: ProviderType;
 }
 
 const RouteContext = createContext<RouteContextValue | undefined>(undefined);
@@ -31,7 +34,8 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     params: {},
     history: [],
   });
-
+  const [aiModel, setAIMModel] = useState<ProviderType>(ProviderType.GLM);
+  
   const navigate = useCallback((route: Route, params: Record<string, string> = {}) => {
     setState((prev: RouteState) => ({
       ...prev,
@@ -67,6 +71,8 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     back,
     setRoute,
     setParams,
+    setAIMModel,
+    aiModel,
   };
 
   return <RouteContext.Provider value={value}>{children}</RouteContext.Provider>;
@@ -82,4 +88,14 @@ export const useRoute = (): [RouteState, Omit<RouteContextValue, 'state'>] => {
     throw new Error('useRoute must be used within RouteProvider');
   }
   return [context.state, context];
+};
+
+
+
+export const useAgentContext = (): RouteContextValue => {
+  const context = useContext(RouteContext);
+  if (!context) {
+    throw new Error('useAgentContext must be used within RouteProvider');
+  }
+  return context;
 };
