@@ -3,6 +3,7 @@
  */
 
 import { LLMProvider } from "../providers/providers/base";
+import { Message } from "./message";
 
 // =============================================================================
 // 常量定义
@@ -26,7 +27,8 @@ export const CLI_TEMPERATURE = 1;                 // CLI 交互模式
 // =============================================================================
 
 /** 流式输出块 */
-export interface StreamChunk {
+export type StreamChunk = {
+    messageId: string;
     content?: string;
     tool_calls?: Array<{
         index: number;
@@ -73,14 +75,7 @@ export interface LLMResponse {
     };
 }
 
-/** 会话消息 */
-export interface Message {
-    role: 'user' | 'assistant' | 'system' | 'tool';
-    type?: 'text' | 'summary';
-    content: import('../providers/providers/base').MessageContent; // 对齐 provider 定义，支持 text / image_url 复合内容
-    reasoning_content?: string;
-    tool_call_id?: string;
-}
+
 
 /** 工具 Schema */
 export interface ToolSchema {
@@ -102,9 +97,9 @@ export interface AgentEvents {
     /** 流式输出块事件 */
     'stream-chunk': StreamChunk;
     /** 工具调用开始事件 */
-    'tool-call': { toolName: string; args: unknown };
+    'tool-call': { messageId: string; toolName: string; args: unknown };
     /** 工具调用完成事件 */
-    'tool-result': { toolName: string; result: ToolResult; duration: number };
+    'tool-result': { messageId: string; toolName: string; result: ToolResult; duration: number };
     /** 错误事件 */
     'error': { error: Error; phase: string };
     /** 会话消息事件 */
@@ -116,11 +111,11 @@ export interface AgentEvents {
     /** 思考结束事件 */
     'thinking-end': { step: number; hasToolCalls: boolean };
     /** 工具调用组开始事件 */
-    'tool-calls-start': { count: number };
+    'tool-calls-start': {  count: number };
     /** 工具调用组结束事件 */
-    'tool-calls-end': { count: number; hasErrors: boolean; summary: string };
+    'tool-calls-end': {  count: number; hasErrors: boolean; summary: string };
     /** 任务完成事件 */
-    'complete': { response: AgentResponse };
+    'complete': {  response: AgentResponse };
     /** 任务取消事件 */
     'cancelled': { reason: string };
 }

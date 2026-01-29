@@ -10,8 +10,6 @@ import {
     AgentConfig,
     AgentRunOptions,
     AgentResponse,
-    LLMResponse,
-    Message,
     StreamChunk,
     ToolResult,
     ToolCall,
@@ -21,6 +19,7 @@ import {
     VALID_FINISH_REASONS,
     ToolSchema,
 } from './types';
+import {StreamChunk as LLMStreamChunk} from '../providers/providers/base';
 import { ToolError } from './ToolError';
 import { isRetryableError, isPermanentError, isAbortedError, LLMAuthError, LLMNotFoundError } from '../providers/providers/errors';
 import { ScopedLogger } from '../util/log';
@@ -28,7 +27,8 @@ import { SessionManager } from '../session-v2';
 import { ToolRegistry } from '../tool/registry';
 import { Compaction } from '../session-v2/compaction';
 import { AgentContext, getAgentContext } from '../context';
-
+import { Message } from './message';
+import { uuid } from 'uuidv4';
 // =============================================================================
 // 错误信息接口（内部使用）
 // =============================================================================
@@ -131,7 +131,7 @@ export class Agent {
    async start(): Promise<void> {
        await  this.sessionManager.init();
     }
-     on(event: keyof AgentEvents, listener: (data: AgentEvents[typeof event]) => void): void {
+    on<TEvent extends keyof AgentEvents>(event: TEvent, listener: (data: AgentEvents[TEvent]) => void): void {
         this.events.on(event, listener);
     }
     /**
@@ -249,11 +249,11 @@ export class Agent {
 
             return false;
         };
-
         // 添加用户消息
-        const userMessage: Message = { role: 'user', type: 'text', content: query };
-        this.sessionManager.addMessage(userMessage);
+        const userMessage: Message = this.sessionManager.addMessage({ role: 'user', type: 'text', content: query } as Message);
         this.events.emit('message', { message: userMessage });
+     
+
 
         // 主循环
         let step = 0;
@@ -268,13 +268,13 @@ export class Agent {
             // 获取并压缩消息
             const messages = this.sessionManager.getMessages();
             const { totalUsed, usableLimit } = this.compaction.getToken(
-                [{ role: 'system', content: this.systemPrompt }, ...messages],
+                [{ role: 'system', content: this.systemPrompt } as Message, ...messages],
                 tools
             );
             log('info', `totalUsed: ${totalUsed}/${usableLimit}`);
 
             const { isCompacted, list: llmMessages } = await this.compaction.compact(
-                [{ role: 'system', content: this.systemPrompt }, ...messages],
+                [{ role: 'system', content: this.systemPrompt } as Message, ...messages],
                 tools
             );
 
@@ -297,14 +297,15 @@ export class Agent {
             }
 
             try {
+                const messageId = uuid();
                 // 构建流式回调
                 const wrappedStreamCallback = streamCallback
-                    ? (chunk: StreamChunk) => {
-                          streamCallback(chunk);
-                          this.events.emit('stream-chunk', chunk);
+                    ? (chunk: LLMStreamChunk) => {
+                          streamCallback({ messageId, ... chunk });
+                          this.events.emit('stream-chunk', { messageId, ... chunk } as StreamChunk);
                       }
-                    : (chunk: StreamChunk) => {
-                          this.events.emit('stream-chunk', chunk);
+                    : (chunk: LLMStreamChunk) => {
+                          this.events.emit('stream-chunk', { messageId, ... chunk } as StreamChunk);
                       };
                 
                 // 构建 LLM 选项，优先使用运行时参数
@@ -327,13 +328,13 @@ export class Agent {
                 if (!llmResponse) {
                     throw new Error('LLM response is null');
                 }
-
+                const llmMessage = { messageId, ...llmResponse } as Message;
                 // 保存 LLM 响应
-                this.sessionManager.addMessage(llmResponse as Message);
-                this.events.emit('message', { message: llmResponse as Message });
+                this.sessionManager.addMessage(llmMessage);
+                this.events.emit('message', { message: llmMessage });
 
                 // 处理工具调用
-                const { hasToolCalls, hasError } = await this.handleToolCalls(llmResponse, { silent, spinner, log, complete });
+                const { hasToolCalls, hasError } = await this.handleToolCalls(llmMessage, { silent, spinner, log, complete });
 
                 if (hasError) {
                     log('warn', 'Tool execution had errors');
@@ -392,29 +393,30 @@ export class Agent {
 
     /** 处理工具调用 */
     private async handleToolCalls(
-        llmResponse: LLMResponse,
+        llmResponse: Message,
         ctx: { silent: boolean; spinner: ReturnType<ScopedLogger['spinner']> | null; log: (level: 'info' | 'warn' | 'error', message: string) => void; complete: (c: string) => AgentResponse }
-    ): Promise<{ hasToolCalls: boolean; hasError: boolean }> {
+    ): Promise<{messageId: string; hasToolCalls: boolean; hasError: boolean }> {
         if (!llmResponse.tool_calls?.length) {
-            return { hasToolCalls: false, hasError: false };
+            return { messageId: llmResponse.messageId, ...{ hasToolCalls: false, hasError: false } };
         }
 
         const toolCount = llmResponse.tool_calls.length;
         this.events.emit('tool-calls-start', { count: toolCount });
-
+        
         const toolResults: Message[] = [];
         let hasError = false;
 
         for (const call of llmResponse.tool_calls) {
             try {
-                const result = await this.executeTool(call);
+                const result = await this.executeTool(call, llmResponse.messageId);
                 toolResults.push(result);
             } catch (error) {
                 if (error instanceof ToolError) {
-                    toolResults.push(error.data);
+                    toolResults.push({ ...error.data });
                     hasError = true;
                 } else {
                     toolResults.push({
+                        messageId: llmResponse.messageId,
                         role: 'tool',
                         type: 'text',
                         content: `Error: Unknown tool execution error - ${error instanceof Error ? error.message : String(error)}`,
@@ -425,8 +427,8 @@ export class Agent {
             }
         }
 
-        this.sessionManager.addMessage(toolResults);
-        toolResults.forEach(msg => this.events.emit('message', { message: msg }));
+        this.sessionManager.addMessages(toolResults);
+        toolResults.forEach(msg => this.events.emit('message', {  message: msg }));
 
         // 生成摘要
         const summary = toolResults
@@ -437,20 +439,21 @@ export class Agent {
 
         // 输出工具调用结果
         if (ctx.silent) {
-            this.events.emit('log', { level: hasError ? 'warn' : 'info', message: `Tool calls: ${summary}` });
+            this.events.emit('log', {  level: hasError ? 'warn' : 'info', message: `Tool calls: ${summary}` });
         } else if (ctx.spinner) {
             ctx.spinner[hasError ? 'warn' : 'succeed'](`Tool calls: ${summary}`);
         }
 
-        return { hasToolCalls: true, hasError };
+        return {messageId: llmResponse.messageId, hasToolCalls: true, hasError } ;
     }
 
     /** 执行单个工具调用 */
-    private async executeTool(toolCall: ToolCall): Promise<Message> {
+    private async executeTool(toolCall: ToolCall, messageId:Message['messageId']): Promise<Message> {
         const { name, arguments: args } = toolCall.function;
 
         if (!name) {
             throw new ToolError({
+                messageId,
                 role: 'tool',
                 type: 'text',
                 content: 'Error: Tool name is empty',
@@ -458,15 +461,16 @@ export class Agent {
             });
         }
 
-        this.events.emit('tool-call', { toolName: name, args });
+        this.events.emit('tool-call', { messageId, toolName: name, args });
 
         const startTime = Date.now();
         try {
             const result = await ToolRegistry.execute(name, args);
             const duration = Date.now() - startTime;
 
-            this.events.emit('tool-result', { toolName: name, result, duration });
+            this.events.emit('tool-result', { messageId, toolName: name, result, duration });
             return {
+                messageId,
                 role: 'tool',
                 type: 'text',
                 content: this.formatToolResult(result),
@@ -477,12 +481,14 @@ export class Agent {
             const errorMsg = error instanceof Error ? error.message : String(error);
 
             this.events.emit('tool-result', {
+                messageId,
                 toolName: name,
                 result: { success: false, error: errorMsg },
                 duration,
             });
 
             throw new ToolError({
+                messageId,
                 role: 'tool',
                 type: 'text',
                 content: `Error: Tool execution failed - ${errorMsg}`,
@@ -505,3 +511,4 @@ export class Agent {
         return `Error: ${result.error || 'Unknown error'}`;
     }
 }
+

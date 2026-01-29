@@ -73,7 +73,7 @@ export type MessageContent = string | MessageContentPart[];
 export type Message = {
   role: 'user' | 'system' | 'assistant' | 'tool';
   content: MessageContent;
-  type?: 'text' | 'tool' | 'tool_call'| 'summary';
+  type?: 'text' | 'tool' | 'tool_call'| 'summary'| 'tool-call' | 'tool-result';
   /** 思维链/推理内容，部分模型（如 Kimi）在启用 thinking 时要求携带 */
   reasoning_content?: string;
   /** Tool call ID (required for tool response messages) */

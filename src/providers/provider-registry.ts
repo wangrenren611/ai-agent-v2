@@ -194,14 +194,14 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
     name: 'MiniMax',
     defaultModel: 'MiniMax-M2.1',
     baseURL: 'https://api.minimaxi.com/v1',
-    endpointPath: '/v1/text/chatcompletion_v2',
+    endpointPath: '/chat/completion',
     envApiKey: 'MINIMAX_API_KEY',
     envBaseURL: 'MINIMAX_API_BASE',
     models: {
       'MiniMax-M2.1': {
         name: 'MiniMax-M2.1',
         displayName: 'MiniMax M2.1',
-        maxTokens: 200000,
+        maxTokens: 8000,
         features: ['streaming', 'function-calling'],
       },
       'abab6.5s-chat': {
@@ -255,11 +255,16 @@ export class ProviderRegistry {
     config?: Partial<OpenAICompatibleConfig>
  ): LLMProvider {
 
+    if(!providerType){
+        throw new Error('ProviderType is required');
+    }
+    
     // 如果未指定类型，自动检测
     let metadata =  PROVIDER_METADATA?.[providerType];
-    let modelName = metadata.defaultModel;
+    let modelName = metadata?.defaultModel;
+
     // 如果providerType不是ProviderType类型，检查是否为model名称
-    if (!metadata) {
+    if (!metadata && providerType) {
         providerType = Object.keys(PROVIDER_METADATA).find(key=>providerType.includes(key)) as ProviderType;
         metadata = PROVIDER_METADATA[providerType];
         modelName = providerType;
@@ -276,7 +281,7 @@ export class ProviderRegistry {
       model: modelName,
       temperature: 0.7,
       maxTokens: modelConfig.maxTokens,
-      maxOutputTokens: 8000,
+      maxOutputTokens: 1000*200,
     };
 
     // 合并用户自定义配置

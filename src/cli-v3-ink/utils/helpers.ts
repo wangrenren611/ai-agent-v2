@@ -2,7 +2,6 @@
  * CLI v2 (Ink-based) Helper Functions
  */
 
-import type { ToolCallInfo } from '../types';
 import { MAX_TOOL_ARGS_PREVIEW, MAX_TOOL_OUTPUT_PREVIEW } from './constants';
 
 // ============================================================================

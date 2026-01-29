@@ -28,19 +28,15 @@ export class MiniMaxAdapter extends StandardAdapter {
 
   constructor(options: MiniMaxAdapterOptions = {}) {
     super({
-      endpointPath: '/v1/text/chatcompletion_v2',
+      endpointPath: '/chat/completions',
       defaultModel: 'MiniMax-M2.1',
     });
-    this.groupId = options.groupId;
   }
 
   getHeaders(apiKey: string): Headers {
-    const groupId = this.groupId || '';
 
     // MiniMax uses custom auth format: Bearer {GroupId}.{ApiKey}
-    const authorization = groupId
-      ? `Bearer ${groupId}.${apiKey}`
-      : `Bearer ${apiKey}`;
+    const authorization =`Bearer ${apiKey}`;
 
     return new Headers({
       'Content-Type': 'application/json',

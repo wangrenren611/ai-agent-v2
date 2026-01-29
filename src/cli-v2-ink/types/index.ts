@@ -2,7 +2,7 @@
  * CLI v2 (Ink-based) Type Definitions
  */
 
-import type { Agent, AgentEvents } from '../../agent';
+import type { Agent } from '../../agent';
 import type { RouteContextValue } from '../context/route';
 
 // ============================================================================

@@ -1,6 +1,9 @@
 import path from "node:path";
-import { LLMProvider, Message } from "../providers/providers/base";
+import { LLMProvider } from "../providers/providers/base";
 import fs, { mkdir } from 'node:fs/promises';
+import { Message } from '../agent/message';
+import { uuid } from 'uuidv4';
+
 
 
 export class SessionManager {
@@ -47,19 +50,21 @@ export class SessionManager {
     }
   }
 
-  addMessage(message: Message | Message[]) {
-    if (Array.isArray(message)) {
-      for (const msg of message) {
-        this.messageList.push(msg);
-        this.save(msg);
-      }
-    } else {
-      this.messageList.push(message);
-      this.save(message);
-    }
+  addMessage(message: Message): Message {
+      const item = {
+        ...message,
+        messageId:message?.messageId || uuid(),
+      };
+      this.messageList.push(item);
+      this.save(item);
+      return item;
+  }
+  
+  addMessages(messages: Message[]) {
+    messages.forEach(msg => this.addMessage(msg));
   }
 
-  private save(message: Message | Message[]) {
+  private save(message: Message) {
     // 使用 Promise 链确保保存顺序，防止竞态条件
     this.saveQueue = this.saveQueue.then(async () => {
       try {
@@ -83,7 +88,10 @@ export class SessionManager {
   }
 
   async setMessages(messages: Message[]) {
-    this.messageList = messages;
+    this.messageList = messages.map(msg => ({
+      ...msg,
+      messageId:msg.messageId || uuid(),
+    }));
     await fs.writeFile(
       path.join(this.sessionPath, 'messages.json'),
       JSON.stringify(this.messageList, null, 2)

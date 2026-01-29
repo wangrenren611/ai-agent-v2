@@ -14,7 +14,6 @@ import type {
   EventMetrics,
 } from './types';
 import { EventBus } from './EventBus';
-import { ScopedEventBus } from './ScopedEventBus';
 
 /**
  * 类型安全的事件总线（泛型版本）

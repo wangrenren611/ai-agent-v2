@@ -36,7 +36,7 @@ async function main() {
 
 
    const agent = new Agent({
-       llmProvider: ProviderRegistry.createFromEnv(ProviderType.GLM,'glm-4.7'),
+       llmProvider: ProviderRegistry.createFromEnv(ProviderType.GLM),
        systemPrompt: operatorPrompt({
            directory: process.env.PROJECT_DIRECTORY || process.cwd(),
            vcs: process.env.VCS || 'git',

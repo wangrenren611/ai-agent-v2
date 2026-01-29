@@ -1,5 +1,7 @@
-import { Message, LLMProvider } from "../providers/providers/base";
+import { LLMProvider } from "../providers/providers/base";
 import { ScopedLogger } from "../util/log";
+import { Message } from "../agent/message";
+import { uuid } from "uuidv4";
 
 export class Compaction {
   private readonly maxTokens: number;
@@ -283,6 +285,7 @@ export class Compaction {
     );
 
     const summaryMessage: Message = {
+      messageId: uuid(),
       role: "assistant",
       type: "summary",
       content: `${newSummaryContent}`,
@@ -290,6 +293,7 @@ export class Compaction {
 
     // 6. 重组历史
     const newHistory = [summaryMessage, ...activeMessages, {
+      messageId: uuid(),
       role: "user" as const,
       type: "text" as const,
       content: "Confirm task completion. If the task is not finished, define the next actions and continue execution until all user requirements are satisfied.",
