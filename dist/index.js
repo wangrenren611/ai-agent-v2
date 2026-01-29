@@ -3,10 +3,14 @@
  * 初始化并启动 AI Agent 应用
  * 支持从系统环境变量读取配置（类似 Claude Code）
  */
-import { Agent } from './agent';
-import { ProviderRegistry } from './providers';
-import { operatorPrompt } from './prompts/operator';
-import { registerDefaultToolsAsync, ToolRegistry } from './tool';
+import { Agent } from './agent/index.js';
+import { operatorPrompt } from './prompts/operator.js';
+import { registerDefaultToolsAsync, ToolRegistry } from './tool/index.js';
+import { ProviderRegistry, ProviderType } from './providers/provider-registry.js';
+import dotenv from 'dotenv';
+dotenv.config({
+    path: './.env.development',
+});
 /**
  * 创建并启动 Agent
  *
@@ -21,16 +25,11 @@ async function main() {
     // 如果需要 .env 文件支持，可以在 shell 中执行 source .env.development
     console.log('[Agent] Initializing Agent...');
     console.log('[Agent] Configuration source: System environment variables');
-    // Auto-detect and create provider from environment variables
-    // 优先使用 ANTHROPIC_API_KEY（通用 API Key，类似 Claude Code）
-    // 其次使用特定提供者的 API Key（GLM_API_KEY, KIMI_API_KEY 等）
-    const llmProvider = ProviderRegistry.createFromEnv();
     console.log('[Agent] Provider created successfully');
     await registerDefaultToolsAsync();
     console.log('[Agent] Tools registered');
     const agent = new Agent({
-        model: process.env.AI_MODEL || process.env.ANTHROPIC_MODEL || 'gpt-4o',
-        llmProvider,
+        llmProvider: ProviderRegistry.createFromEnv(ProviderType.GLM, 'glm-4.7'),
         systemPrompt: operatorPrompt({
             directory: process.env.PROJECT_DIRECTORY || process.cwd(),
             vcs: process.env.VCS || 'git',

@@ -6,7 +6,7 @@
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { Route, RouteState } from '../types';
-import { ProviderType } from '../../providers/providers';
+import { ProviderType } from '../../providers/provider-registry';
 
 // ============================================================================
 // Route Context Interface

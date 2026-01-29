@@ -171,6 +171,10 @@ export interface AgentRunOptions {
     abortSignal?: AbortSignal;
     /** 温度 */
     temperature?: number;
+    /** 最大输入 tokens */
+    maxTokens?: number;
+    /** 最大输出 tokens */
+    maxOutputTokens?: number;
     /** 思考配置 */
 }
 

@@ -12,15 +12,14 @@ import { ChatMessage, ToolCallInfo } from '../types';
 import { useAgentContext } from '../context';
 import { INITIAL_DELAY_MS, MESSAGES } from '../utils/constants';
 import { formatToolArgs, formatToolOutput } from '../utils/helpers';
-import { getModel, ModelType } from '../../providers';
-import { model } from 'mongoose';
+import { ProviderRegistry, ProviderType } from '../../providers/provider-registry';
 
 // ============================================================================
 // Type Definitions
 // ============================================================================
 
 interface UseAgentProps {
-  selectedModel: ModelType;
+  selectedModel: ProviderType;
   onStateChange: (state: { status: string; ready: boolean }) => void;
   onMessage: (message: ChatMessage) => void;
   onResponseUpdate: (chunk: string) => void;
@@ -72,7 +71,7 @@ export const useAgent = ({
 }: UseAgentProps) => {
   const [agent, setAgent] = useState<Agent | null>(null);
   const activeToolCallRef = useRef<Map<string, ToolCallInfo>>(new Map());
-  const { aiModel } = useAgentContext();
+  const { model: contextModel } = useAgentContext();
 
   /**
    * Handle stream-chunk event
@@ -229,7 +228,7 @@ export const useAgent = ({
 
       // Step 4: Create agent instance
       const newAgent = new Agent({
-        llmProvider: getModel(selectedModel||aiModel),
+        llmProvider: ProviderRegistry.createFromEnv(ProviderType.GLM,'glm-4.7'),
         temperature: DEFAULT_TEMPERATURE,
         systemPrompt: operatorPrompt({
           directory: process.env.PROJECT_DIRECTORY || process.cwd(),
@@ -261,7 +260,7 @@ export const useAgent = ({
       });
       onStateChange({ status: 'Error', ready: true });
     }
-  }, [selectedModel, onStateChange, aiModel, onAgentReady, setupEventListeners, processPendingMessage, onMessage]);
+  }, [selectedModel, onStateChange, contextModel, onAgentReady, setupEventListeners, processPendingMessage, onMessage]);
 
   /**
    * Initialize agent on mount

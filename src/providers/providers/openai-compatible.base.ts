@@ -14,7 +14,7 @@ import { BaseAPIAdapter } from '../adapters/base-adapter';
 import { HTTPClient } from '../utils/http-client';
 import { StreamParser } from '../utils/stream-parser';
 import { LLMError } from './errors';
-import { OpenAIAdapter } from '../adapters';
+import { OpenAIAdapter } from '../adapters/openai-adapter';
 
 export interface OpenAICompatibleConfig extends BaseProviderConfig {
   organization?: string;
@@ -48,28 +48,28 @@ export interface OpenAICompatibleConfig extends BaseProviderConfig {
   [key: string]: unknown;
 }
 
-export abstract class OpenAICompatibleProvider extends LLMProvider {
+export class OpenAICompatibleProvider extends LLMProvider {
   readonly httpClient: HTTPClient;
   readonly baseURL: string;
   apiKey: string;
   temperature: number;
   model: string;
   maxOutputTokens: number;
-  adapter: OpenAIAdapter;
+  adapter: BaseAPIAdapter;
 
-   constructor(config: OpenAICompatibleConfig) {
+   constructor(config: OpenAICompatibleConfig, adapter?: BaseAPIAdapter) {
      super(config);
      this.apiKey = config.apiKey;
      this.baseURL = config.baseURL;
      this.temperature = config.temperature;
      this.model = config.model;
-     this.maxOutputTokens = config.maxOutputTokens;    
-     this.adapter = new OpenAIAdapter(config);
+     this.maxOutputTokens = config.maxOutputTokens;
+     this.adapter = adapter ?? new OpenAIAdapter(config);
      this.config = {
       ...config,
       baseURL: (config.baseURL).replace(/\/$/, ''),
     };
-    
+
     this.baseURL = this.config.baseURL as string;
 
     this.httpClient = new HTTPClient({

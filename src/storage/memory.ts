@@ -27,9 +27,21 @@ export default class Memory {
        if (this.db) {
            // 持久化到数据库
            try {
+               // Convert MessageContent to string for storage
+               let contentStr = '';
+               if (typeof msg.content === 'string') {
+                   contentStr = msg.content;
+               } else if (Array.isArray(msg.content)) {
+                   contentStr = msg.content.map(part => {
+                       if (part.type === 'text') return part.text;
+                       if (part.type === 'image_url') return '[Image]';
+                       return '';
+                   }).join('');
+               }
+
                await MessageData.create({
                    userId: 'default',
-                   content: msg.role==='tool'? "":msg.content,
+                   content: msg.role === 'tool' ? '' : contentStr,
                    role: msg.role,
                    type: msg.type || 'text',
                });

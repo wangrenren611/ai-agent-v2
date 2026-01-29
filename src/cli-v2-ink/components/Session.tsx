@@ -17,7 +17,7 @@ import { CommandList } from './CommandList';
 import { useAgent } from '../hooks/useAgent';
 import { getSelectedModel } from '../utils/helpers';
 import { MESSAGES, COLORS, ICONS } from '../utils/constants';
-import { PROVIDER_METADATA } from '../../providers';
+import { PROVIDER_METADATA } from '../../providers/provider-registry';
 import { Command, matchCommands, findCommand } from '../utils/commands';
 
 const Session: React.FC<SessionProps> = ({ navigate }) => {

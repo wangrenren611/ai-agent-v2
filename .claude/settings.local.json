@@ -69,7 +69,9 @@
       "Bash(bun --eval:*)",
       "Bash(pnpm dev:cli-v2:*)",
       "Bash(pnpm dev:cli-v2-ink:*)",
-      "mcp__context7__resolve-library-id"
+      "mcp__context7__resolve-library-id",
+      "Bash(wc:*)",
+      "Bash(grep:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -307,17 +307,21 @@ export class Agent {
                           this.events.emit('stream-chunk', chunk);
                       };
                 
+                // 构建 LLM 选项，优先使用运行时参数
+                const llmOptions = {
+                    tools: tools.length > 0 ? tools : undefined,
+                    maxTokens: options?.maxTokens ?? this.llmProvider.config.maxTokens,
+                    maxOutputTokens: options?.maxOutputTokens ?? this.llmProvider.config.maxOutputTokens,
+                    stream: streamEnabled,
+                    streamCallback: wrappedStreamCallback,
+                    abortSignal: currentAbortSignal,
+                    temperature: options?.temperature ?? this.temperature,
+                };
+
                 // 调用 LLM
                 const llmResponse = await this.llmProvider.generate(
                     [{ role: 'system', content: this.systemPrompt }, ...llmMessages],
-                    {
-                        tools: tools.length > 0 ? tools : undefined,
-                        maxTokens: this.llmProvider.config.maxOutputTokens,
-                        stream: streamEnabled,
-                        streamCallback: wrappedStreamCallback,
-                        abortSignal: currentAbortSignal,
-                        temperature: this.temperature,
-                    }
+                    llmOptions
                 );
                   
                 if (!llmResponse) {

@@ -10,8 +10,7 @@ import { Box, Text, useInput } from 'ink';
 import type { RouteContextValue } from '../context/route';
 import { COLORS } from '../utils/constants';
 import { SelectList, SelectListItem } from '../components/SelectList';
-import { ProviderType } from '../../providers/providers';
-import { PROVIDER_METADATA } from '../../providers';
+import { ProviderType, PROVIDER_METADATA } from '../../providers/provider-registry';
 
 interface SettingsProps {
   navigate: RouteContextValue['navigate'];
@@ -25,16 +24,19 @@ const Settings: React.FC<SettingsProps> = ({ navigate }) => {
   const [error, setError] = useState<string | null>(null);
   const [showError, setShowError] = useState(false);
 
-  // Build list of available models
+  // Build list of available models (all models from all providers)
   const modelList = useMemo<SelectListItem[]>(() => {
     const items: SelectListItem[] = [];
 
     Object.entries(PROVIDER_METADATA).forEach(([type, metadata]) => {
-      items.push({
-        id: `${type}-${metadata.defaultModel}`,
-        label: metadata.name,
-        provider: type.toUpperCase(),
-        model: metadata.defaultModel,
+      // Add all models for this provider
+      Object.values(metadata.models).forEach((model) => {
+        items.push({
+          id: `${type}-${model.name}`,
+          label: `${metadata.name} - ${model.displayName}`,
+          provider: type.toUpperCase(),
+          model: model.name,
+        });
       });
     });
 
@@ -51,7 +53,7 @@ const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       setCurrentProvider(providerType || 'UNKNOWN');
 
       const currentIndex = modelList.findIndex(
-        item => item.model === currentModel || item.label.toLowerCase().includes(currentModel.split('-')[0])
+        item => item.model === currentModel
       );
       if (currentIndex >= 0) {
         setSelectedIndex(currentIndex);

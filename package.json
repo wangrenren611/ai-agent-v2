@@ -5,19 +5,19 @@
   "license": "ISC",
   "author": "",
   "type": "module",
-  "main": "index.js",
+  "main": "bin/index.js",
   "bin": {
-    "QpsCode": "bin/index.js"
+    "Qpscode": "bin/index.js"
   },
   "files": [
-    "dist"
+    "bin/index.js"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.js",
     "lint:fix": "eslint . --ext .ts,.js --fix",
     "lint:strict": "eslint . --ext .ts,.js --max-warnings 0",
-    "build": "cross-env NODE_ENV=production  tsc",
+    "build": "cross-env NODE_ENV=production tsc && node scripts/fix-esm-imports.cjs",
     "dev": "cross-env NODE_ENV=development  tsx src/index.ts",
     "dev:demo": "cross-env NODE_ENV=development  tsx src/index.ts demo",
     "dev:blessed": "cross-env NODE_ENV=development node -r esbuild-register ./src/ui/blessed/pure-blessed.ts",

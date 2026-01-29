@@ -6,14 +6,14 @@
 import { Agent } from './agent';
 import {operatorPrompt} from './prompts/operator';
 import { registerDefaultToolsAsync, ToolRegistry } from './tool';
-import { getModel, ModelType } from './providers';
+import { ProviderRegistry, ProviderType } from './providers/provider-registry';
 import dotenv from 'dotenv';
 dotenv.config({
     path: './.env.development',
 });
 /**
  * 创建并启动 Agent
- * 
+ *
  * 配置优先级（类似 Claude Code）:
  * 1. 系统环境变量（ANTHROPIC_API_KEY, GLM_API_KEY 等）
  * 2. .env.development 或 .env.production 文件（通过 dotenv）
@@ -27,16 +27,16 @@ async function main() {
    console.log('[Agent] Initializing Agent...');
    console.log('[Agent] Configuration source: System environment variables');
 
- 
+
 
    console.log('[Agent] Provider created successfully');
 
    await registerDefaultToolsAsync();
    console.log('[Agent] Tools registered');
 
-       
+
    const agent = new Agent({
-       llmProvider:getModel(ModelType.MINIMAX),
+       llmProvider: ProviderRegistry.createFromEnv(ProviderType.GLM,'glm-4.7'),
        systemPrompt: operatorPrompt({
            directory: process.env.PROJECT_DIRECTORY || process.cwd(),
            vcs: process.env.VCS || 'git',
@@ -46,7 +46,7 @@ async function main() {
        tools:ToolRegistry.getSchemas(),
 
    });
-   
+
    await agent.start();
    console.log('[Agent] Agent started');
 

@@ -4,9 +4,9 @@
  * Manages Agent initialization and event handling
  */
 
-import { useEffect, useState, useCallback, useRef, useContext } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Agent } from '../../agent';
-import { ProviderRegistry, ProviderType } from '../../providers/providers';
+import { ProviderRegistry } from '../../providers/provider-registry';
 import { operatorPrompt } from '../../prompts/operator';
 import { registerDefaultToolsAsync, ToolRegistry } from '../../tool';
 import type { ChatMessage, ToolCallInfo } from '../types';
