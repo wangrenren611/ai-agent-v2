@@ -31,14 +31,13 @@ const MarkdownText: React.FC<MarkdownTextProps> = ({ content, isStreaming }) => 
 
   // Custom markdown theme using project colors
   const markdownTheme = {
- code: chalk.yellow,
+  code: chalk.yellow,
   blockquote: chalk.gray.italic,
   html: chalk.gray,
   heading: chalk.green.bold,
   firstHeading: chalk.magenta.underline.bold,
   hr: chalk.reset,
   listitem: chalk.reset,
-  table: chalk.reset,
   paragraph: chalk.reset,
   strong: chalk.bold,
   em: chalk.italic,

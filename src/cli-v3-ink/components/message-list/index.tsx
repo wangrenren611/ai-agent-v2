@@ -52,10 +52,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading = false }
       iconColor = 'white';
     }
 
-    return (<Box key={`${msg.messageId}-${index}`} flexDirection="column">
-        {msg.content && !isToolCall ? (<Box marginTop={1}><Text color={iconColor}>{icon}</Text><Text>{' '}</Text><MarkdownText content={((msg?.content as string)?.trim() as string).replace(/^\n+|\n+$/g, '')} /></Box>) : null}
-        {isToolCall && (
-          <Box marginTop={1}>
+    return (<Box key={`${msg.messageId}-${index}`} flexDirection="column" flexShrink={0}>{msg.content && !isToolCall ? (<Box overflow="hidden" marginTop={1}><Text color={iconColor}>{icon}</Text><Text>{' '}</Text><MarkdownText content={((msg?.content as string)?.trim() as string).replace(/^\n+|\n+$/g, '').replace(/^\r+|\r+$/g, '')} /></Box>) : null}{isToolCall && (<Box marginTop={1}>
             <Text color={iconColor}>{icon}</Text><Text>{' '}</Text>
             <Text>{msg.toolName}</Text>
             <Text>({formatArgs(msg.args)})</Text>
