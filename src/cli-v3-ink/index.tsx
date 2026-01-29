@@ -8,7 +8,7 @@ import React from 'react';
 import { render } from 'ink';
 import App from './app';
 import dotenv from 'dotenv';
-
+import AppContextProvider from './context/app';
 // Load env early so all routes can read AI_MODEL 等配置
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}`, override: true });
@@ -65,5 +65,9 @@ process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.title = 'AI Agent v2';
 
 // Render the app and wait until exit
-const { waitUntilExit } = render(<App />);
+const { waitUntilExit } = render(
+  <AppContextProvider>
+    <App />
+  </AppContextProvider>
+);
 waitUntilExit();
