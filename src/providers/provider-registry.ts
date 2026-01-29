@@ -22,7 +22,7 @@ export enum ProviderType {
   OPENAI = 'openai',
   KIMI = 'kimi',
   DEEPSEEK = 'deepseek',
-  GLM = 'glm',
+  GLM = 'glm-4.7',
   MINIMAX = 'minimax',
   QWEN = 'qwen',
 }
@@ -251,17 +251,22 @@ export class ProviderRegistry {
    * @param config 可选的配置覆盖，用于动态设置 temperature、maxTokens 等参数
    */
   static createFromEnv(
-    type?: ProviderType,
-    model?: string,
+    providerType:ProviderType,
     config?: Partial<OpenAICompatibleConfig>
-  ): LLMProvider {
-    // 如果未指定类型，自动检测
-    const providerType = type || ProviderRegistry.detectFromEnv();
+ ): LLMProvider {
 
-    const metadata = PROVIDER_METADATA[providerType];
+    // 如果未指定类型，自动检测
+    let metadata =  PROVIDER_METADATA?.[providerType];
+    let modelName = metadata.defaultModel;
+    // 如果providerType不是ProviderType类型，检查是否为model名称
+    if (!metadata) {
+        providerType = Object.keys(PROVIDER_METADATA).find(key=>providerType.includes(key)) as ProviderType;
+        metadata = PROVIDER_METADATA[providerType];
+        modelName = providerType;
+    }
+
     const apiKey = process.env[metadata.envApiKey] || '';
     const baseURL = process.env[metadata.envBaseURL] || metadata.baseURL;
-    const modelName = model || metadata.defaultModel;
     const modelConfig = metadata.models[modelName] || metadata.models[metadata.defaultModel];
 
     // 基础配置
@@ -279,7 +284,7 @@ export class ProviderRegistry {
       ...baseConfig,
       ...config,
     };
-    console.log(finalConfig);
+
     // 创建对应的 Adapter
     const adapter = ProviderRegistry.createAdapter(providerType, finalConfig);
 

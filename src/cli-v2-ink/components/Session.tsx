@@ -46,17 +46,9 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
   // Match commands based on input
   const matchedCommands = matchCommands(input);
 
-  // Debug logging
-  console.log('[Session] Render state:', {
-    input,
-    showCommandList,
-    matchedCommandsCount: matchedCommands.length,
-    ready
-  });
 
   // Handle agent state changes
   const handleStateChange = useCallback((state: { status: string; ready: boolean }) => {
-    console.log('[Session] State changed:', state);
     setStatus(state.status);
     setReady(state.ready);
   }, []);
@@ -107,7 +99,6 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
 
   // Handle agent ready
   const handleAgentReady = useCallback((agent: Agent) => {
-    console.log('[Session] Agent ready');
     agentRef.current = agent;
     
     // Process pending message from Home page
@@ -115,7 +106,6 @@ const Session: React.FC<SessionProps> = ({ navigate }) => {
       hasProcessedPendingMessage.current = true;
       const pendingMessage = (global as any).__pendingMessage;
       if (pendingMessage) {
-        console.log('[Session] Processing pending message:', pendingMessage);
         (global as any).__pendingMessage = null;
         
         // Handle commands

@@ -1,42 +1,40 @@
 /**
- * Welcome Component
+ * Welcome Banner Component
  *
- * Displays the ASCII art banner with app info
+ * ASCII art banner with app information
  */
 
 import React from 'react';
 import { Box, Text } from 'ink';
 import { COLORS } from '../../utils/constants';
 
-const SEPARATOR = '─'.repeat(50);
-
-interface WelcomeProps {
-  currentPath?: string;
+interface WelcomeBannerProps {
   model?: string;
+  currentPath?: string;
 }
 
-const Welcome: React.FC<WelcomeProps> = ({
-  currentPath = 'D:\\work\\ai-agent-v2',
-  model = 'glm-4.7',
+const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
+  model = 'gpt-4o',
+  currentPath = process.cwd(),
 }) => {
   return (
     <Box flexDirection="column" marginBottom={1} paddingTop={2}>
-      {/* ASCII Art Cat Banner */}
+      {/* ASCII Art Banner */}
       <Box flexDirection="column">
         <Box>
           <Text bold color={COLORS.PRIMARY}>    /\\_/\\</Text>
         </Box>
         <Box>
           <Text bold color={COLORS.PRIMARY}>   ( o.o )</Text>
-          <Text>       CoCo Code v1.0.0</Text>
+          <Text>       AI Agent CLI v3.0</Text>
         </Box>
         <Box>
-          <Text bold color={COLORS.PRIMARY}>   &gt;  ^  &lt;</Text>
-          <Text>       {model} · API Usage</Text>
+          <Text bold color={COLORS.PRIMARY}>    {'> ^ <'}</Text>
+          <Text>        {model} · Ready</Text>
         </Box>
         <Box>
-          <Text bold color={COLORS.PRIMARY}>    //   \\\\</Text>
-          <Text  dimColor>    {currentPath}</Text>
+          <Text bold color={COLORS.PRIMARY}>    // \\\\</Text>
+          <Text dimColor>      {currentPath}</Text>
         </Box>
         <Box>
           <Text bold color={COLORS.PRIMARY}>   (___(___)</Text>
@@ -49,16 +47,13 @@ const Welcome: React.FC<WelcomeProps> = ({
       {/* Tip */}
       <Box marginTop={1}>
         <Text dimColor>  </Text>
+        <Text color={COLORS.PRIMARY}>/help</Text>
+        <Text dimColor> for commands · </Text>
         <Text color={COLORS.PRIMARY}>/model</Text>
-        <Text dimColor> to try Ai Coding</Text>
-      </Box>
-
-      {/* Separator */}
-      <Box marginTop={0.5}>
-        <Text dimColor>{SEPARATOR}</Text>
+        <Text dimColor> to switch AI</Text>
       </Box>
     </Box>
   );
 };
 
-export default Welcome;
+export default WelcomeBanner;

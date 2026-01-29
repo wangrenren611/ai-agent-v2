@@ -6,8 +6,7 @@
 
 import React from 'react';
 import { Box } from 'ink';
-import { AgentProvider, MessageProvider, UIProvider } from './context';
-import WelcomeView from './views/welcome-view';
+import Welcome from './components/welcome';
 
 // ============================================================================
 // Main App Component
@@ -15,15 +14,9 @@ import WelcomeView from './views/welcome-view';
 
 const App: React.FC = () => {
   return (
-    <AgentProvider>
-      <MessageProvider>
-        <UIProvider>
-          <Box flexDirection="column" flexGrow={1}>
-            <WelcomeView />
-          </Box>
-        </UIProvider>
-      </MessageProvider>
-    </AgentProvider>
+    <Box flexDirection="column" flexGrow={1}>
+      <Welcome />
+    </Box>
   );
 };
 
