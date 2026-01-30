@@ -1,8 +1,9 @@
 import React from 'react';
-import { Box, Text } from 'ink';
+import { Box, Static, Text } from 'ink';
 import { Message } from '../../../agent/message';
 import { COLORS, ICONS } from '../../utils/constants';
 import MarkdownText from './MarkdownText';
+import Loading from '../Loading';
 
 interface MessageListProps {
   messages: Message[];
@@ -51,7 +52,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading = false }
     } else {
       iconColor = 'white';
     }
-
+    
     return (<Box key={`${msg.messageId}-${index}`} flexDirection="column" flexShrink={0}>{msg.content && !isToolCall ? (<Box overflow="hidden" marginTop={1}><Text color={iconColor}>{icon}</Text><Text>{' '}</Text><MarkdownText content={((msg?.content as string)?.trim() as string).replace(/^\n+|\n+$/g, '').replace(/^\r+|\r+$/g, '')} /></Box>) : null}{isToolCall && (<Box marginTop={1}>
             <Text color={iconColor}>{icon}</Text><Text>{' '}</Text>
             <Text>{msg.toolName}</Text>
@@ -72,14 +73,12 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading = false }
     );
   }
 
-  return (<Box flexDirection="column">
+  return (
+    <Box flexDirection="column">
       {messages.map((msg, index) => renderMessage(msg, index))}
-      {isLoading && (
-        <Box marginTop={1} marginBottom={4}>
-          <Text color={COLORS.DIM}><Text color={COLORS.SECONDARY}>●</Text> AI is thinking...</Text>
-        </Box>
-      )}
-    </Box>);
+      {isLoading && <Loading />}
+    </Box>
+  );
 };
 
 export default MessageList;

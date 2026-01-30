@@ -86,12 +86,13 @@ export class OpenAICompatibleProvider extends LLMProvider {
     if (messages.length === 0) return null;
     const requestBody = this.adapter.transformRequest(messages, {
       model:  this.config.model,
-      max_tokens: options?.maxTokens || this.config.maxTokens,
+      max_tokens: options?.maxOutputTokens || this.config.maxOutputTokens,
       extraBody: (this.config as any).extraBody,
       enableReasoningSplit: (this.config as any).enableReasoningSplit,
       temperature: this.config.temperature,
       ...(options || {}),
     } as any);
+
     const url = this.resolveEndpoint();
     const headers = this.adapter.getHeaders(this.config.apiKey || '' );
   

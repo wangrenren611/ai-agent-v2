@@ -37,6 +37,8 @@ export interface ModelConfig {
   displayName: string;
   /** 最大输入 token 数 */
   maxTokens: number;
+  /** 最大输出 token 数 */
+  outputMaxTokens: number;
   /** 支持的特性 */
   features: string[];
 }
@@ -79,27 +81,10 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
       'gpt-4o': {
         name: 'gpt-4o',
         displayName: 'GPT-4o',
-        maxTokens: 128000,
+           maxTokens: 200*1000,
+        outputMaxTokens: 8000,
         features: ['streaming', 'function-calling', 'vision'],
-      },
-      'gpt-4o-mini': {
-        name: 'gpt-4o-mini',
-        displayName: 'GPT-4o Mini',
-        maxTokens: 128000,
-        features: ['streaming', 'function-calling', 'vision'],
-      },
-      'gpt-4-turbo': {
-        name: 'gpt-4-turbo',
-        displayName: 'GPT-4 Turbo',
-        maxTokens: 128000,
-        features: ['streaming', 'function-calling', 'vision'],
-      },
-      'gpt-3.5-turbo': {
-        name: 'gpt-3.5-turbo',
-        displayName: 'GPT-3.5 Turbo',
-        maxTokens: 16385,
-        features: ['streaming', 'function-calling'],
-      },
+      }
     },
   },
   [ProviderType.KIMI]: {
@@ -114,13 +99,15 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
       'kimi-3.5': {
         name: 'kimi-3.5',
         displayName: 'Kimi 3.5',
-        maxTokens: 2048000,
+        maxTokens: 200*1000,
+        outputMaxTokens: 8000,
         features: ['streaming', 'function-calling', 'reasoning'],
       },
       'kimi-2.5': {
         name: 'kimi-2.5',
         displayName: 'Kimi 2.5',
-        maxTokens: 2048000,
+        maxTokens: 200*1000,
+        outputMaxTokens: 8000,
         features: ['streaming', 'function-calling', 'reasoning'],
       },
     },
@@ -138,12 +125,14 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
         name: 'deepseek-chat',
         displayName: 'DeepSeek Chat',
         maxTokens: 64000,
+        outputMaxTokens: 200*1000,
         features: ['streaming', 'function-calling'],
       },
       'deepseek-coder': {
         name: 'deepseek-coder',
         displayName: 'DeepSeek Coder',
         maxTokens: 64000,
+        outputMaxTokens: 200*1000,
         features: ['streaming', 'function-calling'],
       },
     },
@@ -160,32 +149,9 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
       'glm-4.7': {
         name: 'glm-4.7',
         displayName: 'GLM-4.7',
-        maxTokens: 128000,
+        maxTokens: 200*1000,
+        outputMaxTokens: 8000,
         features: ['streaming', 'function-calling', 'vision'],
-      },
-      'glm-4.6': {
-        name: 'glm-4.6',
-        displayName: 'GLM-4.6',
-        maxTokens: 128000,
-        features: ['streaming', 'function-calling'],
-      },
-      'glm-vl': {
-        name: 'glm-vl',
-        displayName: 'GLM-VL (Vision)',
-        maxTokens: 128000,
-        features: ['streaming', 'vision'],
-      },
-      'glm-4-flash': {
-        name: 'glm-4-flash',
-        displayName: 'GLM-4 Flash',
-        maxTokens: 128000,
-        features: ['streaming', 'function-calling'],
-      },
-      'glm-4-air': {
-        name: 'glm-4-air',
-        displayName: 'GLM-4 Air',
-        maxTokens: 128000,
-        features: ['streaming', 'function-calling'],
       },
     },
   },
@@ -201,13 +167,8 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
       'MiniMax-M2.1': {
         name: 'MiniMax-M2.1',
         displayName: 'MiniMax M2.1',
-        maxTokens: 8000,
-        features: ['streaming', 'function-calling'],
-      },
-      'abab6.5s-chat': {
-        name: 'abab6.5s-chat',
-        displayName: 'ABAB6.5s Chat',
-        maxTokens: 200000,
+         maxTokens: 200*1000,
+        outputMaxTokens: 8000,
         features: ['streaming', 'function-calling'],
       },
     },
@@ -224,20 +185,9 @@ export const PROVIDER_METADATA: Record<ProviderType, ProviderMetadata> = {
       'qwen-3.5': {
         name: 'qwen-3.5',
         displayName: 'Qwen 3.5',
-        maxTokens: 128000,
+         maxTokens: 200*1000,
+        outputMaxTokens: 8000,
         features: ['streaming', 'function-calling', 'vision'],
-      },
-      'qwen-2.5': {
-        name: 'qwen-2.5',
-        displayName: 'Qwen 2.5',
-        maxTokens: 128000,
-        features: ['streaming', 'function-calling'],
-      },
-      'qwen-vl-plus': {
-        name: 'qwen-vl-plus',
-        displayName: 'Qwen VL Plus',
-        maxTokens: 128000,
-        features: ['streaming', 'vision'],
       },
     },
   },
@@ -281,7 +231,7 @@ export class ProviderRegistry {
       model: modelName,
       temperature: 0.7,
       maxTokens: modelConfig.maxTokens,
-      maxOutputTokens: 1000*200,
+      maxOutputTokens: 8000,
     };
 
     // 合并用户自定义配置

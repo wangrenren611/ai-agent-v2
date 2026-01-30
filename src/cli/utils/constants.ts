@@ -35,6 +35,7 @@ export const ICONS = {
 export const COLORS = {
   PRIMARY: 'cyan',
   SECONDARY: 'green',
+  ACCENT: 'yellowBright',
   ERROR: 'red',
   WARNING: 'yellow',
   INFO: 'blue',

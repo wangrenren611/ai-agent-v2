@@ -1,5 +1,5 @@
 {
-  "name": "ai-agent-v2",
+  "name": "code-aget",
   "version": "1.0.1",
   "description": "",
   "license": "ISC",
@@ -27,19 +27,16 @@
     "test:ui": "vitest --ui",
     "langfuse:demo": "cross-env NODE_ENV=development tsx src/examples/langfuse-demo.ts",
     "dev:permission": "cross-env NODE_ENV=development tsx src/cli/ui/permission-cli.tsx",
-    "dev:cli-v2": "cross-env NODE_ENV=development node -r esbuild-register src/cli-v2/index.ts",
-    "dev:cli-v2-ink": "cross-env NODE_ENV=development tsx src/cli-v2-ink/index.tsx",
-    "typecheck:cli-v2": "tsc --project src/cli-v2/tsconfig.json --noEmit",
     "setup:env": "bash ./scripts/setup-anthropic-key.sh",
     "test:env": "bash ./scripts/test-config.sh",
     "setup:provider": "bash ./scripts/config-provider.sh",
-    "dev:cli": "cross-env NODE_ENV=development tsx src/cli-v3-ink/index.tsx"
+    "dev:cli": "cross-env NODE_ENV=development tsx src/cli/index.tsx"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@types/dockerode": "^4.0.1",
     "@types/ink": "^2.0.3",
-    "@types/node": "^22.19.3",
+    "@types/node": "^22.19.7",
     "@types/prompts": "^2.4.9",
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.7",

@@ -21,7 +21,7 @@ export class Compaction {
 
   getToken(history: Message[],tools:any[]) {
     const totalUsed = this.calculateTotalUsage(history,tools);
-    const usableLimit = this.maxTokens - this.maxOutputTokens;
+    const usableLimit = this.maxTokens;
   
     return {
       totalUsed,
@@ -365,7 +365,7 @@ ${textToSummarize}
         },
       ],
       {
-        maxTokens: 8000,
+        maxOutputTokens: 8000,
         temperature: 0.3,
       },
     );

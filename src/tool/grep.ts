@@ -2,8 +2,11 @@ import { spawn } from 'node:child_process';
 import * as readline from 'node:readline';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { createRequire } from 'node:module';
 import { z } from 'zod';
 import { BaseTool, ToolResult } from './base';
+
+const require = createRequire(import.meta.url);
 
 const schema = z.object({
   pattern: z.string().min(1).describe('Regex pattern'),

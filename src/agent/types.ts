@@ -118,6 +118,10 @@ export interface AgentEvents {
     'complete': {  response: AgentResponse };
     /** 任务取消事件 */
     'cancelled': { reason: string };
+    "token-usage": {
+        usedTokens: number;
+        totalTokens: number;
+    }
 }
 
 // =============================================================================

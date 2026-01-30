@@ -1,6 +1,6 @@
 import { useInput } from 'ink';
 import type { Key as EventKey } from 'ink';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import React from 'react';
 import { ProviderType } from '../../providers/provider-registry';
 import useAgent from '../hooks/use-agent';
@@ -15,6 +15,11 @@ export type AppContextType = {
   setInput: (newInput: string) => void;  
   onSubmit: (newInput: string) => void;
   isLoading: boolean;
+  model: ProviderType;
+  usedTokens: {
+    usedTokens: number;
+    totalTokens: number;
+  };
 };
 
 const AppContext = createContext<AppContextType>({
@@ -26,6 +31,11 @@ const AppContext = createContext<AppContextType>({
   setInput: (newInput: string) => {},
   onSubmit: (newInput: string) => {},
   isLoading: false,
+  model: ProviderType.GLM,
+  usedTokens: {
+    usedTokens: 0,
+    totalTokens: 0,
+  },
 });
 // {
 //   upArrow: false,
@@ -48,8 +58,9 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode })=
    const [route, setRoute] = useState('/home');
    const [eventKey, setEventKey] = useState<EventKey>();
    const [input, setInput] = useState('');
-   const [model, setModel] = useState<ProviderType>(ProviderType.MINIMAX);
-   const {submitMessage, messages, isLoading} = useAgent({model});
+   const [model, setModel] = useState<ProviderType>(ProviderType.GLM);
+   const {submitMessage, messages, isLoading,usedTokens} = useAgent({model});
+
 
    const onRouteChange = (newRoute: string) => {
      setRoute(newRoute);
@@ -72,7 +83,7 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode })=
    }
   
     return (
-        <AppContext.Provider value={{ route, input, messages, setInput,onSubmit, setRoute: onRouteChange,isEscape: !!eventKey?.escape, isLoading }}>    
+        <AppContext.Provider value={{ route,model,usedTokens, input, messages, setInput,onSubmit, setRoute: onRouteChange,isEscape: !!eventKey?.escape, isLoading }}>    
             {children}
         </AppContext.Provider>
     );

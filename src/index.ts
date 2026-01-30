@@ -50,15 +50,20 @@ async function main() {
    await agent.start();
    console.log('[Agent] Agent started');
 
-   agent.run('当前目录有什么',{
-       stream:true,
-   });
-
+   // 先注册所有事件监听器
    agent.on('stream-chunk', (message) => {
-       // console.log(message.content);
        if ('content' in message && typeof message.content === 'string') {
          process.stdout.write(message.content || '');
        }
+   });
+
+   agent.on('token-usage', (data) => {
+       console.log('\n[Token Usage] Used:', data.usedTokens, 'Total:', data.totalTokens);
+   });
+
+   // 再执行 agent.run
+   agent.run('当前目录有什么',{
+       stream:true,
    });
 }
 

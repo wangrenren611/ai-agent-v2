@@ -126,7 +126,14 @@ export class Agent {
     // -------------------------------------------------------------------------
     // 公开方法
     // -------------------------------------------------------------------------
-
+    getUsedTokens(): {usedTokens: number, totalTokens: number} {
+        const history=this.sessionManager.getMessages();
+        const hasHistory= history?.length>0;
+        const allHistory=hasHistory? history as Message[]:[];
+      
+        const {totalUsed, usableLimit} = this.compaction.getToken(allHistory,[]);
+        return  {usedTokens: totalUsed, totalTokens:usableLimit};
+    }
     /** 启动 Agent，初始化会话 */
    async start(): Promise<void> {
        await  this.sessionManager.init();
@@ -271,8 +278,9 @@ export class Agent {
                 [{ role: 'system', content: this.systemPrompt } as Message, ...messages],
                 tools
             );
-            log('info', `totalUsed: ${totalUsed}/${usableLimit}`);
 
+            this.events.emit('token-usage', this.getUsedTokens());
+            
             const { isCompacted, list: llmMessages } = await this.compaction.compact(
                 [{ role: 'system', content: this.systemPrompt } as Message, ...messages],
                 tools
@@ -311,7 +319,6 @@ export class Agent {
                 // 构建 LLM 选项，优先使用运行时参数
                 const llmOptions = {
                     tools: tools.length > 0 ? tools : undefined,
-                    maxTokens: options?.maxTokens ?? this.llmProvider.config.maxTokens,
                     maxOutputTokens: options?.maxOutputTokens ?? this.llmProvider.config.maxOutputTokens,
                     stream: streamEnabled,
                     streamCallback: wrappedStreamCallback,

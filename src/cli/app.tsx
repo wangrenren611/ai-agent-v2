@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Box } from 'ink';
+import { Box ,Text} from 'ink';
 import Welcome from './components/welcome';
 import { ChatInput } from './components/chat-input';
 import MessageList from './components/message-list';
@@ -16,15 +16,18 @@ import { useAppContext } from './context/app';
 // ============================================================================
 
 const App: React.FC = () => {
- const { messages, isLoading } = useAppContext();
+ const { messages, isLoading ,model,usedTokens} = useAppContext();
 
   return (
     <Box flexDirection="column" >
-      <Welcome />
+      <Welcome  model={model} currentPath={process.cwd()} />
       {messages.length > 0 && <MessageList messages={messages} isLoading={isLoading} />}
       <Box marginBottom={messages?.length > 0 ? 2 : 0}>
        <ChatInput />
      </Box>
+      <Box marginTop={1}>
+        <Text color="gray">Context left: {Math.ceil(((1-usedTokens?.usedTokens/usedTokens?.totalTokens) || 0) * 100)}%</Text>
+      </Box>
   </Box>
   );
 };

@@ -3,10 +3,10 @@
  * 初始化并启动 AI Agent 应用
  * 支持从系统环境变量读取配置（类似 Claude Code）
  */
-import { Agent } from './agent/index.js';
-import { operatorPrompt } from './prompts/operator.js';
-import { registerDefaultToolsAsync, ToolRegistry } from './tool/index.js';
-import { ProviderRegistry, ProviderType } from './providers/provider-registry.js';
+import { Agent } from './agent';
+import { operatorPrompt } from './prompts/operator';
+import { registerDefaultToolsAsync, ToolRegistry } from './tool';
+import { ProviderRegistry, ProviderType } from './providers/provider-registry';
 import dotenv from 'dotenv';
 dotenv.config({
     path: './.env.development',

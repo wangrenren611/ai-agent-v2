@@ -52,7 +52,7 @@ export type StreamChunk = {
 export type StreamCallback = (chunk: StreamChunk) => void
 
 export interface LLMOptions {
-  maxTokens?: number
+  maxOutputTokens?: number
   temperature?: number,
   system_prompt?: string
   tools?: ToolSchema[]
