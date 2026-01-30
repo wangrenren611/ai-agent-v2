@@ -52,7 +52,6 @@ async function main() {
 
    agent.run('当前目录有什么',{
        stream:true,
-
    });
 
    agent.on('stream-chunk', (message) => {
