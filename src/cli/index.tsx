@@ -50,7 +50,6 @@ process.on('unhandledRejection', (reason, promise) => {
 // ============================================================================
 
 const shutdown = (signal: string) => {
-  console.log(`\nReceived ${signal}, shutting down gracefully...`);
   process.exit(0);
 };
 

@@ -45,7 +45,7 @@ export class HTTPClient {
 
   constructor(options: HttpClientOptions = {}) {
     this.defaultTimeout = options.timeout ?? 1000*60*10;
-    this.maxRetries = options.maxRetries ?? 3;
+    this.maxRetries = options.maxRetries ?? 10;
     this.initialRetryDelay = options.initialRetryDelay ?? 1000;
     this.maxRetryDelay = options.maxRetryDelay ?? 10000;
     this.debug = options.debug ?? false;
@@ -67,7 +67,7 @@ export class HTTPClient {
     while (attempt <= maxRetries) {
       try {
         if (this.debug) {
-          console.log(`[HTTPClient] Attempt ${attempt + 1}/${maxRetries + 1}: ${options.method || 'GET'} ${url}`);
+          // console.log(`[HTTPClient] Attempt ${attempt + 1}/${maxRetries + 1}: ${options.method || 'GET'} ${url}`);
         }
 
         const response = await this.fetchWithTimeout(url, options, timeout);
@@ -84,12 +84,12 @@ export class HTTPClient {
 
           lastError = error;
           attempt++;
-
+          
           // Calculate delay before retry
           if (attempt <= maxRetries) {
             const delay = this.calculateRetryDelay(attempt, error as LLMRetryableError);
             if (this.debug) {
-              console.log(`[HTTPClient] Retrying after ${delay}ms...`);
+              // console.log(`[HTTPClient] Retrying after ${delay}ms...`);
             }
             await this.sleep(delay);
             continue;
@@ -108,7 +108,7 @@ export class HTTPClient {
           if (attempt <= maxRetries) {
             const delay = this.calculateRetryDelay(attempt);
             if (this.debug) {
-              console.log(`[HTTPClient] Network error, retrying after ${delay}ms...`);
+              // console.log(`[HTTPClient] Network error, retrying after ${delay}ms...`);
             }
             await this.sleep(delay);
             continue;

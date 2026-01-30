@@ -395,7 +395,7 @@ export class EventBus {
   private handleError(event: string, error: unknown, context: EventContext): void {
     const metrics = this.getOrCreateMetrics(event);
     metrics.errors++;
-    console.error(`EventBus error for event "${event}":`, error, context);
+    // console.error(`EventBus error for event "${event}":`, error, context);
   }
 
   private generateCorrelationId(): string {

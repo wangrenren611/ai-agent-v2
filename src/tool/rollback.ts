@@ -39,8 +39,8 @@ export class RollbackTool extends BaseTool<any> {
         }
 
         if (success) {
-            console.log(chalk.green(`\n[Rollback] 已恢复文件: ${filePath}`));
-            console.log(chalk.gray(`备份 ID: ${backupId}`));
+            // console.log(chalk.green(`\n[Rollback] 已恢复文件: ${filePath}`));
+            // console.log(chalk.gray(`备份 ID: ${backupId}`));
             return this.success({ filePath, backupId, restored: true });
         } else {
             return this.fail(
@@ -80,16 +80,16 @@ export class ListBackupsTool extends BaseTool<any> {
             sizeFormatted: backup.size > 1024 ? `${(backup.size / 1024).toFixed(2)} KB` : `${backup.size} B`,
         }));
 
-        console.log(chalk.bold(`\n文件 ${filePath} 的备份列表:`));
+        // console.log(chalk.bold(`\n文件 ${filePath} 的备份列表:`));
 
-        formattedBackups.forEach((backup, index) => {
-            console.log(
-                chalk.yellow(`${index + 1}. 备份 ID: ${backup.id}`) +
-                chalk.gray(` (${backup.createdAt}, ${backup.sizeFormatted})`)
-            );
-        });
+        // formattedBackups.forEach((backup, index) => {
+        //     // console.log(
+        //         chalk.yellow(`${index + 1}. 备份 ID: ${backup.id}`) +
+        //         chalk.gray(` (${backup.createdAt}, ${backup.sizeFormatted})`)
+        //     );
+        // });
 
-        console.log(chalk.gray('使用 rollback_file 工具恢复到指定备份'));
+        // console.log(chalk.gray('使用 rollback_file 工具恢复到指定备份'));
 
         return this.success({ filePath, backups: formattedBackups });
     }
@@ -126,7 +126,7 @@ export class CleanBackupsTool extends BaseTool<any> {
             return this.fail(`Clean operation failed: ${error}`, { code: 'CLEAN_FAILED' });
         }
 
-        console.log(chalk.yellow(`\n[Clean] 已清理文件 ${filePath} 的所有备份`));
+        // console.log(chalk.yellow(`\n[Clean] 已清理文件 ${filePath} 的所有备份`));
 
         return this.success({ filePath, cleaned: true });
     }

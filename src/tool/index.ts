@@ -2,7 +2,7 @@
  * Tool Registry - 工具注册中心
  *
  * 管理所有可用的工具，提供统一的工具执行接口
- * 
+ *
  * @example
  * ```ts
  * import { ToolRegistry } from './index';
@@ -31,8 +31,10 @@ import { initializeMcp } from '../mcp/index';
 import { WebSearchTool } from './web-search';
 import { WebFetchTool } from './web-fetch';
 import { SkillTool, initializeSkills } from '../skills';
+import { LspTool } from './lsp';
 
 // =============================================================================
+
 // 重新导出
 // =============================================================================
 
@@ -41,15 +43,25 @@ export { BaseTool } from './base';
 export type { ToolResult } from './base';
 
 // =============================================================================
+
 // 默认工具注册
 // =============================================================================
 
+// 标志：确保只注册一次
+let toolsRegistered = false;
+
 /**
  * 注册所有默认工具（同步版本）
- * 
+ *
  * 在应用启动时调用此函数
  */
 export function registerDefaultTools(): void {
+  // 防止重复注册
+  if (toolsRegistered) {
+    return;
+  }
+  toolsRegistered = true;
+
   ToolRegistry.register([
     new BashTool(),
     new GlobTool(),
@@ -60,6 +72,7 @@ export function registerDefaultTools(): void {
     new BatchReplaceTool(),
     new WebSearchTool(),
     new WebFetchTool(),
+    new LspTool(),
     new SkillTool(),
     ...TodoTools(),
   ]);
@@ -67,12 +80,12 @@ export function registerDefaultTools(): void {
 
 /**
  * 注册所有工具（异步版本，包括 MCP 服务器工具）
- * 
+ *
  * 在应用启动时调用此函数，异步加载 MCP 服务器
- * 
+ *
  * @param configPath - MCP 配置文件路径（可选）
  * @returns MCP 管理器实例
- * 
+ *
  * @example
  * ```ts
  * import { registerDefaultToolsAsync } from './tool';
@@ -85,15 +98,20 @@ export function registerDefaultTools(): void {
  * ```
  */
 export async function registerDefaultToolsAsync(configPath?: string) {
-  // 初始化技能加载器（在注册 SkillTool 之前）
-  try {
-    await initializeSkills();
-  } catch (error) {
-    console.warn('[Skills] Failed to initialize skills:', error);
-  }
+  // 防止重复注册
+  if (toolsRegistered) {
+    // 已经注册过，只初始化 MCP（如果需要）
+  } else {
+    // 初始化技能加载器（在注册 SkillTool 之前）
+    try {
+      await initializeSkills();
+    } catch (error) {
+      // console.warn('[Skills] Failed to initialize skills:', error);
+    }
 
-  // 注册内置工具
-  registerDefaultTools();
+    // 注册内置工具
+    registerDefaultTools();
+  }
 
   // 初始化 MCP 服务器（如果配置文件存在）
   try {
@@ -102,20 +120,21 @@ export async function registerDefaultToolsAsync(configPath?: string) {
     const totalTools = manager.getTotalToolsCount();
 
     if (servers.length > 0) {
-      console.log(`[MCP] Loaded ${totalTools} tools from ${servers.length} server(s)`);
+      // console.log(`[MCP] Loaded ${totalTools} tools from ${servers.length} server(s)`);
     }
 
     return manager;
   } catch (error) {
     // MCP 加载失败不应该阻止应用启动
     if (error instanceof Error && !error.message.includes('not found')) {
-      console.warn('[MCP] Failed to load MCP servers:', error.message);
+      // console.warn('[MCP] Failed to load MCP servers:', error.message);
     }
     return null;
   }
 }
 
 // =============================================================================
+
 // 工具导出
 // =============================================================================
 

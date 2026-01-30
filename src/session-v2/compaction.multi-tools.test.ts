@@ -72,7 +72,7 @@ describe('Multi-Tool Bug Fix Verification', () => {
         const tools = result.list.filter(m => m.role === 'tool');
         expect(tools.length).toBe(4);
 
-        console.log('Multi-tool bug fix verified: All 4 tool responses preserved');
+        // console.log('Multi-tool bug fix verified: All 4 tool responses preserved');
     });
 
     it('should handle multiple assistants each with multiple tool_calls', async () => {
@@ -128,7 +128,7 @@ describe('Multi-Tool Bug Fix Verification', () => {
         // Verify tools exist
         expect(tools.length).toBeGreaterThanOrEqual(2);
 
-        console.log('Multiple assistants with multiple tools handled correctly');
+        // console.log('Multiple assistants with multiple tools handled correctly');
     });
 
     it('should handle user exact scenario: 3 concurrent tool calls split by zone', async () => {
@@ -182,6 +182,6 @@ describe('Multi-Tool Bug Fix Verification', () => {
         const tools = result.list.filter(m => m.role === 'tool');
         expect(tools.length).toBe(3);
 
-        console.log('User scenario verified: All 3 tool responses preserved after compression');
+        // console.log('User scenario verified: All 3 tool responses preserved after compression');
     });
 });

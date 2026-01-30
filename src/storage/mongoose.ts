@@ -15,7 +15,7 @@ export const connectDB = async () => {
     Log.info("mongoose success!!!")
     // 监听连接事件
     mongoose.connection.on('error', (err) => {
-      console.error('MongoDB connection error:', err);
+      // console.error('MongoDB connection error:', err);
     });
 
     return conn;
@@ -23,7 +23,7 @@ export const connectDB = async () => {
 
   } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`Error connecting to MongoDB: ${message}`);
+      // console.error(`Error connecting to MongoDB: ${message}`);
       process.exit(1);
   }
 

@@ -10,10 +10,10 @@ import { Message } from "./message";
 // =============================================================================
 
 export const DEFAULT_MAX_LOOP = 1024;
-export const DEFAULT_NO_PROGRESS_LIMIT = 2;
+export const DEFAULT_NO_PROGRESS_LIMIT = 10;
 export const DEFAULT_MAX_OUTPUT_TOKENS = 8000;
 export const DEFAULT_MAX_TOKENS = 16000;
-export const MAX_NETWORK_RETRIES = 3;
+export const MAX_NETWORK_RETRIES = 10;
 export const VALID_FINISH_REASONS = ['stop', 'eos', undefined] as const;
 
 /** Temperature 默认值 */

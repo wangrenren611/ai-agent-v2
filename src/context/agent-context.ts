@@ -308,7 +308,7 @@ export class AgentContext extends EventEmitter {
             await fs.mkdir(this.sessionCacheDir, { recursive: true });
             this.emit('cache:cleared' as any, reason);
         } catch (error) {
-            console.error('[Context] Failed to clear cache:', error);
+            // console.error('[Context] Failed to clear cache:', error);
         }
     }
 
@@ -385,7 +385,7 @@ export class AgentContext extends EventEmitter {
         await fs.mkdir(this.sessionConfig.sessionDir, { recursive: true });
 
         this.emit('session:changed' as any, oldSession, newSessionId);
-        console.log(`[Context] Switched session: ${oldSession} -> ${newSessionId}`);
+        // console.log(`[Context] Switched session: ${oldSession} -> ${newSessionId}`);
     }
 
     /**
@@ -546,7 +546,7 @@ export class AgentContext extends EventEmitter {
      */
     setSecurityMode(mode: 'prompt' | 'block' | 'allow'): void {
         this.securityConfig.dangerousMode = mode;
-        console.log(`[Context] Security mode set to: ${mode}`);
+        // console.log(`[Context] Security mode set to: ${mode}`);
     }
 
     /**

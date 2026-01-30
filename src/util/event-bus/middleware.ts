@@ -21,25 +21,25 @@ export function createLoggingMiddleware(source?: string): Middleware {
     const startTime = Date.now();
     const sourceLabel = source || 'EventBus';
 
-    console.log(`[${sourceLabel}] Event started: ${context.event}`, {
-      correlationId: context.metadata.correlationId,
-      timestamp: new Date(context.metadata.timestamp).toISOString(),
-    });
+    // console.log(`[${sourceLabel}] Event started: ${context.event}`, {
+    //   correlationId: context.metadata.correlationId,
+    //   timestamp: new Date(context.metadata.timestamp).toISOString(),
+    // });
 
     try {
       await next();
       const duration = Date.now() - startTime;
-      console.log(`[${sourceLabel}] Event completed: ${context.event}`, {
-        correlationId: context.metadata.correlationId,
-        duration: `${duration}ms`,
-      });
+      // console.log(`[${sourceLabel}] Event completed: ${context.event}`, {
+      //   correlationId: context.metadata.correlationId,
+      //   duration: `${duration}ms`,
+      // });
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.error(`[${sourceLabel}] Event failed: ${context.event}`, {
-        correlationId: context.metadata.correlationId,
-        duration: `${duration}ms`,
-        error,
-      });
+      // console.error(`[${sourceLabel}] Event failed: ${context.event}`, {
+      //   correlationId: context.metadata.correlationId,
+      //   duration: `${duration}ms`,
+      //   error,
+      // });
     }
   };
 }

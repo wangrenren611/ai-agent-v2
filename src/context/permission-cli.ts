@@ -53,19 +53,19 @@ export class PermissionCLI {
      * 处理确认请求
      */
     private async handleConfirmation(request: ConfirmationRequest): Promise<void> {
-        console.log('\n' + '='.repeat(60));
-        console.log('⚠️  危险操作警告');
-        console.log('='.repeat(60));
-        console.log(`操作类型: ${request.operation}`);
-        console.log(`风险等级: ${this.formatRiskLevel(request.riskLevel)}`);
-        console.log(`命令: ${request.command}`);
+        // console.log('\n' + '='.repeat(60));
+        // console.log('⚠️  危险操作警告');
+        // console.log('='.repeat(60));
+        // console.log(`操作类型: ${request.operation}`);
+        // console.log(`风险等级: ${this.formatRiskLevel(request.riskLevel)}`);
+        // console.log(`命令: ${request.command}`);
         if (request.affectedPath) {
-            console.log(`影响路径: ${request.affectedPath}`);
+            // console.log(`影响路径: ${request.affectedPath}`);
         }
-        console.log(`时间: ${request.timestamp.toLocaleString()}`);
-        console.log('-'.repeat(60));
-        console.log('此操作需要用户确认才能执行');
-        console.log('='.repeat(60));
+        // console.log(`时间: ${request.timestamp.toLocaleString()}`);
+        // console.log('-'.repeat(60));
+        // console.log('此操作需要用户确认才能执行');
+        // console.log('='.repeat(60));
 
         const answer = await this.askQuestion(
             '是否允许执行此操作? (y/n/a - yes/no/always): '
@@ -81,7 +81,7 @@ export class PermissionCLI {
             case 'always':
                 confirmed = true;
                 this.context.setSecurityMode('allow');
-                console.log('已切换到"允许所有操作"模式');
+                // console.log('已切换到"允许所有操作"模式');
                 break;
             default:
                 confirmed = false;
@@ -91,9 +91,9 @@ export class PermissionCLI {
         this.context.handleConfirmation(request.id, confirmed);
 
         if (confirmed) {
-            console.log('✅ 操作已允许');
+            // console.log('✅ 操作已允许');
         } else {
-            console.log('❌ 操作已拒绝');
+            // console.log('❌ 操作已拒绝');
         }
     }
 

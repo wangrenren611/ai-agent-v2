@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
 // 构建dist目录中的主文件路径
-const mainFile = path.join(projectRoot, 'dist', 'cli-v3-ink/index.js');
+const mainFile = path.join(projectRoot, 'dist', 'cli/index.js');
 
 // 检查文件是否存在
 if (!fs.existsSync(mainFile)) {
@@ -27,10 +27,10 @@ const args = process.argv.slice(2);
 // 处理帮助和版本参数（不需要 TTY）
 if (args.includes('--help') || args.includes('-h')) {
   console.log(`
-AI Agent v2 - CLI Assistant
+Coding Agent - CLI Assistant
 
 Usage:
-  Qpscode [options]
+  qcode [options]
 
 Options:
   --help, -h     Show this help message

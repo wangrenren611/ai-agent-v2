@@ -18,7 +18,7 @@ describe('GrepTool', () => {
   const skipIfRipgrepUnavailable = async (testFn: () => Promise<void>) => {
     const available = await isRipgrepAvailable();
     if (!available) {
-      console.warn('Skipping test: ripgrep not available');
+      // console.warn('Skipping test: ripgrep not available');
       return;
     }
     await testFn();

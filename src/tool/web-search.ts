@@ -14,7 +14,7 @@ export class WebSearchTool extends BaseTool<any> {
     query: string;
     maxResults?: number;
   }): Promise<ToolResult> {
-    console.log(`🔍 搜索请求: "${query}"`);
+    // console.log(`🔍 搜索请求: "${query}"`);
 
     // === 业务错误：API Key 未配置 ===
     if (!process.env.TAVILY_API_KEY) {
@@ -44,7 +44,7 @@ export class WebSearchTool extends BaseTool<any> {
     const summarizedResults = results.map((r: any) => ({
       title: r.title,
       url: r.url,
-      content: r.content ? r.content.slice(0, 300) + (r.content.length > 300 ? '...' : '') : '',
+      content: r.content || '',
       score: r.score
     }));
 

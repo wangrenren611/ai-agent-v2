@@ -90,7 +90,7 @@ describe('Compaction - 并发工具调用修复验证', () => {
       expect(hasMatchingReply).toBe(true);
     }
 
-    console.log('✓ 场景1 通过：4个并发工具调用被正确保留');
+    // console.log('✓ 场景1 通过：4个并发工具调用被正确保留');
   });
 
   it('场景2: 3个并发工具调用，只有2个在保护区内', async () => {
@@ -145,7 +145,7 @@ describe('Compaction - 并发工具调用修复验证', () => {
     const tools = result.list.filter(m => m.role === 'tool');
     expect(tools.length).toBe(3);
 
-    console.log('✓ 场景2 通过：3个并发工具调用被正确保留');
+    // console.log('✓ 场景2 通过：3个并发工具调用被正确保留');
   });
 
   it('场景3: 单个工具调用不应该影响压缩', async () => {
@@ -189,6 +189,6 @@ describe('Compaction - 并发工具调用修复验证', () => {
     expect(assistant).toBeDefined();
     expect(tool).toBeDefined();
 
-    console.log('✓ 场景3 通过：单个工具调用被正确保留');
+    // console.log('✓ 场景3 通过：单个工具调用被正确保留');
   });
 });

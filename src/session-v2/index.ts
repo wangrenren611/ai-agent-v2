@@ -78,7 +78,7 @@ export class SessionManager {
           { flag: 'a' }
         );
       } catch (err) {
-        console.error('Session save error:', err);
+        // console.error('Session save error:', err);
       }
     });
   }

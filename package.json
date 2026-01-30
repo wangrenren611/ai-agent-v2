@@ -1,16 +1,17 @@
 {
-  "name": "code-aget",
-  "version": "1.0.1",
-  "description": "",
+  "name": "qcode-agent",
+  "version": "0.0.1",
+  "description": "Coding Agent - CLI Assistant",
   "license": "ISC",
-  "author": "",
+  "author": "wangrenren611@gmail.com",
   "type": "module",
   "main": "bin/index.js",
   "bin": {
-    "Qpscode": "bin/index.js"
+    "qcode": "bin/index.js"
   },
   "files": [
-    "bin/index.js"
+    "bin/index.js",
+    "dist"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",

@@ -28,7 +28,7 @@ let langfuseClient: Langfuse | null = null;
  */
 export function getLangfuseClient(): Langfuse | null {
     if (!LANGFUSE_PUBLIC_KEY || !LANGFUSE_SECRET_KEY) {
-        console.warn('[Langfuse] Missing credentials. Set LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY environment variables.');
+        // console.warn('[Langfuse] Missing credentials. Set LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY environment variables.');
         return null;
     }
 
@@ -38,7 +38,7 @@ export function getLangfuseClient(): Langfuse | null {
             secretKey: LANGFUSE_SECRET_KEY,
             baseUrl: LANGFUSE_BASE_URL,
         });
-        console.log('[Langfuse] Client initialized');
+        // console.log('[Langfuse] Client initialized');
     }
 
     return langfuseClient;
@@ -133,9 +133,9 @@ export async function flushTraces() {
 
     try {
         await client.flushAsync();
-        console.log('[Langfuse] Traces flushed');
+        // console.log('[Langfuse] Traces flushed');
     } catch (error) {
-        console.error('[Langfuse] Failed to flush traces:', error);
+        // console.error('[Langfuse] Failed to flush traces:', error);
     }
 }
 

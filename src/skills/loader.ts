@@ -68,7 +68,7 @@ export class SkillLoader {
         } catch (error) {
             // 技能目录不存在是可接受的
             if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-                console.warn(`[Skills] Failed to load skills: ${(error as Error).message}`);
+                // console.warn(`[Skills] Failed to load skills: ${(error as Error).message}`);
             }
         }
     }
@@ -86,13 +86,13 @@ export class SkillLoader {
 
             // 验证技能名称
             if (!this.isValidSkillName(parsed.metadata.name)) {
-                console.warn(`[Skills] Invalid skill name: ${parsed.metadata.name}`);
+                // console.warn(`[Skills] Invalid skill name: ${parsed.metadata.name}`);
                 return;
             }
 
             // 验证描述长度
             if (parsed.metadata.description.length > 1024) {
-                console.warn(`[Skills] Description too long for skill: ${parsed.metadata.name}`);
+                // console.warn(`[Skills] Description too long for skill: ${parsed.metadata.name}`);
                 return;
             }
 
@@ -103,7 +103,7 @@ export class SkillLoader {
 
             this.skills.set(parsed.metadata.name, skill);
         } catch (error) {
-            console.warn(`[Skills] Failed to load skill ${skillPath}: ${(error as Error).message}`);
+            // console.warn(`[Skills] Failed to load skill ${skillPath}: ${(error as Error).message}`);
         }
     }
 

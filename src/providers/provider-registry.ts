@@ -322,9 +322,8 @@ export class ProviderRegistry {
   /**
    * 获取指定厂商的所有模型
    */
-  static listModels(providerType: ProviderType): ModelConfig[] {
-    const metadata = PROVIDER_METADATA[providerType];
-    return Object.values(metadata.models);
+  static getModels(): ProviderType[] {
+    return Object.keys(PROVIDER_METADATA) as ProviderType[];
   }
 
   /**

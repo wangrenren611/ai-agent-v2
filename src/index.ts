@@ -24,15 +24,15 @@ async function main() {
    // 直接使用系统环境变量（类似 Claude Code）
    // 如果需要 .env 文件支持，可以在 shell 中执行 source .env.development
 
-   console.log('[Agent] Initializing Agent...');
-   console.log('[Agent] Configuration source: System environment variables');
+   // console.log('[Agent] Initializing Agent...');
+   // console.log('[Agent] Configuration source: System environment variables');
 
 
 
-   console.log('[Agent] Provider created successfully');
+   // console.log('[Agent] Provider created successfully');
 
    await registerDefaultToolsAsync();
-   console.log('[Agent] Tools registered');
+   // console.log('[Agent] Tools registered');
 
 
    const agent = new Agent({
@@ -48,7 +48,7 @@ async function main() {
    });
 
    await agent.start();
-   console.log('[Agent] Agent started');
+   // console.log('[Agent] Agent started');
 
    // 先注册所有事件监听器
    agent.on('stream-chunk', (message) => {
@@ -58,7 +58,7 @@ async function main() {
    });
 
    agent.on('token-usage', (data) => {
-       console.log('\n[Token Usage] Used:', data.usedTokens, 'Total:', data.totalTokens);
+       // console.log('\n[Token Usage] Used:', data.usedTokens, 'Total:', data.totalTokens);
    });
 
    // 再执行 agent.run
@@ -68,6 +68,6 @@ async function main() {
 }
 
 main().catch((error) => {
-   console.error('[Agent] Failed to start:', error);
+   // console.error('[Agent] Failed to start:', error);
    process.exit(1);
 });

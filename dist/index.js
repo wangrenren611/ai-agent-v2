@@ -23,11 +23,11 @@ async function main() {
     // 注意：不再强制加载 .env 文件
     // 直接使用系统环境变量（类似 Claude Code）
     // 如果需要 .env 文件支持，可以在 shell 中执行 source .env.development
-    console.log('[Agent] Initializing Agent...');
-    console.log('[Agent] Configuration source: System environment variables');
-    console.log('[Agent] Provider created successfully');
+    // console.log('[Agent] Initializing Agent...');
+    // console.log('[Agent] Configuration source: System environment variables');
+    // console.log('[Agent] Provider created successfully');
     await registerDefaultToolsAsync();
-    console.log('[Agent] Tools registered');
+    // console.log('[Agent] Tools registered');
     const agent = new Agent({
         llmProvider: ProviderRegistry.createFromEnv(ProviderType.GLM),
         systemPrompt: operatorPrompt({
@@ -39,18 +39,22 @@ async function main() {
         tools: ToolRegistry.getSchemas(),
     });
     await agent.start();
-    console.log('[Agent] Agent started');
-    agent.run('当前目录有什么', {
-        stream: true,
-    });
+    // console.log('[Agent] Agent started');
+    // 先注册所有事件监听器
     agent.on('stream-chunk', (message) => {
-        // console.log(message.content);
         if ('content' in message && typeof message.content === 'string') {
             process.stdout.write(message.content || '');
         }
     });
+    agent.on('token-usage', (data) => {
+        // console.log('\n[Token Usage] Used:', data.usedTokens, 'Total:', data.totalTokens);
+    });
+    // 再执行 agent.run
+    agent.run('当前目录有什么', {
+        stream: true,
+    });
 }
 main().catch((error) => {
-    console.error('[Agent] Failed to start:', error);
+    // console.error('[Agent] Failed to start:', error);
     process.exit(1);
 });

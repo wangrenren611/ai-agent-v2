@@ -83,7 +83,8 @@ export class ToolRegistry {
     const tools = Array.isArray(tool) ? tool : [tool];
     for (const t of tools) {
       if (this.tools.has(t.name)) {
-        throw new Error(`Tool "${t.name}" is already registered`);
+        // 静默忽略重复注册（可能是 React StrictMode 重新挂载）
+        continue;
       }
       this.tools.set(t.name, t);
 

@@ -95,7 +95,7 @@ export class BatchReplaceTool extends BaseTool<any> {
 
       // === 警告：同一行多次替换 ===
       if (processedLines.has(line)) {
-        console.log(chalk.yellow(`[Warning] Multiple replacements on line ${line}. Each uses the original line content.`));
+        // console.log(chalk.yellow(`[Warning] Multiple replacements on line ${line}. Each uses the original line content.`));
       }
       processedLines.add(line);
 
@@ -118,9 +118,9 @@ export class BatchReplaceTool extends BaseTool<any> {
 
       results.push({ line, success: true });
 
-      console.log(chalk.yellow(`[Batch Edit] ${filePath}:${line}`));
-      console.log(chalk.red(`- ${originalLine.trim()}`));
-      console.log(chalk.green(`+ ${newLine.trim()}`));
+      // console.log(chalk.yellow(`[Batch Edit] ${filePath}:${line}`));
+      // console.log(chalk.red(`- ${originalLine.trim()}`));
+      // console.log(chalk.green(`+ ${newLine.trim()}`));
     }
 
     // === 写入文件（保留原换行符类型）===
@@ -137,7 +137,7 @@ export class BatchReplaceTool extends BaseTool<any> {
 
     const failedCount = results.filter(r => !r.success).length;
     const summary = `\nModified ${modifiedCount}/${replacements.length} replacements in ${filePath}`;
-    console.log(chalk.green(summary));
+    // console.log(chalk.green(summary));
 
     // === 返回结果 ===
     if (failedCount > 0) {

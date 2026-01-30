@@ -84,7 +84,7 @@ export class McpManager {
 
       // 监听错误
       client.on('error', (error) => {
-        console.error(`[MCP:${config.name}] Error:`, error.message);
+        // console.error(`[MCP:${config.name}] Error:`, error.message);
       });
 
       // 连接到服务器
@@ -103,7 +103,7 @@ export class McpManager {
       // 更新连接信息
       this.updateConnectionInfo(config.name, client, ConnectionState.Connected);
 
-      console.log(`[MCP] Connected to "${config.name}" with ${toolsResponse.tools.length} tools`);
+      // console.log(`[MCP] Connected to "${config.name}" with ${toolsResponse.tools.length} tools`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.connectionInfo.set(config.name, {
@@ -139,7 +139,7 @@ export class McpManager {
     this.clients.delete(serverName);
     this.connectionInfo.delete(serverName);
 
-    console.log(`[MCP] Disconnected from "${serverName}"`);
+    // console.log(`[MCP] Disconnected from "${serverName}"`);
   }
 
   /**
@@ -180,7 +180,7 @@ export class McpManager {
     // 更新连接信息
     this.updateConnectionInfo(serverName, client, ConnectionState.Connected);
 
-    console.log(`[MCP] Refreshed ${toolsResponse.tools.length} tools from "${serverName}"`);
+    // console.log(`[MCP] Refreshed ${toolsResponse.tools.length} tools from "${serverName}"`);
   }
 
   // -------------------------------------------------------------------------

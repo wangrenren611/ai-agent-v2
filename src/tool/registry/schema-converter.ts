@@ -83,7 +83,7 @@ export class SchemaConverter {
       case 'ZodDefault':
         const wrappedType = def.innerType || def.schema || def.type;
         if (!wrappedType) {
-          console.warn(`Missing wrapped type for field: ${key}, def:`, def);
+          // console.warn(`Missing wrapped type for field: ${key}, def:`, def);
           return {};
         }
         return this.zodTypeToJsonSchema(wrappedType._def || wrappedType, key);
@@ -109,9 +109,9 @@ export class SchemaConverter {
 
       default:
         if (typeName !== undefined) {
-          console.warn(`Unknown Zod type: ${typeName} for field: ${key}`);
+          // console.warn(`Unknown Zod type: ${typeName} for field: ${key}`);
         } else {
-          console.warn(`Undefined Zod type definition for field: ${key}, def:`, def);
+          // console.warn(`Undefined Zod type definition for field: ${key}, def:`, def);
         }
         return {};
     }
@@ -162,7 +162,7 @@ export class SchemaConverter {
   private static convertEffects(def: any, key?: string): Record<string, unknown> {
     const effectType = def.innerType || def.schema || def.type;
     if (!effectType) {
-      console.warn(`Missing effect inner type for field: ${key}, def:`, def);
+      // console.warn(`Missing effect inner type for field: ${key}, def:`, def);
       return {};
     }
     const innerSchema = this.zodTypeToJsonSchema(effectType._def || effectType, key);

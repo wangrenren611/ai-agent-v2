@@ -158,7 +158,7 @@ async function extractTextFromHTML(html: string): Promise<string> {
     // 处理需要跳过的元素
     .on('script, style, noscript, iframe, object, embed', {
       element(element: any) {
-        skipContent = true;
+       // skipContent = true;
       },
       text(input: any) {
         // 跳过这些元素内的文本

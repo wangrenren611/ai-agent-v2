@@ -80,7 +80,7 @@ export class McpClient extends EventEmitter {
     this.setState(ConnectionState.Connecting);
 
     try {
-      console.log(`[MCP:${this.serverName}] Starting process: ${this.config.command} ${(this.config.args || []).join(' ')}`);
+      // console.log(`[MCP:${this.serverName}] Starting process: ${this.config.command} ${(this.config.args || []).join(' ')}`);
 
       // 启动服务器进程
       // Windows 上需要 shell: true 来正确执行 .cmd 文件
@@ -93,41 +93,41 @@ export class McpClient extends EventEmitter {
       // 设置输出处理
       this.process.stdout?.on('data', (data: Buffer) => {
         const output = data.toString();
-        console.log(`[MCP:${this.serverName}] stdout:`, output);
+        // console.log(`[MCP:${this.serverName}] stdout:`, output);
         this.handleMessage(output);
       });
 
       // 设置错误处理
       this.process.stderr?.on('data', (data: Buffer) => {
         const output = data.toString();
-        console.error(`[MCP:${this.serverName}] stderr:`, output);
+        // console.error(`[MCP:${this.serverName}] stderr:`, output);
         this.emit('stderr', output);
       });
 
       // 设置进程退出处理
       this.process.on('close', (code) => {
-        console.log(`[MCP:${this.serverName}] Process closed with code ${code}`);
+        // console.log(`[MCP:${this.serverName}] Process closed with code ${code}`);
         this.setState(ConnectionState.Disconnected);
         this.emit('close', code);
         this.rejectAllPendingRequests(new Error(`Process closed with code ${code}`));
       });
 
       this.process.on('error', (error) => {
-        console.error(`[MCP:${this.serverName}] Process error:`, error.message);
+        // console.error(`[MCP:${this.serverName}] Process error:`, error.message);
         this.setState(ConnectionState.Error);
         this.emit('error', error);
         this.rejectAllPendingRequests(error);
       });
 
       // 初始化握手
-      console.log(`[MCP:${this.serverName}] Sending initialize request...`);
+      // console.log(`[MCP:${this.serverName}] Sending initialize request...`);
       await this.initialize();
 
       this.setState(ConnectionState.Connected);
-      console.log(`[MCP:${this.serverName}] Connected successfully`);
+      // console.log(`[MCP:${this.serverName}] Connected successfully`);
       this.emit('connected');
     } catch (error) {
-      console.error(`[MCP:${this.serverName}] Connection failed:`, error);
+      // console.error(`[MCP:${this.serverName}] Connection failed:`, error);
       this.setState(ConnectionState.Error);
       throw error;
     }

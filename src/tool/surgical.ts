@@ -115,9 +115,9 @@ Use this tool when:
       throw new Error(`Failed to write file: ${error}`);
     }
 
-    console.log(chalk.yellow(`\n[Edit] Modified ${filePath}:${line} (${oldTextLines.length} lines → ${newTextLines.length} lines)`));
-    console.log(chalk.red(`- ${oldTextLines.slice(0, 2).join('\n')}${oldTextLines.length > 2 ? '\n...' : ''}`));
-    console.log(chalk.green(`+ ${newTextLines.slice(0, 2).join('\n')}${newTextLines.length > 2 ? '\n...' : ''}`));
+    // console.log(chalk.yellow(`\n[Edit] Modified ${filePath}:${line} (${oldTextLines.length} lines → ${newTextLines.length} lines)`));
+    // console.log(chalk.red(`- ${oldTextLines.slice(0, 2).join('\n')}${oldTextLines.length > 2 ? '\n...' : ''}`));
+    // console.log(chalk.green(`+ ${newTextLines.slice(0, 2).join('\n')}${newTextLines.length > 2 ? '\n...' : ''}`);
 
     // 返回格式化的字符串结果
     let resultMessage = `Modification successful`;

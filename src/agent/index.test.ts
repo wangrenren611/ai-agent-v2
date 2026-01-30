@@ -752,7 +752,7 @@ describe('Agent Session Management', () => {
             await agent.sessionManager.clearAll();
         } catch (e) {
             // 忽略文件系统错误，这不是这个测试的重点
-            console.warn('Session clear error (ignoring):', e);
+            // console.warn('Session clear error (ignoring):', e);
         }
 
         // 验证消息已清空

@@ -196,18 +196,18 @@ export class OpenAICompatibleProvider extends LLMProvider {
         },
       });
     } catch (error) {
-      console.error('Stream processing error:', error);
+      // console.error('Stream processing error:', error);
       throw error;
     }
 
     const hasToolCalls = toolCallsMap.size > 0;
     if (!accumulatedContent && !hasToolCalls && finishReason !== 'stop') {
-      console.warn('Stream ended with no content, no tool calls, and finishReason:', finishReason);
+      // console.warn('Stream ended with no content, no tool calls, and finishReason:', finishReason);
       throw new Error('Empty content in response without tool calls or stop reason');
     }
 
     if (!accumulatedContent && !hasToolCalls && finishReason === 'stop') {
-      console.warn('Stream ended with empty content and finishReason: stop - will be handled by Agent layer');
+      // console.warn('Stream ended with empty content and finishReason: stop - will be handled by Agent layer');
     }
 
     return {

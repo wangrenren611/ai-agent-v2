@@ -1,18 +1,18 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { registerDefaultToolsAsync, ToolRegistry } from "../../tool";
 import { Agent } from "../../agent";
-import { ProviderRegistry, ProviderType } from "../../providers/provider-registry";
 import { operatorPrompt } from "../../prompts/operator";
 import { Message } from "../../agent/message";
 import { StreamChunk } from "../../agent/types";
+import { ProviderRegistry } from "../../providers/provider-registry";
 
-
-const useAgent = ({model}: {model: ProviderType;}) => {
+const useAgent = ({model}: {model: string;}) => {
     const [agent, setAgent] = useState<Agent | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [currentMessageId, setCurrentMessageId] = useState<string | null>(null);
     const [usedTokens, setUsedTokens] = useState<{usedTokens: number; totalTokens: number;}>({usedTokens: 0, totalTokens: 0});
+    const [error, setError] = useState<{message: string; phase: string} | null>(null);
 
     // 使用 ref 存储事件处理函数的引用，避免闭包问题
     const eventHandlersRef = useRef<{
@@ -21,16 +21,16 @@ const useAgent = ({model}: {model: ProviderType;}) => {
         handleToolCall?: (data: any) => void;
         handleToolResult?: (data: any) => void;
         handleTokenUsage?: (data: { usedTokens: number; totalTokens: number }) => void;
+        handleError?: (data: { error: Error; phase: string }) => void;
     }>({});
 
     const agentRef = useRef<Agent | null>(null);
 
     const initAgent = useCallback(async () => {
-        
         await registerDefaultToolsAsync();
 
         const agent = new Agent({
-            llmProvider: ProviderRegistry.createFromEnv(model),
+            llmProvider: ProviderRegistry.createFromEnv(model as any),
             systemPrompt: operatorPrompt({
                 directory: process.env.PROJECT_DIRECTORY || process.cwd(),
                 vcs: process.env.VCS || 'git',
@@ -45,24 +45,24 @@ const useAgent = ({model}: {model: ProviderType;}) => {
 
        setUsedTokens(agent.getUsedTokens());
 
-        // 保存到 ref 
+        // 保存到 ref
         agentRef.current = agent;
-    
+
         setAgent(agent);
 
         // 立即注册事件监听器（不依赖 useEffect）
         const handleStreamChunk = (message: StreamChunk) => {
             setMessages((prev) => {
                 const existingIndex = prev.findIndex(msg => msg.messageId === message.messageId);
-                
+
                 if (existingIndex !== -1) {
-                    return prev.map((msg, index) => 
-                        index === existingIndex 
+                    return prev.map((msg, index) =>
+                        index === existingIndex
                             ? { ...msg, content: msg.content + (message?.content || '') }
                             : msg
                     );
                 }
-                
+
                 return [...prev, message as Message];
             });
         };
@@ -74,15 +74,15 @@ const useAgent = ({model}: {model: ProviderType;}) => {
 
         const handleToolCall = (data: any) => {
             setMessages((prev) => {
-                const existingIndex = prev.findIndex(msg => 
-                    msg.messageId === data.messageId 
+                const existingIndex = prev.findIndex(msg =>
+                    msg.messageId === data.messageId
                 );
 
                 if (existingIndex !== -1) {
-                    return prev.map((msg, index) => 
-                        index === existingIndex 
-                            ? { 
-                                ...msg, 
+                    return prev.map((msg, index) =>
+                        index === existingIndex
+                            ? {
+                                ...msg,
                                 type: 'tool-call' as Message['type'],
                                 toolName: data.toolName,
                                 args: data.args,
@@ -106,15 +106,15 @@ const useAgent = ({model}: {model: ProviderType;}) => {
 
         const handleToolResult = (data: any) => {
             setMessages(prev => {
-                const existingToolCallIndex = prev.findIndex(msg => 
+                const existingToolCallIndex = prev.findIndex(msg =>
                     msg.messageId === data.messageId && msg.type === 'tool-call'
                 );
 
                 let updatedMessages = [...prev];
 
                 if (existingToolCallIndex !== -1) {
-                    updatedMessages = updatedMessages.map((msg, index) => 
-                        index === existingToolCallIndex 
+                    updatedMessages = updatedMessages.map((msg, index) =>
+                        index === existingToolCallIndex
                             ? { ...msg, result: data.result }
                             : msg
                     );
@@ -142,6 +142,14 @@ const useAgent = ({model}: {model: ProviderType;}) => {
             });
         };
 
+        const handleError = (data: { error: Error; phase: string }) => {
+            // console.error('[Agent Error] Phase:', data.phase, 'Error:', data.error.message);
+            setError({
+                message: data.error.message,
+                phase: data.phase,
+            });
+        };
+
         // 保存处理函数引用以便清理
         eventHandlersRef.current = {
             handleStreamChunk,
@@ -149,6 +157,7 @@ const useAgent = ({model}: {model: ProviderType;}) => {
             handleToolCall,
             handleToolResult,
             handleTokenUsage,
+            handleError,
         };
 
         // 注册事件监听器
@@ -157,20 +166,22 @@ const useAgent = ({model}: {model: ProviderType;}) => {
         agent.on('tool-call', handleToolCall);
         agent.on('tool-result', handleToolResult);
         agent.on('token-usage', handleTokenUsage);
- 
-        console.log('[useAgent] Event listeners registered');
+        agent.on('error', handleError);
 
     }, [model]);
-
 
 
     useEffect(() => {
         initAgent();
     }, [initAgent]);
 
+
     const submitMessage = (message: string) => {
         const currentAgent = agentRef.current;
         if (currentAgent && message) {
+            // 清除之前的错误
+            setError(null);
+
             const userMessage: Message = {
                 messageId: `user-${Date.now()}`,
                 role: 'user',
@@ -178,7 +189,7 @@ const useAgent = ({model}: {model: ProviderType;}) => {
             };
             setMessages(prev => [...prev, userMessage]);
             setIsLoading(true);
-            
+
             currentAgent.run(message, {
                 stream: true,
             });
@@ -189,9 +200,12 @@ const useAgent = ({model}: {model: ProviderType;}) => {
     return {
         submitMessage,
         messages,
+        setMessages,
         isLoading,
         currentMessageId,
-        usedTokens
+        usedTokens,
+        error,
+        agent,
     }
 
 }

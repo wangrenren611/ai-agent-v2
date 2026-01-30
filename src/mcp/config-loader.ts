@@ -131,7 +131,7 @@ function normalizeConfig(rawConfig: any): McpConfigFile {
   }
 
   // 未知格式
-  console.warn('[MCP] Unknown config format, treating as empty config');
+  // console.warn('[MCP] Unknown config format, treating as empty config');
   return { mcpServers: [] };
 }
 

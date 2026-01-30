@@ -110,8 +110,7 @@ export class Agent {
 
         // 初始化 Token 限制
         this.maxOutputTokens = config.maxOutputTokens || this.llmProvider.config.maxOutputTokens;
-        this.maxTokens =config.maxTokens || this.llmProvider.config.maxTokens;
-       console.log('maxTokens', this.maxTokens);
+        this.maxTokens = config.maxTokens || this.llmProvider.config.maxTokens;
 
         // 初始化上下文压缩器
         this.temperature = config.temperature || this.llmProvider.config.temperature;
@@ -239,11 +238,9 @@ export class Agent {
                         : `Resource not found. ${info.message}`;
                 }
 
-                if (++consecutiveErrorCount > this.noProgressLimit) {
-                    complete(userMessage);
-                    return true;
-                }
-                return false;
+                // 永久性错误应立即停止，不重试
+                complete(userMessage);
+                return true;
             }
 
             // 未知错误
@@ -274,10 +271,6 @@ export class Agent {
 
             // 获取并压缩消息
             const messages = this.sessionManager.getMessages();
-            const { totalUsed, usableLimit } = this.compaction.getToken(
-                [{ role: 'system', content: this.systemPrompt } as Message, ...messages],
-                tools
-            );
 
             this.events.emit('token-usage', this.getUsedTokens());
             
@@ -335,6 +328,7 @@ export class Agent {
                 if (!llmResponse) {
                     throw new Error('LLM response is null');
                 }
+                
                 const llmMessage = { messageId, ...llmResponse } as Message;
                 // 保存 LLM 响应
                 this.sessionManager.addMessage(llmMessage);
@@ -388,6 +382,7 @@ export class Agent {
                 networkErrorCount = 0;
             } catch (error) {
                 if (handleError(error)) {
+
                     return lastResponse;
                 }
             }
@@ -516,6 +511,10 @@ export class Agent {
             return 'Tool executed successfully';
         }
         return `Error: ${result.error || 'Unknown error'}`;
+    }
+
+    clear() {
+       this.sessionManager.clearAll();
     }
 }
 

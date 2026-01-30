@@ -72,7 +72,7 @@ export function parseSkillMarkdown(content: string, basePath?: string): string {
         return parsed.content.trim();
     } catch (error) {
         // 如果解析失败，返回原始内容
-        console.warn(`[SkillParser] Failed to parse frontmatter: ${error}`);
+        // console.warn(`[SkillParser] Failed to parse frontmatter: ${error}`);
         return content;
     }
 }
@@ -97,7 +97,7 @@ export function parseSkillMarkdownFull(content: string): ParsedSkillMarkdown {
             shells: extractShellCommands(text),
         };
     } catch (error) {
-        console.warn(`[SkillParser] Failed to parse frontmatter: ${error}`);
+        // console.warn(`[SkillParser] Failed to parse frontmatter: ${error}`);
         return {
             content: content,
             data: {},
