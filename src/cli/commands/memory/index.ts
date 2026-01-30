@@ -17,42 +17,28 @@ const handler: CommandHandler = async (context: CommandContext, args?: string[])
 
   if (!action) {
     // 显示当前记忆状态
-    const memoryEnabled = context.memoryEnabled as boolean | undefined;
-    const status = memoryEnabled ? 'enabled' : 'disabled';
+    const status = context.session.memoryEnabled ? 'enabled' : 'disabled';
     return successResult(`Memory is ${status}`);
   }
 
   switch (action) {
     case 'on':
     case 'enable':
-      const enableMemory = context.setMemory as ((enabled: boolean) => void) | undefined;
-      if (enableMemory) {
-        enableMemory(true);
-        return successResult('Memory enabled');
-      }
-      return errorResult('Memory control not available');
+      context.sessionManager.updateMemory(true);
+      return successResult('Memory enabled');
 
     case 'off':
     case 'disable':
-      const disableMemory = context.setMemory as ((enabled: boolean) => void) | undefined;
-      if (disableMemory) {
-        disableMemory(false);
-        return successResult('Memory disabled');
-      }
-      return errorResult('Memory control not available');
+      context.sessionManager.updateMemory(false);
+      return successResult('Memory disabled');
 
     case 'clear':
-      const clearMemory = context.clearMemory as (() => void) | undefined;
-      if (clearMemory) {
-        clearMemory();
-        return successResult('Memory cleared');
-      }
-      return errorResult('Memory clearing not available');
+      // Memory clearing not implemented yet
+      return errorResult('Memory clearing not implemented');
 
     case 'show':
     case 'status':
-      const memoryEnabled = context.memoryEnabled as boolean | undefined;
-      const status = memoryEnabled ? 'enabled' : 'disabled';
+      const status = context.session.memoryEnabled ? 'enabled' : 'disabled';
       return successResult(`Memory is ${status}`);
 
     default:

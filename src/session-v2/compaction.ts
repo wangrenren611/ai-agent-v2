@@ -1,6 +1,7 @@
 import { LLMProvider } from "../providers/providers/base";
 import { ScopedLogger } from "../util/log";
 import { Message } from "../agent/message";
+import { toProviderMessageList } from "../agent/message-converter";
 import { uuid } from "uuidv4";
 
 export class Compaction {
@@ -296,7 +297,7 @@ export class Compaction {
       messageId: uuid(),
       role: "user" as const,
       type: "text" as const,
-      content: "Confirm task completion. If the task is not finished, define the next actions and continue execution until all user requirements are satisfied.",
+      content: "Confirm task completion. If the task is not finished, define next actions and continue execution until all user requirements are satisfied.",
     }];
 
     return {
@@ -310,8 +311,12 @@ export class Compaction {
   /**
    * 计算整个对话数组的 Token 用量
    */
-  public calculateTotalUsage(messages: Message[],tools:any[]): number {
-    return [...messages,...tools].reduce((acc, m) => {
+  public calculateTotalUsage(messages: Message[], tools?: any[]): number {
+    const allMessages = [...messages];
+    if (tools && Array.isArray(tools)) {
+      allMessages.push(...tools);
+    }
+    return allMessages.reduce((acc, m) => {
       // 每条消息基础开销 4 tokens (role, name, newline)
       return acc + this.estimate(JSON.stringify(m)) + 4;
     }, 0);
@@ -336,15 +341,15 @@ export class Compaction {
       [
         {
           role: "user",
-          content: `You are an expert conversation compressor. Compress the conversation history into a structured summary organized in the following 8 sections:
-1. **Primary Request and Intent**: What is the user's core goal?
+          content: `You are an expert conversation compressor. Compress conversation history into a structured summary organized in following 8 sections:
+1. **Primary Request and Intent**: What is user's core goal?
 2. **Key Technical Concepts**: Frameworks, libraries, tech stacks, etc., involved in the conversation.
 3. **Files and Code Sections**: All file paths mentioned or modified.
 4. **Errors and Fixes**: Record error messages encountered and their solutions.
 5. **Problem Solving**: The thought process and decision path for solving the problem.
-6. **All User Messages**: Preserve key instructions and feedback from the user.
+6. **All User Messages**: Preserve key instructions and feedback from user.
 7. **Pending Tasks**: Work items that remain unfinished.
-8. **Current Work**: The progress at the point the conversation was interrupted.
+8. **Current Work**: The progress at the point conversation was interrupted.
 
 ${previousSummary ? `<previous_summary>
   ${previousSummary}

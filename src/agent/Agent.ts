@@ -28,6 +28,8 @@ import { ToolRegistry } from '../tool/registry';
 import { Compaction } from '../session-v2/compaction';
 import { AgentContext, getAgentContext } from '../context';
 import { Message } from './message';
+import { Message as ProviderMessage } from '../providers/providers/base';
+import { toProviderMessage, toProviderMessageList } from './message-converter';
 import { uuid } from 'uuidv4';
 // =============================================================================
 // 错误信息接口（内部使用）
@@ -320,8 +322,9 @@ export class Agent {
                 };
 
                 // 调用 LLM
+                const providerMessages = toProviderMessageList(llmMessages);
                 const llmResponse = await this.llmProvider.generate(
-                    [{ role: 'system', content: this.systemPrompt }, ...llmMessages],
+                    [{ role: 'system', content: this.systemPrompt }, ...providerMessages],
                     llmOptions
                 );
                   

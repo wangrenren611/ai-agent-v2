@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Box, Text } from 'ink';
-import { COLORS } from '../../utils/constants';
+import { COLORS, ICONS } from '../../utils/constants';
 
 interface WelcomeBannerProps {
   model?: string;
@@ -18,6 +18,11 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
   model = 'gpt-4o',
   currentPath = process.cwd(),
 }) => {
+  // Truncate path if too long
+  const displayPath = currentPath.length > 60
+    ? '...' + currentPath.slice(-57)
+    : currentPath;
+
   return (
     <Box flexDirection="column" marginBottom={1} paddingTop={0}>
       {/* Compact ASCII Art Banner - 60% size */}
@@ -25,12 +30,12 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
         <Box justifyContent="center">
           <Text bold color="cyan">
             {`
-  ██████╗ ███████╗ ██████╗ ███████╗    ██████╗ ███████╗██████╗ 
+  ██████╗ ███████╗ ██████╗ ███████╗    ██████╗ ███████╗██████╗
   ██╔══██╗██╔════╝██╔════╝ ██╔════╝   ██╔═══██╗██╔════╝██╔══██╗
   ███████║█████╗  ██║  ███╗█████╗     ██║   ██║███████╗██████╔╝
-  ██╔══██║██╔══╝  ██║   ██║██╔══╝     ██║   ██║╚════██║██╔═══╝ 
-  ██║  ██║███████╗╚██████╔╝███████╗   ╚██████╔╝███████║██║     
-  ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚══════╝    ╚═════╝ ╚══════╝╚═╝     
+  ██╔══██║██╔══╝  ██║   ██║██╔══╝     ██║   ██║╚════██║██╔═══╝
+  ██║  ██║███████╗╚██████╔╝███████╗   ╚██████╔╝███████║██║
+  ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚══════╝    ╚═════╝ ╚══════╝╚═╝
             `}
           </Text>
         </Box>
@@ -58,13 +63,13 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
       {/* Model and Status Info */}
       <Box justifyContent="center" marginTop={0}>
         <Text dimColor>  </Text>
-        <Text color={COLORS.ACCENT}>⚡</Text>
+        <Text color={COLORS.ACCENT}>{ICONS.TOOL}</Text>
         <Text dimColor> v1.0.1 · </Text>
         <Text color="cyanBright">{model}</Text>
         <Text dimColor> · </Text>
         <Text color="greenBright">● Ready</Text>
         <Text dimColor> · </Text>
-        <Text dimColor color="gray">{currentPath}</Text>
+        <Text dimColor color="gray">{displayPath}</Text>
       </Box>
 
       {/* Commands Help */}

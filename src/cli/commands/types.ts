@@ -5,22 +5,39 @@
  */
 
 // ============================================================================
-// Command Context
+// Imports
 // ============================================================================
 
 import type { Agent } from '../../agent';
+import type { IReadOnlySession, ISessionManager } from '../core/session/types';
+import type { INavigationService } from '../core/navigation/types';
 
 // ============================================================================
-// Command Context
+// Command Context - Type Safe
 // ============================================================================
 
+/**
+ * 命令上下文 - 类型安全的接口
+ * 移除 [key: string]: unknown 以确保完全类型安全
+ */
 export interface CommandContext {
-  input: string;
-  sessionId?: string;
-  userId?: string;
-  model?: string;
-  agent?: Agent;
-  [key: string]: unknown;
+  /** 输入的原始命令字符串 */
+  readonly input: string;
+
+  /** 会话只读视图 */
+  readonly session: IReadOnlySession;
+
+  /** Agent 实例（如果已初始化） */
+  readonly agent: Agent | undefined;
+
+  /** 会话管理器 - 提供会话操作 */
+  readonly sessionManager: ISessionManager;
+
+  /** 导航服务 - 提供页面导航 */
+  readonly navigation: INavigationService;
+
+  /** 显示命令结果 */
+  readonly showResult: (result: CommandResult) => void;
 }
 
 // ============================================================================

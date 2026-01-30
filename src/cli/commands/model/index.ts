@@ -13,13 +13,9 @@ import { successResult, errorResult } from '../executor.js';
 // ============================================================================
 
 const handler: CommandHandler = async (context: CommandContext) => {
-  const navigateToPage = context.navigateToPage as ((pageId: string) => void) | undefined;
-  // 如果没有参数，导航到模型选择页面
-    if (navigateToPage) {
-      navigateToPage('model-select');
-      return successResult('Opening model selection...');
-    }
-    return errorResult('Model selection not available');
+  // 导航到模型选择页面
+  context.navigation.navigateTo('model-select');
+  return successResult('Opening model selection...');
 };
 
 // ============================================================================

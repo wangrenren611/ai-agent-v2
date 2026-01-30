@@ -74,6 +74,10 @@ export class CommandExecutor implements ICommandExecutor {
    */
   async executeCommand(command: Command, args: string[], context?: CommandContext): Promise<CommandResult> {
     try {
+      // 确保 context 存在（向后兼容）
+      if (!context) {
+        throw new Error('CommandContext is required for command execution');
+      }
       const result = await command.handler(context, args);
       return result;
     } catch (error) {

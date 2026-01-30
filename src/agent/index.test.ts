@@ -5,7 +5,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { Agent } from './index';
-import { LLMProvider, LLMResponse, Message, ToolCall, ToolSchema } from '../providers/base';
+import { LLMProvider, LLMResponse, Message, ToolCall, ToolSchema } from '../providers/providers/base';
 import { ToolRegistry } from '../tool/registry';
 import { BashTool } from '../tool';
 

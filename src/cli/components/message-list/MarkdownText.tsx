@@ -73,7 +73,7 @@ const MarkdownText: React.FC<MarkdownTextProps> = ({ content, isStreaming }) => 
 
   // Configure marked with custom terminal renderer for each render
   const renderer = new TerminalRenderer(markdownTheme);
-  marked.setOptions({ renderer });
+  marked.setOptions({ renderer: renderer as any });
 
   // Parse markdown to terminal-formatted string
   const renderedContent = parse(content) as string;

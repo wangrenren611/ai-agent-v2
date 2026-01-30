@@ -16,14 +16,8 @@ const handler: CommandHandler = async (context: CommandContext, args?: string[])
   const argsString = args?.join(' ') || '';
 
   // 导航到 help 页面
-  const navigateToPage = context.navigateToPage as ((pageId: string) => void) | undefined;
-
-  if (navigateToPage) {
-    navigateToPage('help');
-    return successResult('Opening help page...');
-  }
-
-  return successResult('Help navigation not available');
+  context.navigation.navigateTo('help');
+  return successResult('Opening help page...');
 };
 
 // ============================================================================

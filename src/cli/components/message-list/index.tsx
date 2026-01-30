@@ -1,9 +1,16 @@
+/**
+ * Message List Component
+ *
+ * Displays conversation messages with improved styling and tool call integration
+ */
+
 import React from 'react';
-import { Box, Static, Text } from 'ink';
+import { Box, Text } from 'ink';
 import { Message } from '../../../agent/message';
 import { COLORS, ICONS } from '../../utils/constants';
 import MarkdownText from './MarkdownText';
 import Loading from '../Loading';
+import ToolCallList from '../tool-call';
 
 interface MessageListProps {
   messages: Message[];
@@ -11,71 +18,141 @@ interface MessageListProps {
 }
 
 const MessageList: React.FC<MessageListProps> = ({ messages, isLoading = false }) => {
+  // Group messages by user/assistant and tool calls
+  const groupMessages = (messages: Message[]) => {
+    const groups: Array<{
+      type: 'user' | 'assistant' | 'tool-group';
+      message?: Message;
+      tools?: Message[];
+      index: number;
+    }> = [];
 
-  const formatArgs = (args: unknown): string => {
-    if (args === null || args === undefined) return 'null';
-    const str = typeof args === 'string' ? args : JSON.stringify(args);
-    return str.length > 40 ? str.slice(0, 40) + '...' : str;
+    messages.forEach((msg, index) => {
+      const isUser = msg.role === 'user';
+      const isAssistant = msg.role === 'assistant';
+      const isToolCall = msg.type === 'tool-call';
+
+      if (isToolCall) {
+        // Check if there's already a tool group
+        const lastGroup = groups[groups.length - 1];
+        if (lastGroup?.type === 'tool-group') {
+          lastGroup.tools?.push(msg);
+        } else {
+          groups.push({
+            type: 'tool-group',
+            tools: [msg],
+            index,
+          });
+        }
+      } else {
+        // Start a new message group
+        groups.push({
+          type: isUser ? 'user' : 'assistant',
+          message: msg,
+          index,
+        });
+      }
+    });
+
+    return groups;
   };
 
-  const formatResult = (result: any): string => {
-    if (result === null || result === undefined) return 'null';
-    const str = typeof result === 'string' ? result : JSON.stringify(result);
-    return str.length > 60 ? str.slice(0, 60) + '...' : str;
-  };
+  const renderUserMessage = (msg: Message) => {
+    const content = typeof msg.content === 'string' ? msg.content : '';
+    const trimmedContent = content.trim();
 
-  const renderMessage = (msg: Message, index: number) => {
-    const isUser = msg.role === 'user';
-    const isToolCall = msg.type === 'tool-call';
-    const isToolResult = msg.type === 'tool-result';
-
-    let icon = '●';
-    let iconColor: string = COLORS.DIM;
-
-    if (isUser) {
-      icon = ICONS.INPUT;
-      iconColor = COLORS.DIM;
-    } else if (isToolCall) {
-      if (msg.result?.success) {
-        iconColor = COLORS.SECONDARY;
-      } else if (msg.result?.success === false) {
-        iconColor = COLORS.ERROR;
-      } else {
-        iconColor = COLORS.DIM;
-      }
-    } else if (isToolResult) {
-      if (msg.result?.success) {
-        iconColor = COLORS.SECONDARY;
-      } else {
-        iconColor = COLORS.ERROR;
-      }
-    } else {
-      iconColor = 'white';
-    }
-    
-    return (<Box key={`${msg.messageId}-${index}`} flexDirection="column" flexShrink={0}>{msg.content && !isToolCall ? (<Box overflow="hidden" marginTop={1}><Text color={iconColor}>{icon}</Text><Text>{' '}</Text><MarkdownText content={((msg?.content as string)?.trim() as string).replace(/^\n+|\n+$/g, '').replace(/^\r+|\r+$/g, '')} /></Box>) : null}{isToolCall && (<Box marginTop={1}>
-            <Text color={iconColor}>{icon}</Text><Text>{' '}</Text>
-            <Text>{msg.toolName}</Text>
-            <Text>({formatArgs(msg.args)})</Text>
+    return (
+      <Box
+        key={`user-${msg.messageId}`}
+        flexDirection="row"
+        marginBottom={1}
+        width="100%"
+      >
+       <Text color={COLORS.DIM}>{ICONS.INPUT}</Text>
+        {trimmedContent && (
+          <Box marginLeft={1}>
+            <Text dimColor color="gray">
+              {trimmedContent}
+            </Text>
           </Box>
         )}
-        {isToolResult && (
-          <Box marginLeft={4}><Text color={'#999'}>{formatResult(msg.result)}</Text></Box>
-        )}
-      </Box>);
+      </Box>
+    );
   };
+
+  const renderAssistantMessage = (msg: Message) => {
+    const content = typeof msg.content === 'string' ? msg.content : '';
+    const trimmedContent = content;
+
+    return (
+      <Box
+        key={`assistant-${msg.messageId}`}
+        flexDirection="row"
+        marginBottom={1}
+        width="100%"
+      >
+      <Text bold color="green">{ICONS.ASSISTANT}</Text>
+        {trimmedContent && (
+          <Box marginLeft={1}>
+            <MarkdownText content={trimmedContent} />
+          </Box>
+        )}
+      </Box>
+    );
+  };
+
+  const renderToolGroup = (tools: Message[], index: number) => {
+    const toolCallMessages = tools.filter(t => t.type === 'tool-call').map(t => ({
+      type: 'tool-call' as const,
+      toolName: t.toolName,
+      args: t.args,
+      result: t.result,
+    }));
+
+    return (
+      <Box
+        key={`tool-group-${index}`}
+        flexDirection="column"
+        marginBottom={1}
+        width="100%"
+      >
+        <Box>
+          <Text color={COLORS.DIM}>⚡</Text>
+          <Text> </Text>
+          <Text bold color="yellow">
+            Tools
+          </Text>
+        </Box>
+        <Box marginLeft={3}>
+          <ToolCallList messages={toolCallMessages} />
+        </Box>
+      </Box>
+    );
+  };
+
+  const groupedMessages = groupMessages(messages);
 
   if (messages.length === 0) {
     return (
       <Box justifyContent="center" marginTop={1}>
-        <Text dimColor color={COLORS.DIM}>No messages yet. Start chatting!</Text>
+        <Text dimColor color={COLORS.DIM}>
+          No messages yet. Start chatting!
+        </Text>
       </Box>
     );
   }
 
   return (
-    <Box flexDirection="column">
-      {messages.map((msg, index) => renderMessage(msg, index))}
+    <Box flexDirection="column" width="100%">
+      {groupedMessages.map((group) => {
+        if (group.type === 'user') {
+          return renderUserMessage(group.message!);
+        } else if (group.type === 'assistant') {
+          return renderAssistantMessage(group.message!);
+        } else {
+          return renderToolGroup(group.tools!, group.index);
+        }
+      })}
       {isLoading && <Loading />}
     </Box>
   );

@@ -42,7 +42,7 @@ const handler: CommandHandler = async (context: CommandContext, args?: string[])
 // ============================================================================
 
 async function handleSave(context: CommandContext, filePath?: string) {
-  const messages = context.messages as any[] | undefined;
+  const messages = context.session.messages as any;
 
   if (!messages || messages.length === 0) {
     return errorResult('No messages to save');
@@ -76,7 +76,7 @@ async function handleLoad(filePath?: string) {
 }
 
 async function handleExport(context: CommandContext, filePath?: string) {
-  const messages = context.messages as any[] | undefined;
+  const messages = context.session.messages as any;
 
   if (!messages || messages.length === 0) {
     return errorResult('No messages to export');

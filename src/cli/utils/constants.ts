@@ -19,12 +19,14 @@ export const INITIAL_DELAY_MS = 100;
 export const ICONS = {
   USER: '👨',
   INPUT: '❯',
-  ASSISTANT: '💻',
+  ASSISTANT: '●',
   SYSTEM: '⚠️',
+  TOOL: '⚡',
   TOOL_CALLING: '⏳',
   TOOL_SUCCESS: '✅',
   TOOL_ERROR: '❌',
   CHECK: '✓',
+  ERROR: '✗',
   SPINNER_FRAMES: ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'],
 } as const;
 

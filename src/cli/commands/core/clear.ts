@@ -21,14 +21,9 @@ const handler: CommandHandler = async (context: CommandContext) => {
     return successResult('Message history cleared');
   }
 
-  // 降级：如果 agent 不可用，尝试使用 clearMessages 回调
-  const clearMessages = context.clearMessages as (() => void) | undefined;
-  if (clearMessages && typeof clearMessages === 'function') {
-    clearMessages();
-    return successResult('Message history cleared (UI only)');
-  }
-
-  return successResult('Clear requested (no clear function provided)');
+  // 降级：使用 sessionManager.clearMessages()
+  context.sessionManager.clearMessages();
+  return successResult('Message history cleared');
 };
 
 // ============================================================================

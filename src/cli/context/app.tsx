@@ -1,6 +1,6 @@
 import { useInput } from 'ink';
 import type { Key as EventKey } from 'ink';
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import React from 'react';
 // @ts-ignore
 import { ProviderRegistry, ProviderType } from '../../providers/provider-registry';
@@ -12,6 +12,7 @@ import {
   type CommandContext,
   type CommandResult,
 } from '../commands';
+import { createSessionManager, createNavigationService } from '../infrastructure/context';
 
 // ============================================================================
 // Register Commands on Import
@@ -109,6 +110,9 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
   const [pageHistory, setPageHistory] = useState<PageId[]>(['home']);
   const [currentPage, setCurrentPage] = useState<PageId>('home');
 
+  // 使用锁来防止重复提交，通过 Promise 来确保操作完成后才释放
+  const operationLockRef = useRef<string | null>(null);
+
   const { submitMessage, messages, setMessages, isLoading, usedTokens, error, agent  } = useAgent({ model: model as any });
 
   // Model selection index
@@ -127,9 +131,7 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
       setPageHistory(newHistory);
       setCurrentPage(newHistory[newHistory.length - 1]);
       setCommandResult(null);
-      // 清除 input，防止残留命令字符串
       setInput('');
-      // 清除 eventKey，防止触发退出逻辑
       setEventKey(undefined);
     }
   }, [pageHistory]);
@@ -145,13 +147,12 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
         setModelSelectIndex(prev => Math.min(AVAILABLE_MODELS.length - 1, prev + 1));
       } else if (key.return) {
         const newModel = AVAILABLE_MODELS[modelSelectIndex];
-        // 设置模型到 agent（通过 setAgentModel 如果可用）
         setModel(newModel);
+        setEventKey(undefined);
         goBack();
      }
     }
-  
-  }, [currentPage, modelSelectIndex, setModel, setModel, goBack]);
+  }, [currentPage, modelSelectIndex, setModel, goBack]);
   // 处理键盘输入（全局监听以设置 eventKey，但页面特定逻辑由 handlePageKey 处理）
   useInput((_input, key) => {
     setEventKey(key);
@@ -165,7 +166,7 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
 
   // 同步模型选择索引
   useEffect(() => {
-    const currentIndex = AVAILABLE_MODELS.indexOf(model);
+    const currentIndex = AVAILABLE_MODELS.indexOf(model as any);
     if (currentIndex >= 0) {
       setModelSelectIndex(currentIndex);
     }
@@ -185,43 +186,95 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
     }
   }, [eventKey?.backspace, eventKey?.escape, currentPage, goBack]);
 
-  // 处理提交
+  // 处理提交 - 使用锁机制防止重复提交
   const onSubmit = async (newInput: string) => {
-    setInput(newInput);
-
-    // 尝试执行命令
-    const commandContext: CommandContext = {
-      input: newInput,
-      sessionId,
-      userId: 'default',
-      model,
-      messages,
-      memoryEnabled,
-      setSessionId,
-      setModel,
-      setMemory: setMemoryEnabled,
-      clearMessages: () => setMessages([]),
-      navigateToPage,
-      agent: agent || undefined,
-    };
-
-    const result = await commandExecutor.execute(newInput, commandContext);
-    // 如果是命令执行，处理结果
-    if (result) {
-      // 设置命令结果到状态（由 UI 显示）
-      setCommandResult(result);
-
-      // 处理退出
-      if (result.exit) {
-        process.exit(0);
-      }
+    // 如果已有锁，忽略这次提交
+    if (operationLockRef.current) {
       setInput('');
       return;
     }
-    
-    // 否则作为普通消息发送
-    submitMessage(newInput);
-    setInput('');
+
+    // 检查是否是命令
+    const isCommand = newInput.trim().startsWith('/');
+
+    // 如果是命令，设置锁
+    if (isCommand) {
+      const lockId = `lock_${Date.now()}_${Math.random()}`;
+      operationLockRef.current = lockId;
+    }
+
+    setInput(newInput);
+
+    // 尝试执行命令
+    // 创建临时的 session manager 和 navigation service
+    const tempSessionManager = createSessionManager({
+      state: {
+        sessionId: sessionId || '',
+        userId: 'default',
+        model,
+        memoryEnabled,
+      },
+      current: {
+        sessionId: sessionId || '',
+        userId: 'default',
+        model,
+        memoryEnabled,
+        messages,
+      },
+      messages,
+      setMessages,
+      setModel,
+      setMemoryEnabled,
+      setSessionId,
+    });
+
+    const tempNavigationService = createNavigationService({
+      currentPage,
+      canGoBack,
+      history: pageHistory,
+      navigateTo: navigateToPage,
+      goBack,
+      replace: (pageId) => setCurrentPage(pageId),
+      reset: (pageId) => {
+        setPageHistory([pageId]);
+        setCurrentPage(pageId);
+      },
+    });
+
+    const commandContext: CommandContext = {
+      input: newInput,
+      session: tempSessionManager.current,
+      agent: agent || undefined,
+      sessionManager: tempSessionManager,
+      navigation: tempNavigationService,
+      showResult: (result) => setCommandResult(result),
+    };
+
+    try {
+      const result = await commandExecutor.execute(newInput, commandContext);
+
+      // 如果是命令执行，处理结果
+      if (result) {
+        // 设置命令结果到状态（由 UI 显示）
+        setCommandResult(result);
+
+        // 处理退出
+        if (result.exit) {
+          process.exit(0);
+        }
+        setInput('');
+        return;
+      }
+
+      // 否则作为普通消息发送
+      submitMessage(newInput);
+      setInput('');
+    } finally {
+      // 无论成功还是失败，都释放锁
+      if (isCommand) {
+        operationLockRef.current = null;
+      }
+    }
   };
 
   return (

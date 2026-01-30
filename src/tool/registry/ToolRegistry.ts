@@ -256,7 +256,7 @@ export class ToolRegistry {
       };
     }
   }
-
+  
   /**
    * 获取工具的 schema（用于 LLM 函数调用）
    * 

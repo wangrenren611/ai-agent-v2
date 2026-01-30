@@ -18,8 +18,7 @@ const handler: CommandHandler = async (context: CommandContext, args?: string[])
 
   if (!action) {
     // 显示当前会话信息
-    const currentSessionId = context.sessionId || 'default';
-    return successResult(`Current session: ${currentSessionId}`);
+    return successResult(`Current session: ${context.session.sessionId}`);
   }
 
   switch (action) {
@@ -32,23 +31,14 @@ const handler: CommandHandler = async (context: CommandContext, args?: string[])
       if (!sessionId) {
         return errorResult('Please provide a session ID. Usage: /session switch <id>');
       }
-      // 这里需要通过 context 设置 session
-      const switchSession = context.setSessionId as ((id: string) => void) | undefined;
-      if (switchSession) {
-        switchSession(sessionId);
-        return successResult(`Switched to session: ${sessionId}`);
-      }
-      return errorResult('Session switching not available');
+      await context.sessionManager.switchSession(sessionId);
+      return successResult(`Switched to session: ${sessionId}`);
 
     case 'new':
     case 'create':
       const newSessionId = sessionId || `session_${Date.now()}`;
-      const createSession = context.setSessionId as ((id: string) => void) | undefined;
-      if (createSession) {
-        createSession(newSessionId);
-        return successResult(`Created new session: ${newSessionId}`);
-      }
-      return errorResult('Session creation not available');
+      await context.sessionManager.createSession(newSessionId);
+      return successResult(`Created new session: ${newSessionId}`);
 
     default:
       return errorResult(`Unknown session action: ${action}. Available: list, switch, new`);

@@ -86,12 +86,11 @@ Path formats supported:
     }
 
     const selectedLines = lines.slice(startIndex, endIndex);
-    const numbered = selectedLines.map((l, i) => `${startIndex + i + 1} | ${l}`).join('\n');
 
     return this.success(
       {
         filePath,
-        content: numbered,
+        content: selectedLines.join('\n'),
         range: { startLine: startIndex + 1, endLine: endIndex },
       },
       { truncated: content.length > 50000 }
