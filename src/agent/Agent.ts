@@ -1,523 +1,242 @@
 /**
- * Agent - AI 代理 (基于 EventBus)
- * 负责编排 LLM 调用和会话管理
- *
- * @module Agent
+ * Agent - AI 代理 (重构版)
+ * 
+ * 职责：
+ * 1. 初始化和管理核心组件
+ * 2. 对外提供简洁的接口
+ * 3. 事件转发
+ * 
+ * 改进：
+ * - 分层架构：核心逻辑移至 AgentRunner
+ * - 依赖注入：易于测试和扩展
+ * - 单一职责：只负责协调，不处理具体逻辑
  */
+
 import { TypedEventBus } from '../util/event-bus';
-import {
-    AgentEvents,
-    AgentConfig,
-    AgentRunOptions,
-    AgentResponse,
-    StreamChunk,
-    ToolResult,
-    ToolCall,
-    DEFAULT_MAX_LOOP,
-    DEFAULT_NO_PROGRESS_LIMIT,
-    MAX_NETWORK_RETRIES,
-    VALID_FINISH_REASONS,
-    ToolSchema,
-} from './types';
-import {StreamChunk as LLMStreamChunk} from '../providers/providers/base';
-import { ToolError } from './ToolError';
-import { isRetryableError, isPermanentError, isAbortedError, LLMAuthError, LLMNotFoundError } from '../providers/providers/errors';
-import { ScopedLogger } from '../util/log';
-import { SessionManager } from '../session-v2';
+import { SessionManager } from '../session-v2/SessionManager';
 import { ToolRegistry } from '../tool/registry';
-import { Compaction } from '../session-v2/compaction';
 import { AgentContext, getAgentContext } from '../context';
-import { Message } from './message';
-import { Message as ProviderMessage } from '../providers/providers/base';
-import { toProviderMessage, toProviderMessageList } from './message-converter';
-import { uuid } from 'uuidv4';
-// =============================================================================
-// 错误信息接口（内部使用）
-// =============================================================================
+import { ScopedLogger } from '../util/log';
+import type {
+  AgentEvents,
+  AgentConfig,
+  AgentRunOptions,
+  AgentResponse,
+  ToolSchema,
+} from './types';
+import type { Message } from './message';
+import { ErrorHandler } from './core/ErrorHandler';
+import { ToolExecutor } from './core/ToolExecutor';
+import { AgentRunner } from './core/AgentRunner';
+import { SmartCompactionStrategy } from '../session-v2/compaction-strategy';
 
-interface ErrorInfo {
-    message: string;
-    isAborted: boolean;
-    isRetryable: boolean;
-    isPermanent: boolean;
-    isAuth: boolean;
-    isModelNotFound: boolean;
-    resourceType?: string;
-}
-
-// =============================================================================
-// Agent 类
-// =============================================================================
+// 常量定义
+const DEFAULT_MAX_LOOP = 1024;
+const DEFAULT_NO_PROGRESS_LIMIT = 10;
 
 export class Agent {
-    // -------------------------------------------------------------------------
-    // 私有属性
-    // -------------------------------------------------------------------------
-    private readonly llmProvider: AgentConfig['llmProvider'];
-    private readonly logger: ScopedLogger;
-    private readonly systemPrompt: string;
-    private readonly maxLoop: number;
-    private readonly noProgressLimit: number;
-    private readonly compaction: Compaction;
-    private readonly temperature: number;
+  // 配置
+  private config: AgentConfig;
+  
+  // 公开属性
+  public readonly sessionManager: SessionManager;
+  public readonly context: AgentContext;
+  public readonly events: TypedEventBus<AgentEvents>;
+  public readonly tools: ToolSchema[];
+  
+  // 私有组件
+  private logger: ScopedLogger;
+  private runner: AgentRunner;
 
-    // -------------------------------------------------------------------------
-    // 公开属性
-    // -------------------------------------------------------------------------
-    public readonly sessionManager: SessionManager;
-    public readonly context: AgentContext;
-    public readonly events: TypedEventBus<AgentEvents>;
-    tools: ToolSchema[];
-    maxOutputTokens: number;
-    maxTokens: number;
+  constructor(config: AgentConfig) {
+    this.config = {
+      maxLoop: DEFAULT_MAX_LOOP,
+      noProgressLimit: DEFAULT_NO_PROGRESS_LIMIT,
+      ...config,
+    };
+    this.tools = config.tools || [];
 
-    // -------------------------------------------------------------------------
-    // 构造函数
-    // -------------------------------------------------------------------------
+    // 初始化上下文
+    this.context = this.initContext(config.sessionId);
+    this.context.initialize();
 
-    constructor(config: AgentConfig) {
-        this.llmProvider = config.llmProvider;
-        this.systemPrompt = config.systemPrompt;
-        this.maxLoop = config.maxLoop ?? DEFAULT_MAX_LOOP;
-        this.noProgressLimit = Math.max(0, config.noProgressLimit ?? DEFAULT_NO_PROGRESS_LIMIT);
-        this.tools = config.tools || [];
- 
-        // 初始化上下文
-        this.context = getAgentContext({
-            session: {
-                sessionId: config.sessionId || `session_${Date.now()}`,
-                userId: 'default',
-            },
-            
+    // 初始化事件总线
+    this.events = new TypedEventBus<AgentEvents>();
+
+    // 初始化日志
+    this.logger = new ScopedLogger('Agent');
+
+    // 初始化会话管理器
+    this.sessionManager = this.initSessionManager(config);
+
+    // 初始化运行器
+    this.runner = this.initRunner();
+
+    // 设置工具注册表上下文
+    ToolRegistry.setAgentContext(this.context);
+  }
+
+  /**
+   * 初始化上下文
+   */
+  private initContext(sessionId?: string): AgentContext {
+    return getAgentContext({
+      session: {
+        sessionId: sessionId || `session_${Date.now()}`,
+        userId: 'default',
+      },
+    });
+  }
+
+  /**
+   * 初始化会话管理器
+   */
+  private initSessionManager(config: AgentConfig): SessionManager {
+    const maxTokens = config.maxTokens ?? config.llmProvider.config.maxTokens;
+    const maxOutputTokens = config.maxOutputTokens ?? config.llmProvider.config.maxOutputTokens;
+    const temperature = config.temperature ?? config.llmProvider.config.temperature;
+
+    return new SessionManager({
+      sessionId: this.context.sessionId,
+      sessionDir: this.context.sessionDir,
+      llmProvider: config.llmProvider,
+      maxTokens,
+      maxOutputTokens,
+    });
+  }
+
+  /**
+   * 初始化运行器
+   */
+  private initRunner(): AgentRunner {
+    const maxTokens = this.config.maxTokens ?? this.config.llmProvider.config.maxTokens;
+    const maxOutputTokens = this.config.maxOutputTokens ?? this.config.llmProvider.config.maxOutputTokens;
+
+    return new AgentRunner(
+      {
+        llmProvider: this.config.llmProvider,
+        sessionManager: this.sessionManager,
+        systemPrompt: this.config.systemPrompt,
+        maxLoop: this.config.maxLoop ?? DEFAULT_MAX_LOOP,
+        temperature: this.config.temperature ?? this.config.llmProvider.config.temperature,
+        maxTokens,
+        maxOutputTokens,
+        tools: this.tools,  // 传递工具
+      },
+      {
+        errorHandler: new ErrorHandler({
+          maxNetworkRetries: 10,
+          noProgressLimit: this.config.noProgressLimit ?? DEFAULT_NO_PROGRESS_LIMIT,
+        }),
+        toolExecutor: new ToolExecutor(),
+      }
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // 公开方法
+  // ---------------------------------------------------------------------------
+
+  /**
+   * 启动 Agent
+   */
+  async start(): Promise<void> {
+    await this.sessionManager.init();
+  }
+
+  /**
+   * 运行 Agent 处理用户查询
+   */
+  async run(query: string, options: AgentRunOptions = {}): Promise<AgentResponse | null> {
+    const streamEnabled = options.stream ?? false;
+    const streamCallback = options.streamCallback;
+
+    return this.runner.run(query, options, {
+      // 流式输出
+      onStreamChunk: streamCallback
+        ? (chunk) => {
+            streamCallback(chunk);
+            this.events.emit('stream-chunk', chunk);
+          }
+        : (chunk) => {
+            this.events.emit('stream-chunk', chunk);
+          },
+
+      // 思考事件
+      onThinking: (step) => {
+        this.events.emit('thinking', { step });
+      },
+
+      onThinkingEnd: (step, hasToolCalls) => {
+        this.events.emit('thinking-end', { step, hasToolCalls });
+      },
+
+      // 工具调用事件
+      onToolCallsStart: (count) => {
+        this.events.emit('tool-calls-start', { count });
+      },
+
+      onToolCallsEnd: (summary, hasErrors) => {
+        this.events.emit('tool-calls-end', { 
+          count: 0, // 需要统计
+          hasErrors,
+          summary 
         });
-        this.context.initialize();
-
-        // 初始化事件总线
-        this.events = new TypedEventBus<AgentEvents>();
-
-        // 初始化会话管理器
-        this.sessionManager = new SessionManager({
-            sessionId: this.context.sessionId,
-            sessionDir: this.context.sessionDir,
-            llmProvider: this.llmProvider,
-        });
-
-    
-
-        // 设置 AgentContext 到 ToolRegistry
-        ToolRegistry.setAgentContext(this.context);
-
-        // 初始化日志器
-        this.logger = new ScopedLogger('Agent');
-
-        // 初始化 Token 限制
-        this.maxOutputTokens = config.maxOutputTokens || this.llmProvider.config.maxOutputTokens;
-        this.maxTokens = config.maxTokens || this.llmProvider.config.maxTokens;
-
-        // 初始化上下文压缩器
-        this.temperature = config.temperature || this.llmProvider.config.temperature;
-
-        this.compaction = new Compaction({
-            maxTokens: this.maxTokens,
-            maxOutputTokens: this.maxOutputTokens,
-            llmProvider: this.llmProvider,
-        });
-    }
-
-    // -------------------------------------------------------------------------
-    // 公开方法
-    // -------------------------------------------------------------------------
-    getUsedTokens(): {usedTokens: number, totalTokens: number} {
-        const history=this.sessionManager.getMessages();
-        const hasHistory= history?.length>0;
-        const allHistory=hasHistory? history as Message[]:[];
-      
-        const {totalUsed, usableLimit} = this.compaction.getToken(allHistory,[]);
-        return  {usedTokens: totalUsed, totalTokens:usableLimit};
-    }
-    /** 启动 Agent，初始化会话 */
-   async start(): Promise<void> {
-       await  this.sessionManager.init();
-    }
-    on<TEvent extends keyof AgentEvents>(event: TEvent, listener: (data: AgentEvents[TEvent]) => void): void {
-        this.events.on(event, listener);
-    }
-    /**
-     * 运行 Agent 处理用户查询
-     */
-    async run(query: string, options?: AgentRunOptions): Promise<AgentResponse | null> {
-        // 运行时状态
-        const tools = [...this.tools, ...(options?.tools ?? [])];
-        const silent = options?.silent ?? false;
-        const streamEnabled = options?.stream ?? false;
-        const streamCallback = options?.streamCallback;
-        const abortSignal = options?.abortSignal;
-    
-
-        // 错误计数
-        let consecutiveErrorCount = 0;
-        let networkErrorCount = 0;
-        let lastResponse: AgentResponse | null = null;
-
-        // 辅助方法：发送日志
-        const log = (level: 'info' | 'warn' | 'error', message: string) => {
-            if (silent) {
-                this.events.emit('log', { level, message });
-            } else if (level === 'error') {
-                this.logger.error(message);
-            } else if (level === 'warn') {
-                this.logger.warn(message);
-            } else {
-                this.logger.info(message);
-            }
-        };
-
-        // 辅助方法：创建 spinner
-        let spinner: ReturnType<ScopedLogger['spinner']> | null = null;
-
-        // 辅助方法：完成响应
-        const complete = (content: string): AgentResponse => {
-            const response = { content, role: 'assistant' as const };
-            this.events.emit('complete', { response });
-            lastResponse = response;
-            return response;
-        };
-
-        // 辅助方法：获取错误信息
-        const getErrorInfo = (error: unknown): ErrorInfo => {
-            const message = error instanceof Error ? error.message : String(error);
-            return {
-                message,
-                isAborted: isAbortedError(error),
-                isRetryable: isRetryableError(error),
-                isPermanent: isPermanentError(error),
-                isAuth: error instanceof LLMAuthError,
-                isModelNotFound: error instanceof LLMNotFoundError,
-                resourceType: error instanceof LLMNotFoundError ? error.resourceType : undefined,
-            };
-        };
-
-        // 辅助方法：处理错误
-        const handleError = (error: unknown): boolean => {
-            const info = getErrorInfo(error);
-            this.events.emit('error', { error: error instanceof Error ? error : new Error(info.message), phase: 'generate' });
-
-            // 取消错误
-            if (info.isAborted) {
-                log('info', 'Task cancelled by user');
-                complete('[Task cancelled]');
-                this.events.emit('cancelled', { reason: 'user_abort' });
-                return true;
-            }
-
-            // 可重试错误（网络错误）
-            if (info.isRetryable) {
-                networkErrorCount++;
-                const backoffMs = (error as { getBackoff(n: number): number }).getBackoff(networkErrorCount);
-
-                log('warn', `Retryable error (attempt ${networkErrorCount}): ${info.message}`);
-
-                if (networkErrorCount > MAX_NETWORK_RETRIES) {
-                    log('error', `Max retries (${MAX_NETWORK_RETRIES}) reached`);
-                    complete(`Service unavailable after ${MAX_NETWORK_RETRIES} retries. ${info.message}`);
-                    return true;
-                }
-
-                log('info', `Retrying in ${backoffMs / 1000}s...`);
-                return false; // 继续循环重试
-            }
-
-            // 永久性错误（认证、模型不存在等）
-            if (info.isPermanent) {
-                log('error', `Permanent error: ${info.message}`);
-
-                let userMessage = `API Error: ${info.message}`;
-                if (info.isAuth) {
-                    userMessage = 'Authentication failed. Please check your API key configuration.';
-                } else if (info.isModelNotFound) {
-                    userMessage = info.resourceType === 'model'
-                        ? `Model not found. Please check AI_MODEL configuration. ${info.message}`
-                        : `Resource not found. ${info.message}`;
-                }
-
-                // 永久性错误应立即停止，不重试
-                complete(userMessage);
-                return true;
-            }
-
-            // 未知错误
-            log('error', `Unexpected error: ${info.message}`);
-
-            if (++consecutiveErrorCount > this.noProgressLimit) {
-                complete(`Max error limit reached (${this.noProgressLimit} consecutive errors). Last error: ${info.message}`);
-                return true;
-            }
-
-            return false;
-        };
-        // 添加用户消息
-        const userMessage: Message = this.sessionManager.addMessage({ role: 'user', type: 'text', content: query } as Message);
-        this.events.emit('message', { message: userMessage });
-     
-
-
-        // 主循环
-        let step = 0;
-        while (true) {
-            step++;
-
-            // 检查循环限制
-            if (this.maxLoop > 0 && step > this.maxLoop) {
-                return complete(`Max loop limit reached (${this.maxLoop})`);
-            }
-
-            // 获取并压缩消息
-            const messages = this.sessionManager.getMessages();
-
-            this.events.emit('token-usage', this.getUsedTokens());
-            
-            const { isCompacted, list: llmMessages } = await this.compaction.compact(
-                [{ role: 'system', content: this.systemPrompt } as Message, ...messages],
-                tools
-            );
-
-            if (isCompacted) {
-                this.sessionManager.setMessages(llmMessages);
-            }
-
-            // 发送思考开始事件
-            this.events.emit('thinking', { step });
-
-         
-           
-
-            // 构建 AbortController
-            const abortController = new AbortController();
-            const currentAbortSignal = abortSignal || abortController.signal;
-
-            if (abortSignal) {
-                abortSignal.addEventListener('abort', () => abortController.abort());
-            }
-
-            try {
-                const messageId = uuid();
-                // 构建流式回调
-                const wrappedStreamCallback = streamCallback
-                    ? (chunk: LLMStreamChunk) => {
-                          streamCallback({ messageId, ... chunk });
-                          this.events.emit('stream-chunk', { messageId, ... chunk } as StreamChunk);
-                      }
-                    : (chunk: LLMStreamChunk) => {
-                          this.events.emit('stream-chunk', { messageId, ... chunk } as StreamChunk);
-                      };
-                
-                // 构建 LLM 选项，优先使用运行时参数
-                const llmOptions = {
-                    tools: tools.length > 0 ? tools : undefined,
-                    maxOutputTokens: options?.maxOutputTokens ?? this.llmProvider.config.maxOutputTokens,
-                    stream: streamEnabled,
-                    streamCallback: wrappedStreamCallback,
-                    abortSignal: currentAbortSignal,
-                    temperature: options?.temperature ?? this.temperature,
-                };
-
-                // 调用 LLM
-                const providerMessages = toProviderMessageList(llmMessages);
-                const llmResponse = await this.llmProvider.generate(
-                    [{ role: 'system', content: this.systemPrompt }, ...providerMessages],
-                    llmOptions
-                );
-                  
-                if (!llmResponse) {
-                    throw new Error('LLM response is null');
-                }
-                
-                const llmMessage = { messageId, ...llmResponse } as Message;
-                // 保存 LLM 响应
-                this.sessionManager.addMessage(llmMessage);
-                this.events.emit('message', { message: llmMessage });
-
-                // 处理工具调用
-                const { hasToolCalls, hasError } = await this.handleToolCalls(llmMessage, { silent, spinner, log, complete });
-
-                if (hasError) {
-                    log('warn', 'Tool execution had errors');
-                    if (++consecutiveErrorCount > this.noProgressLimit) {
-                        return complete(
-                            `Agent stopped: ${consecutiveErrorCount} consecutive tool errors. ` +
-                            'Please review error messages and try a different approach.'
-                        );
-                    }
-                    this.events.emit('thinking-end', { step, hasToolCalls });
-                    continue;
-                }
-
-                this.events.emit('thinking-end', { step, hasToolCalls });
-
-                // 检查是否需要返回
-                if (!hasToolCalls) {
-                    const { finishReason, content } = llmResponse;
-
-                    // 检查 finishReason
-                    if (!VALID_FINISH_REASONS.includes(finishReason as typeof VALID_FINISH_REASONS[number])) {
-                        log('error', `Unexpected finishReason: ${finishReason}`);
-                        if (++consecutiveErrorCount > this.noProgressLimit) {
-                            return complete(`Max error limit reached: unexpected finishReason "${finishReason}"`);
-                        }
-                        continue;
-                    }
-
-                    // 检查空响应
-                    if (!content || content.trim() === '') {
-                        log('warn', 'LLM returned empty response');
-                        if (++consecutiveErrorCount > this.noProgressLimit) {
-                            return complete(`Agent stopped: ${consecutiveErrorCount} consecutive empty responses`);
-                        }
-                        continue;
-                    }
-
-                    // 正常返回
-                    return complete(content);
-                }
-
-                // 工具调用成功，重置错误计数
-                consecutiveErrorCount = 0;
-                networkErrorCount = 0;
-            } catch (error) {
-                if (handleError(error)) {
-
-                    return lastResponse;
-                }
-            }
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // 私有方法
-    // -------------------------------------------------------------------------
-
-    /** 处理工具调用 */
-    private async handleToolCalls(
-        llmResponse: Message,
-        ctx: { silent: boolean; spinner: ReturnType<ScopedLogger['spinner']> | null; log: (level: 'info' | 'warn' | 'error', message: string) => void; complete: (c: string) => AgentResponse }
-    ): Promise<{messageId: string; hasToolCalls: boolean; hasError: boolean }> {
-        if (!llmResponse.tool_calls?.length) {
-            return { messageId: llmResponse.messageId, ...{ hasToolCalls: false, hasError: false } };
-        }
-
-        const toolCount = llmResponse.tool_calls.length;
-        this.events.emit('tool-calls-start', { count: toolCount });
-        
-        const toolResults: Message[] = [];
-        let hasError = false;
-
-        for (const call of llmResponse.tool_calls) {
-            try {
-                const result = await this.executeTool(call, llmResponse.messageId);
-                toolResults.push(result);
-            } catch (error) {
-                if (error instanceof ToolError) {
-                    toolResults.push({ ...error.data });
-                    hasError = true;
-                } else {
-                    toolResults.push({
-                        messageId: llmResponse.messageId,
-                        role: 'tool',
-                        type: 'text',
-                        content: `Error: Unknown tool execution error - ${error instanceof Error ? error.message : String(error)}`,
-                        tool_call_id: call.id,
-                    });
-                    hasError = true;
-                }
-            }
-        }
-
-        this.sessionManager.addMessages(toolResults);
-        toolResults.forEach(msg => this.events.emit('message', {  message: msg }));
-
-        // 生成摘要
-        const summary = toolResults
-            .map(r => (r.content ?? '').length > 50 ? (r.content ?? '').slice(0, 47) + '...' : (r.content ?? ''))
-            .join(', ');
-
-        this.events.emit('tool-calls-end', { count: toolCount, hasErrors: hasError, summary });
-
-        // 输出工具调用结果
-        if (ctx.silent) {
-            this.events.emit('log', {  level: hasError ? 'warn' : 'info', message: `Tool calls: ${summary}` });
-        } else if (ctx.spinner) {
-            ctx.spinner[hasError ? 'warn' : 'succeed'](`Tool calls: ${summary}`);
-        }
-
-        return {messageId: llmResponse.messageId, hasToolCalls: true, hasError } ;
-    }
-
-    /** 执行单个工具调用 */
-    private async executeTool(toolCall: ToolCall, messageId:Message['messageId']): Promise<Message> {
-        const { name, arguments: args } = toolCall.function;
-
-        if (!name) {
-            throw new ToolError({
-                messageId,
-                role: 'tool',
-                type: 'text',
-                content: 'Error: Tool name is empty',
-                tool_call_id: toolCall.id,
-            });
-        }
-
-        this.events.emit('tool-call', { messageId, toolName: name, args });
-
-        const startTime = Date.now();
-        try {
-            const result = await ToolRegistry.execute(name, args);
-            const duration = Date.now() - startTime;
-
-            this.events.emit('tool-result', { messageId, toolName: name, result, duration });
-            return {
-                messageId,
-                role: 'tool',
-                type: 'text',
-                content: this.formatToolResult(result),
-                tool_call_id: toolCall.id,
-            };
-        } catch (error) {
-            const duration = Date.now() - startTime;
-            const errorMsg = error instanceof Error ? error.message : String(error);
-
-            this.events.emit('tool-result', {
-                messageId,
-                toolName: name,
-                result: { success: false, error: errorMsg },
-                duration,
-            });
-
-            throw new ToolError({
-                messageId,
-                role: 'tool',
-                type: 'text',
-                content: `Error: Tool execution failed - ${errorMsg}`,
-                tool_call_id: toolCall.id,
-            });
-        }
-    }
-
-    /** 格式化工具结果 */
-    private formatToolResult(result: ToolResult): string {
-        if (result.success) {
-            if (result.data !== undefined) {
-                return typeof result.data === 'string' ? result.data : JSON.stringify(result.data, null, 2);
-            }
-            if (result.metadata) {
-                return JSON.stringify(result.metadata, null, 2);
-            }
-            return 'Tool executed successfully';
-        }
-        return `Error: ${result.error || 'Unknown error'}`;
-    }
-
-    clear() {
-       this.sessionManager.clearAll();
-    }
+      },
+
+      onToolCall: (data) => {
+        this.events.emit('tool-call', data);
+      },
+
+      onToolResult: (data) => {
+        this.events.emit('tool-result', data as { messageId: string; toolName: string; result: { success: boolean; data?: unknown; error?: string; }; duration: number; });
+      },
+
+      // Token 使用
+      onTokenUsage: (used, total) => {
+        this.events.emit('token-usage', { usedTokens: used, totalTokens: total });
+      },
+
+      // 完成
+      onComplete: (response) => {
+        this.events.emit('complete', { response });
+      },
+
+      // 错误
+      onError: (error, phase) => {
+        this.events.emit('error', { error, phase });
+      },
+    });
+  }
+
+  /**
+   * 获取 Token 使用情况
+   */
+  getUsedTokens(): { usedTokens: number; totalTokens: number } {
+    const stats = this.sessionManager.getStats(this.tools);
+    const sessionConfig = this.sessionManager['config'] as any;
+    return {
+      usedTokens: stats.totalTokens,
+      totalTokens: sessionConfig.maxTokens!,
+    };
+  }
+
+  /**
+   * 订阅事件
+   */
+  on<TEvent extends keyof AgentEvents>(
+    event: TEvent,
+    listener: (data: AgentEvents[TEvent]) => void
+  ): void {
+    this.events.on(event, listener);
+  }
+
+  /**
+   * 清空会话
+   */
+  clear(): void {
+    this.sessionManager.clearAll();
+  }
 }
 
+export default Agent;

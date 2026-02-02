@@ -34,7 +34,7 @@ export class MiniMaxAdapter extends StandardAdapter {
   }
 
   getHeaders(apiKey: string): Headers {
-
+    console.log('[MiniMaxAdapter] apiKey:', apiKey);
     // MiniMax uses custom auth format: Bearer {GroupId}.{ApiKey}
     const authorization =`Bearer ${apiKey}`;
 

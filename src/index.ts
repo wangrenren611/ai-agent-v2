@@ -6,7 +6,7 @@
 import { Agent } from './agent';
 import {operatorPrompt} from './prompts/operator';
 import { registerDefaultToolsAsync, ToolRegistry } from './tool';
-import { ProviderRegistry, ProviderType } from './providers/provider-registry';
+import { ProviderRegistry, type ModelId } from './providers/registry';
 import dotenv from 'dotenv';
 dotenv.config({
     path: './.env.development',
@@ -36,7 +36,7 @@ async function main() {
 
 
    const agent = new Agent({
-       llmProvider: ProviderRegistry.createFromEnv(ProviderType.GLM),
+       llmProvider: ProviderRegistry.createFromEnv('glm-4.7'),
        systemPrompt: operatorPrompt({
            directory: process.env.PROJECT_DIRECTORY || process.cwd(),
            vcs: process.env.VCS || 'git',

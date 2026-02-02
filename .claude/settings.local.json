@@ -71,7 +71,8 @@
       "Bash(pnpm dev:cli-v2-ink:*)",
       "mcp__context7__resolve-library-id",
       "Bash(wc:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(powershell:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

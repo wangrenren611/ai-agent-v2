@@ -13,7 +13,7 @@ import {
 import { BaseAPIAdapter } from '../adapters/base-adapter';
 import { HTTPClient } from '../utils/http-client';
 import { StreamParser } from '../utils/stream-parser';
-import { LLMError } from './errors';
+import { LLMError } from '../utils/errors';
 import { OpenAIAdapter } from '../adapters/openai-adapter';
 
 export interface OpenAICompatibleConfig extends BaseProviderConfig {

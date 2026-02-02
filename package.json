@@ -71,6 +71,7 @@
     "iconv-lite": "^0.7.2",
     "ink": "^5.2.1",
     "ink-markdown": "^1.0.4",
+    "ink-select-input": "^6.2.0",
     "ink-text-input": "^6.0.0",
     "isbinaryfile": "^6.0.0",
     "json5": "^2.2.3",

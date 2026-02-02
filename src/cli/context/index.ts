@@ -1,9 +1,21 @@
 /**
- * Context Index
+ * Keyboard Context
  *
- * 导出所有 context 和 hooks
+ * 统一导出键盘管理器的所有功能
  */
 
-export { AppContextProvider, useAppContext } from './app.js';
-export { ToastProvider, useToast } from '../components/toast/index.js';
-export * from './types.js';
+export {
+  KeyboardManager,
+  useKeyboard,
+  useGlobalKeyboard,
+  useGlobalShortcuts,
+  useKeyboardLogger,
+  isKeyMatch,
+  HandlerPriority,
+} from './keyboard';
+
+export type {
+  AppMode,
+  KeyboardEvent,
+  KeyboardHandler,
+} from './keyboard';

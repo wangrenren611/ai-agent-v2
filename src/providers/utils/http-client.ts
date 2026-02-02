@@ -13,7 +13,7 @@ import {
   LLMRetryableError,
   isRetryableError,
   createErrorFromStatus,
-} from '../providers/errors';
+} from './errors';
 
 export interface HttpClientOptions {
   /** Request timeout in milliseconds */

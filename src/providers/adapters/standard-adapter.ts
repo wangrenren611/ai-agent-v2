@@ -7,7 +7,6 @@
 
 import { BaseAPIAdapter, APIRequestBody, APIResponse } from './base-adapter';
 import { Message, LLMOptions } from '../providers/base';
-import { DEFAULT_TEMPERATURE } from '../../agent/types';
 
 export interface StandardTransformOptions extends LLMOptions {
   /** Model name (for request body) */
@@ -51,7 +50,7 @@ export class StandardAdapter extends BaseAPIAdapter {
           }>;
         }>,
       max_tokens: options?.maxTokens,
-      temperature: options?.temperature ?? DEFAULT_TEMPERATURE,
+      temperature: options?.temperature,
       stream: options?.stream ?? false,
     };
 
@@ -132,6 +131,7 @@ export class StandardAdapter extends BaseAPIAdapter {
    * Get standard HTTP headers
    */
   getHeaders(apiKey: string): Headers {
+    console.log('[StandardAdapter] apiKey:', apiKey);
     return new Headers({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,

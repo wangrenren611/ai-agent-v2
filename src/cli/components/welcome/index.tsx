@@ -8,16 +8,15 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import { COLORS, ICONS } from '../../utils/constants';
+import { useAppContext } from '../../context/app';
 
 interface WelcomeBannerProps {
   model?: string;
   currentPath?: string;
 }
 
-const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
-  model = 'gpt-4o',
-  currentPath = process.cwd(),
-}) => {
+const WelcomeBanner: React.FC<WelcomeBannerProps> = () => {
+  const { model,currentPath } = useAppContext();
   // Truncate path if too long
   const displayPath = currentPath.length > 60
     ? '...' + currentPath.slice(-57)
